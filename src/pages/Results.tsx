@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import Header from '../components/Header';
@@ -8,11 +9,37 @@ import ShareMenu from '../components/ShareMenu';
 const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasValidData, setHasValidData] = useState(false);
+  
   const { formData, calculationType } = location.state || {};
 
-  if (!formData) {
-    navigate('/');
-    return null;
+  useEffect(() => {
+    console.log('Results page data:', { formData, calculationType });
+    
+    if (!formData || !formData.patrimonio || !formData.estado) {
+      console.log('No valid data found, redirecting to home');
+      navigate('/', { replace: true });
+      return;
+    }
+    
+    setHasValidData(true);
+    setIsLoading(false);
+  }, [formData, navigate]);
+
+  if (isLoading || !hasValidData) {
+    return (
+      <div className="min-h-screen bg-animated">
+        <Header />
+        <main className="pt-24 pb-12 px-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center">
+              <div className="text-white">Carregando resultados...</div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
   }
 
   // Simular cálculos
