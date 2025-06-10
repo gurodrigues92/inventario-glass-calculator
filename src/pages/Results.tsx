@@ -5,6 +5,11 @@ import { ArrowLeft } from 'lucide-react';
 import Header from '../components/Header';
 import GlassCard from '../components/GlassCard';
 import ShareMenu from '../components/ShareMenu';
+import BreakdownCard from '../components/BreakdownCard';
+import ComparisonCard from '../components/ComparisonCard';
+import InsightCard from '../components/InsightCard';
+import { calcularCustosInventario, DadosCalculoInventario } from '../utils/itcmdCalculator';
+import { parseCurrencyValue, formatCurrency } from '../utils/formatters';
 
 const Results = () => {
   const location = useLocation();
@@ -42,52 +47,53 @@ const Results = () => {
     );
   }
 
-  // Simular cálculos
-  const patrimonio = parseFloat(formData.patrimonio.replace(/[R$.\s]/g, '').replace(',', '.')) || 0;
-  
-  const aliquotas: Record<string, number> = {
-    'SP': 0.04, 'RJ': 0.08, 'MG': 0.05, 'RS': 0.03,
-    'PR': 0.06, 'SC': 0.08, 'BA': 0.05, 'GO': 0.04,
-    'PE': 0.08, 'CE': 0.06
+  // Preparar dados para o cálculo
+  const dadosCalculo: DadosCalculoInventario = {
+    patrimonio: parseCurrencyValue(formData.patrimonio),
+    estado: formData.estado,
+    tipoProcesso: formData.tipoProcesso,
+    numeroHerdeiros: parseInt(formData.herdeiros) || 1,
+    temTestamento: formData.temTestamento || false,
+    temMenoresIncapazes: formData.temMenoresIncapazes || false,
+    temLitigio: formData.temLitigio || false,
+    valorImoveis: formData.valorImoveis ? parseCurrencyValue(formData.valorImoveis) : 0,
+    valorVeiculos: formData.valorVeiculos ? parseCurrencyValue(formData.valorVeiculos) : 0,
+    valorInvestimentos: formData.valorInvestimentos ? parseCurrencyValue(formData.valorInvestimentos) : 0,
+    valorOutrosBens: formData.valorOutrosBens ? parseCurrencyValue(formData.valorOutrosBens) : 0,
+    dividasEspolio: formData.dividasEspolio ? parseCurrencyValue(formData.dividasEspolio) : 0
   };
 
-  const aliquota = aliquotas[formData.estado] || 0.04;
-  const itcmd = patrimonio * aliquota;
-  const custas = formData.tipoProcesso === 'judicial' ? patrimonio * 0.02 : patrimonio * 0.01;
-  const honorarios = formData.tipoProcesso === 'judicial' ? patrimonio * 0.05 : patrimonio * 0.03;
-  const total = itcmd + custas + honorarios;
+  // Calcular custos usando a nova lógica
+  const resultado = calcularCustosInventario(dadosCalculo);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value);
-  };
-
-  const metrics = [
+  const breakdownCards = [
     {
+      icon: '🏛️',
       label: 'ITCMD a pagar',
-      value: formatCurrency(itcmd),
-      description: `Alíquota de ${(aliquota * 100).toFixed(1)}% em ${formData.estado}`,
-      color: 'from-purple-500 to-pink-500'
+      value: formatCurrency(resultado.detalhamento.itcmd.valor),
+      subtitle: resultado.detalhamento.itcmd.descricao,
+      color: 'purple' as const
     },
     {
-      label: 'Custas do processo',
-      value: formatCurrency(custas),
-      description: `Processo ${formData.tipoProcesso}`,
-      color: 'from-blue-500 to-cyan-500'
-    },
-    {
+      icon: '⚖️',
       label: 'Honorários advocatícios',
-      value: formatCurrency(honorarios),
-      description: 'Estimativa baseada no patrimônio',
-      color: 'from-green-500 to-emerald-500'
+      value: formatCurrency(resultado.detalhamento.honorarios.valor),
+      subtitle: `${resultado.detalhamento.honorarios.percentual?.toFixed(0)}% do patrimônio`,
+      color: 'green' as const
     },
     {
-      label: 'Custo total estimado',
-      value: formatCurrency(total),
-      description: 'Soma de todos os custos',
-      color: 'from-orange-500 to-red-500'
+      icon: '📋',
+      label: 'Custas do processo',
+      value: formatCurrency(resultado.detalhamento.custas.valor),
+      subtitle: resultado.detalhamento.custas.descricao,
+      color: 'blue' as const
+    },
+    {
+      icon: '🏢',
+      label: 'Cartório e Registro',
+      value: formatCurrency(resultado.detalhamento.cartorio.valor),
+      subtitle: resultado.detalhamento.cartorio.descricao,
+      color: 'orange' as const
     }
   ];
 
@@ -113,93 +119,147 @@ const Results = () => {
               <h1 className="heading-lg mb-4">Análise Completa dos Custos</h1>
               <div className="text-center">
                 <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  {formatCurrency(total)}
+                  {resultado.resumo.custoTotalFormatado}
                 </div>
-                <p className="text-glass mt-2">Custo total estimado do inventário</p>
+                <p className="text-glass mt-2">
+                  Custo total estimado ({resultado.resumo.percentualSobrePatrimonio}% do patrimônio)
+                </p>
+                <p className="text-sm text-glass mt-1">
+                  ⏱️ Tempo estimado: {resultado.resumo.tempoEstimado}
+                </p>
               </div>
             </div>
 
+            {/* Alertas e Validações */}
+            {resultado.alertas.length > 0 && (
+              <div className="mb-8">
+                {resultado.alertas.map((alerta, index) => (
+                  <div key={index} className={`p-4 rounded-lg mb-4 ${
+                    alerta.tipo === 'warning' ? 'bg-yellow-500/10 border border-yellow-500/30' :
+                    alerta.tipo === 'success' ? 'bg-green-500/10 border border-green-500/30' :
+                    'bg-blue-500/10 border border-blue-500/30'
+                  }`}>
+                    <p className="text-white text-sm">{alerta.mensagem}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* Metrics Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-              {metrics.map((metric, index) => (
-                <GlassCard key={index} className={`fade-in-up stagger-${index + 1} text-center`}>
-                  <div className={`text-2xl font-bold bg-gradient-to-r ${metric.color} bg-clip-text text-transparent mb-2`}>
-                    {metric.value}
-                  </div>
-                  <h3 className="font-semibold text-white mb-1">{metric.label}</h3>
-                  <p className="text-xs text-glass">{metric.description}</p>
-                </GlassCard>
+              {breakdownCards.map((card, index) => (
+                <BreakdownCard
+                  key={index}
+                  icon={card.icon}
+                  label={card.label}
+                  value={card.value}
+                  subtitle={card.subtitle}
+                  color={card.color}
+                />
               ))}
             </div>
 
-            {/* Breakdown Chart Placeholder */}
+            {/* ITBI Card se houver imóveis */}
+            {resultado.detalhamento.itbi.valor > 0 && (
+              <div className="mb-8">
+                <GlassCard>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-orange-400 mb-2">
+                      {formatCurrency(resultado.detalhamento.itbi.valor)}
+                    </div>
+                    <h3 className="font-semibold text-white mb-1">ITBI sobre Imóveis</h3>
+                    <p className="text-xs text-glass">{resultado.detalhamento.itbi.descricao}</p>
+                  </div>
+                </GlassCard>
+              </div>
+            )}
+
+            {/* Breakdown Chart */}
             <div className="grid lg:grid-cols-2 gap-8 mb-12">
               <GlassCard className="fade-in-up stagger-2">
                 <h3 className="heading-md mb-6">Composição dos Custos</h3>
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-glass">ITCMD</span>
-                    <span className="text-white font-semibold">{((itcmd / total) * 100).toFixed(1)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-700 rounded-full h-2">
-                    <div 
-                      className="bg-purple-500 h-2 rounded-full" 
-                      style={{ width: `${(itcmd / total) * 100}%` }}
-                    ></div>
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <span className="text-glass">Custas</span>
-                    <span className="text-white font-semibold">{((custas / total) * 100).toFixed(1)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-700 rounded-full h-2">
-                    <div 
-                      className="bg-blue-500 h-2 rounded-full" 
-                      style={{ width: `${(custas / total) * 100}%` }}
-                    ></div>
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <span className="text-glass">Honorários</span>
-                    <span className="text-white font-semibold">{((honorarios / total) * 100).toFixed(1)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-700 rounded-full h-2">
-                    <div 
-                      className="bg-green-500 h-2 rounded-full" 
-                      style={{ width: `${(honorarios / total) * 100}%` }}
-                    ></div>
-                  </div>
+                  {[
+                    { label: 'ITCMD', valor: resultado.detalhamento.itcmd.valor, color: 'purple-500' },
+                    { label: 'Honorários', valor: resultado.detalhamento.honorarios.valor, color: 'green-500' },
+                    { label: 'Custas', valor: resultado.detalhamento.custas.valor, color: 'blue-500' },
+                    { label: 'Cartório', valor: resultado.detalhamento.cartorio.valor, color: 'orange-500' }
+                  ].map((item, index) => (
+                    <div key={index}>
+                      <div className="flex justify-between items-center">
+                        <span className="text-glass">{item.label}</span>
+                        <span className="text-white font-semibold">
+                          {((item.valor / resultado.resumo.custoTotal) * 100).toFixed(1)}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-700 rounded-full h-2">
+                        <div 
+                          className={`bg-${item.color} h-2 rounded-full`} 
+                          style={{ width: `${(item.valor / resultado.resumo.custoTotal) * 100}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </GlassCard>
 
+              {/* Comparação de Processos */}
               <GlassCard className="fade-in-up stagger-3">
                 <h3 className="heading-md mb-6">Comparação de Processos</h3>
                 <div className="space-y-4">
-                  <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                    <h4 className="font-semibold text-green-400 mb-2">Extrajudicial</h4>
-                    <div className="text-2xl font-bold text-white mb-1">
-                      {formatCurrency(itcmd + (patrimonio * 0.01) + (patrimonio * 0.03))}
-                    </div>
-                    <p className="text-sm text-glass">Mais rápido e econômico</p>
-                  </div>
+                  <ComparisonCard
+                    tipo="Extrajudicial"
+                    custo={resultado.comparacao.extrajudicial.custo}
+                    tempo={resultado.comparacao.extrajudicial.tempo}
+                    destaque={dadosCalculo.tipoProcesso === 'extrajudicial'}
+                    economia={dadosCalculo.tipoProcesso === 'judicial' ? 
+                      resultado.comparacao.judicial.custo - resultado.comparacao.extrajudicial.custo : 0}
+                  />
                   
-                  <div className="p-4 rounded-lg bg-orange-500/10 border border-orange-500/20">
-                    <h4 className="font-semibold text-orange-400 mb-2">Judicial</h4>
-                    <div className="text-2xl font-bold text-white mb-1">
-                      {formatCurrency(itcmd + (patrimonio * 0.02) + (patrimonio * 0.05))}
-                    </div>
-                    <p className="text-sm text-glass">Processo tradicional</p>
-                  </div>
+                  <ComparisonCard
+                    tipo="Judicial"
+                    custo={resultado.comparacao.judicial.custo}
+                    tempo={resultado.comparacao.judicial.tempo}
+                    destaque={dadosCalculo.tipoProcesso === 'judicial'}
+                  />
+                  
+                  {resultado.resumo.economiaHolding > 50000 && (
+                    <ComparisonCard
+                      tipo="Holding Familiar"
+                      custo={resultado.comparacao.holding.custo}
+                      tempo={resultado.comparacao.holding.tempo}
+                      economia={resultado.resumo.economiaHolding}
+                      especial={true}
+                    />
+                  )}
                 </div>
               </GlassCard>
             </div>
+
+            {/* Insights Personalizados */}
+            {resultado.insights.length > 0 && (
+              <div className="mb-12">
+                <h3 className="heading-md mb-6 text-center">💡 Insights e Recomendações</h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {resultado.insights.map((insight, index) => (
+                    <InsightCard
+                      key={index}
+                      tipo={insight.tipo}
+                      titulo={insight.titulo}
+                      descricao={insight.descricao}
+                      valor={insight.valor}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Disclaimer */}
             <GlassCard className="mb-12 fade-in-up stagger-4">
               <div className="text-center">
                 <h3 className="font-semibold text-yellow-400 mb-2">⚠️ Importante</h3>
                 <p className="text-sm text-glass">
-                  Este cálculo é uma estimativa baseada em valores médios e legislação atual. 
+                  Este cálculo é uma estimativa baseada em valores médios e legislação atual de 2025. 
                   Os valores reais podem variar conforme particularidades do caso. 
                   Recomendamos consultar um advogado especialista para orientação personalizada.
                 </p>
@@ -211,8 +271,8 @@ const Results = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <ShareMenu 
               data={{
-                total,
-                patrimonio,
+                total: resultado.resumo.custoTotal,
+                patrimonio: dadosCalculo.patrimonio,
                 estado: formData.estado,
                 tipoProcesso: formData.tipoProcesso
               }}

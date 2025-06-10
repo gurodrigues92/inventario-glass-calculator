@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import Header from '../components/Header';
 import GlassCard from '../components/GlassCard';
+import { ESTADOS_DATA, getAliquotaDisplay } from '../data/estadosData';
+import { formatCurrencyInput } from '../utils/formatters';
 
 const BasicCalculator = () => {
   const navigate = useNavigate();
@@ -11,46 +13,30 @@ const BasicCalculator = () => {
     patrimonio: '',
     estado: 'SP',
     tipoProcesso: 'extrajudicial',
-    herdeiros: '1'
+    herdeiros: '1',
+    temTestamento: false,
+    temMenoresIncapazes: false,
+    temLitigio: false
   });
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const formatCurrency = (value: string) => {
-    const numValue = value.replace(/\D/g, '');
-    if (!numValue) return '';
-    const formatted = new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(Number(numValue) / 100);
-    return formatted;
-  };
-
   const handlePatrimonioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatCurrency(e.target.value);
+    const formatted = formatCurrencyInput(e.target.value);
     handleInputChange('patrimonio', formatted);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Navegar para resultados com os dados
     navigate('/resultados', { state: { formData, calculationType: 'basic' } });
   };
 
-  const estados = [
-    { value: 'SP', label: 'São Paulo' },
-    { value: 'RJ', label: 'Rio de Janeiro' },
-    { value: 'MG', label: 'Minas Gerais' },
-    { value: 'RS', label: 'Rio Grande do Sul' },
-    { value: 'PR', label: 'Paraná' },
-    { value: 'SC', label: 'Santa Catarina' },
-    { value: 'BA', label: 'Bahia' },
-    { value: 'GO', label: 'Goiás' },
-    { value: 'PE', label: 'Pernambuco' },
-    { value: 'CE', label: 'Ceará' }
-  ];
+  const estadosOptions = Object.values(ESTADOS_DATA).map(estado => ({
+    value: estado.uf,
+    label: `${estado.nome} - ${getAliquotaDisplay(estado.uf)}`
+  }));
 
   return (
     <div className="min-h-screen bg-animated">
@@ -72,7 +58,7 @@ const BasicCalculator = () => {
             <div className="badge-fast inline-block mb-4">Cálculo Rápido</div>
             <h1 className="heading-lg mb-4">Cálculo Básico de ITCMD</h1>
             <p className="text-glass">
-              Preencha os 4 campos abaixo para uma estimativa rápida dos custos
+              Preencha os campos abaixo para uma estimativa rápida dos custos
             </p>
           </div>
 
@@ -108,12 +94,15 @@ const BasicCalculator = () => {
                   className="glass-input w-full"
                   required
                 >
-                  {estados.map(estado => (
+                  {estadosOptions.map(estado => (
                     <option key={estado.value} value={estado.value} className="bg-gray-900">
                       {estado.label}
                     </option>
                   ))}
                 </select>
+                <p className="text-xs text-glass mt-1">
+                  Alíquotas atualizadas para 2025 - algumas são progressivas
+                </p>
               </div>
 
               {/* Tipo de Processo */}
@@ -132,7 +121,8 @@ const BasicCalculator = () => {
                     }`}
                   >
                     <div className="font-medium text-white">Extrajudicial</div>
-                    <div className="text-sm text-glass">Mais rápido e econômico</div>
+                    <div className="text-sm text-glass">60-120 dias</div>
+                    <div className="text-xs text-green-400">Mais econômico</div>
                   </button>
                   <button
                     type="button"
@@ -144,25 +134,47 @@ const BasicCalculator = () => {
                     }`}
                   >
                     <div className="font-medium text-white">Judicial</div>
-                    <div className="text-sm text-glass">Processo tradicional</div>
+                    <div className="text-sm text-glass">3-8 anos</div>
+                    <div className="text-xs text-orange-400">Processo tradicional</div>
                   </button>
                 </div>
               </div>
 
-              {/* Número de Herdeiros */}
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">
-                  Número de herdeiros *
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="20"
-                  value={formData.herdeiros}
-                  onChange={(e) => handleInputChange('herdeiros', e.target.value)}
-                  className="glass-input w-full"
-                  required
-                />
+              {/* Informações Adicionais */}
+              <div className="space-y-4">
+                <h3 className="text-white font-medium">Informações Adicionais</h3>
+                
+                <div className="grid grid-cols-1 gap-3">
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.temTestamento}
+                      onChange={(e) => handleInputChange('temTestamento', e.target.checked)}
+                      className="rounded border-glass-border"
+                    />
+                    <span className="text-sm text-white">Existe testamento válido</span>
+                  </label>
+                  
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.temMenoresIncapazes}
+                      onChange={(e) => handleInputChange('temMenoresIncapazes', e.target.checked)}
+                      className="rounded border-glass-border"
+                    />
+                    <span className="text-sm text-white">Há herdeiros menores ou incapazes</span>
+                  </label>
+                  
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.temLitigio}
+                      onChange={(e) => handleInputChange('temLitigio', e.target.checked)}
+                      className="rounded border-glass-border"
+                    />
+                    <span className="text-sm text-white">Possibilidade de litígio entre herdeiros</span>
+                  </label>
+                </div>
               </div>
 
               {/* Submit Button */}
