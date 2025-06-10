@@ -18,6 +18,7 @@ const Results = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [hasValidData, setHasValidData] = useState(false);
+  const [resultadoRefinado, setResultadoRefinado] = useState<any>(null);
   
   const { formData, calculationType } = location.state || {};
 
@@ -67,6 +68,12 @@ const Results = () => {
 
   // Calcular custos usando a nova lógica
   const resultado = calcularCustosInventario(dadosCalculo);
+
+  const handleRefinar = (dadosRefinados: any) => {
+    const { aplicarRefinamentos } = require('../utils/itcmdCalculator');
+    const refinado = aplicarRefinamentos(resultado, dadosRefinados);
+    setResultadoRefinado(refinado);
+  };
 
   return (
     <div className="min-h-screen bg-animated">
@@ -124,14 +131,35 @@ const Results = () => {
 
             <ResultsInsights insights={resultado.insights} />
 
+            <ResultsDisclaimer />
+
+            {/* Componente de Refinamento */}
+            <RefinamentoCalculo
+              resultadoInicial={{
+                custoTotal: resultado.resumo.custoTotal,
+                patrimonio: dadosCalculo.patrimonio,
+                estado: formData.estado
+              }}
+              onRefinar={handleRefinar}
+            />
+
+            {/* Mostrar Resultado Refinado se existir */}
+            {resultadoRefinado && (
+              <ResultadoRefinado
+                calculoOriginal={{
+                  total: resultado.resumo.custoTotal,
+                  patrimonio: dadosCalculo.patrimonio
+                }}
+                calculoRefinado={resultadoRefinado}
+              />
+            )}
+
             <ConsultationInsight
               patrimonio={dadosCalculo.patrimonio}
               temLitigio={dadosCalculo.temLitigio}
               temMenoresIncapazes={dadosCalculo.temMenoresIncapazes}
               custoTotal={resultado.resumo.custoTotal}
             />
-
-            <ResultsDisclaimer />
           </div>
 
           <ResultsActions 
