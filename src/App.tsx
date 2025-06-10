@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import BasicCalculator from "./pages/BasicCalculator";
 import AdvancedCalculator from "./pages/AdvancedCalculator";
 import Results from "./pages/Results";
+import CalculosSalvos from "./pages/CalculosSalvos";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/calculadora-basica" element={<BasicCalculator />} />
           <Route path="/calculadora-avancada" element={<AdvancedCalculator />} />
           <Route path="/resultados" element={<Results />} />
+          <Route path="/calculos-salvos" element={<CalculosSalvos />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -1,7 +1,7 @@
-
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Save } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import Header from '../components/Header';
 import ResultsHeader from '../components/ResultsHeader';
 import ResultsBreakdown from '../components/ResultsBreakdown';
@@ -13,8 +13,10 @@ import ResultsDisclaimer from '../components/ResultsDisclaimer';
 import ResultsActions from '../components/ResultsActions';
 import RefinamentoCalculo from '../components/RefinamentoCalculo';
 import ResultadoRefinado from '../components/ResultadoRefinado';
+import SalvarCalculoModal from '../components/SalvarCalculoModal';
 import { calcularCustosInventario, DadosCalculoInventario } from '../utils/itcmdCalculator';
 import { parseCurrencyValue } from '../utils/formatters';
+import { useCalculoStorage } from '../hooks/useCalculoStorage';
 
 const Results = () => {
   const location = useLocation();
@@ -22,8 +24,11 @@ const Results = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasValidData, setHasValidData] = useState(false);
   const [resultadoRefinado, setResultadoRefinado] = useState<any>(null);
+  const [showSalvarModal, setShowSalvarModal] = useState(false);
+  const [calculoSalvoId, setCalculoSalvoId] = useState<string | null>(null);
   
   const { formData, calculationType } = location.state || {};
+  const { salvarCalculo, salvarRefinamento, isLoading: isSaving } = useCalculoStorage();
 
   useEffect(() => {
     console.log('Results page data:', { formData, calculationType });
@@ -72,10 +77,60 @@ const Results = () => {
   // Calcular custos usando a nova lógica
   const resultado = calcularCustosInventario(dadosCalculo);
 
-  const handleRefinar = (dadosRefinados: any) => {
+  const handleSalvarCalculo = async (dadosUsuario: { nome: string; email?: string; telefone?: string }) => {
+    try {
+      const dadosCalculo = {
+        patrimonio: parseCurrencyValue(formData.patrimonio),
+        estado: formData.estado,
+        tipoProcesso: formData.tipoProcesso,
+        numeroHerdeiros: parseInt(formData.herdeiros) || 1,
+        temTestamento: formData.temTestamento || false,
+        temMenoresIncapazes: formData.temMenoresIncapazes || false,
+        temLitigio: formData.temLitigio || false,
+        valorImoveis: formData.valorImoveis ? parseCurrencyValue(formData.valorImoveis) : 0,
+        valorVeiculos: formData.valorVeiculos ? parseCurrencyValue(formData.valorVeiculos) : 0,
+        valorInvestimentos: formData.valorInvestimentos ? parseCurrencyValue(formData.valorInvestimentos) : 0,
+        valorOutrosBens: formData.valorOutrosBens ? parseCurrencyValue(formData.valorOutrosBens) : 0,
+        dividasEspolio: formData.dividasEspolio ? parseCurrencyValue(formData.dividasEspolio) : 0,
+        custoTotal: resultado.resumo.custoTotal,
+        custoItcmd: resultado.detalhamento.itcmd.valor,
+        custoHonorarios: resultado.detalhamento.honorarios.valor,
+        custoCustas: resultado.detalhamento.custas.valor,
+        tempoEstimado: resultado.resumo.tempoEstimado,
+        percentualSobrePatrimonio: resultado.resumo.percentualSobrePatrimonio,
+        insights: resultado.insights,
+        alertas: resultado.alertas,
+        detalhamento: resultado.detalhamento,
+        comparacao: resultado.comparacao
+      };
+
+      const calculoId = await salvarCalculo(dadosUsuario, dadosCalculo, calculationType || 'basica');
+      setCalculoSalvoId(calculoId);
+    } catch (error) {
+      console.error('Erro ao salvar cálculo:', error);
+    }
+  };
+
+  const handleRefinar = async (dadosRefinados: any) => {
     const { aplicarRefinamentos } = require('../utils/itcmdCalculator');
     const refinado = aplicarRefinamentos(resultado, dadosRefinados);
     setResultadoRefinado(refinado);
+
+    // Se o cálculo já foi salvo, salvar também o refinamento
+    if (calculoSalvoId) {
+      try {
+        await salvarRefinamento(calculoSalvoId, {
+          totalRefinado: refinado.resumo.custoTotal,
+          patrimonioLiquido: refinado.patrimonioLiquido,
+          ajustes: refinado.ajustes,
+          isencoes: refinado.isencoes,
+          comparativo: refinado.comparativo,
+          temLitigioRefinado: refinado.temLitigio
+        });
+      } catch (error) {
+        console.error('Erro ao salvar refinamento:', error);
+      }
+    }
   };
 
   return (
@@ -84,14 +139,25 @@ const Results = () => {
       
       <main className="pt-24 pb-12 px-6">
         <div className="max-w-6xl mx-auto">
-          {/* Back Button */}
-          <button 
-            onClick={() => navigate(-1)}
-            className="flex items-center space-x-2 text-glass hover:text-white transition-colors mb-8"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Voltar</span>
-          </button>
+          {/* Back Button and Save Button */}
+          <div className="flex justify-between items-center mb-8">
+            <button 
+              onClick={() => navigate(-1)}
+              className="flex items-center space-x-2 text-glass hover:text-white transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Voltar</span>
+            </button>
+
+            <Button
+              onClick={() => setShowSalvarModal(true)}
+              disabled={isSaving}
+              className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white px-6 py-2"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {calculoSalvoId ? 'Cálculo Salvo' : 'Salvar Cálculo'}
+            </Button>
+          </div>
 
           <div id="results-content">
             <ResultsHeader
@@ -175,6 +241,13 @@ const Results = () => {
           />
         </div>
       </main>
+
+      <SalvarCalculoModal
+        isOpen={showSalvarModal}
+        onClose={() => setShowSalvarModal(false)}
+        onSalvar={handleSalvarCalculo}
+        isLoading={isSaving}
+      />
     </div>
   );
 };
