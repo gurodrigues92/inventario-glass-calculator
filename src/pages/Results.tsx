@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -8,6 +7,7 @@ import ResultsBreakdown from '../components/ResultsBreakdown';
 import ResultsCharts from '../components/ResultsCharts';
 import ResultsComparison from '../components/ResultsComparison';
 import ResultsInsights from '../components/ResultsInsights';
+import ConsultationInsight from '../components/ConsultationInsight';
 import ResultsDisclaimer from '../components/ResultsDisclaimer';
 import ResultsActions from '../components/ResultsActions';
 import { calcularCustosInventario, DadosCalculoInventario } from '../utils/itcmdCalculator';
@@ -123,6 +123,13 @@ const Results = () => {
             </div>
 
             <ResultsInsights insights={resultado.insights} />
+
+            <ConsultationInsight
+              patrimonio={dadosCalculo.patrimonio}
+              temLitigio={dadosCalculo.temLitigio}
+              temMenoresIncapazes={dadosCalculo.temMenoresIncapazes}
+              custoTotal={resultado.resumo.custoTotal}
+            />
 
             <ResultsDisclaimer />
           </div>
