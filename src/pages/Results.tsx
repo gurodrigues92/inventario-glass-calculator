@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -10,6 +11,8 @@ import ResultsInsights from '../components/ResultsInsights';
 import ConsultationInsight from '../components/ConsultationInsight';
 import ResultsDisclaimer from '../components/ResultsDisclaimer';
 import ResultsActions from '../components/ResultsActions';
+import RefinamentoCalculo from '../components/RefinamentoCalculo';
+import ResultadoRefinado from '../components/ResultadoRefinado';
 import { calcularCustosInventario, DadosCalculoInventario } from '../utils/itcmdCalculator';
 import { parseCurrencyValue } from '../utils/formatters';
 
