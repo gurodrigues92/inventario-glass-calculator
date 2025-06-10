@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Share } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import Header from '../components/Header';
 import GlassCard from '../components/GlassCard';
+import ShareMenu from '../components/ShareMenu';
 
 const Results = () => {
   const location = useLocation();
@@ -79,104 +79,117 @@ const Results = () => {
             <span>Voltar</span>
           </button>
 
-          {/* Header */}
-          <div className="text-center mb-12 fade-in-up">
-            <div className="badge-top inline-block mb-4">Resultado do Cálculo</div>
-            <h1 className="heading-lg mb-4">Análise Completa dos Custos</h1>
-            <div className="text-center">
-              <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                {formatCurrency(total)}
+          <div id="results-content">
+            {/* Header */}
+            <div className="text-center mb-12 fade-in-up">
+              <div className="badge-top inline-block mb-4">Resultado do Cálculo</div>
+              <h1 className="heading-lg mb-4">Análise Completa dos Custos</h1>
+              <div className="text-center">
+                <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  {formatCurrency(total)}
+                </div>
+                <p className="text-glass mt-2">Custo total estimado do inventário</p>
               </div>
-              <p className="text-glass mt-2">Custo total estimado do inventário</p>
             </div>
-          </div>
 
-          {/* Metrics Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {metrics.map((metric, index) => (
-              <GlassCard key={index} className={`fade-in-up stagger-${index + 1} text-center`}>
-                <div className={`text-2xl font-bold bg-gradient-to-r ${metric.color} bg-clip-text text-transparent mb-2`}>
-                  {metric.value}
+            {/* Metrics Grid */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              {metrics.map((metric, index) => (
+                <GlassCard key={index} className={`fade-in-up stagger-${index + 1} text-center`}>
+                  <div className={`text-2xl font-bold bg-gradient-to-r ${metric.color} bg-clip-text text-transparent mb-2`}>
+                    {metric.value}
+                  </div>
+                  <h3 className="font-semibold text-white mb-1">{metric.label}</h3>
+                  <p className="text-xs text-glass">{metric.description}</p>
+                </GlassCard>
+              ))}
+            </div>
+
+            {/* Breakdown Chart Placeholder */}
+            <div className="grid lg:grid-cols-2 gap-8 mb-12">
+              <GlassCard className="fade-in-up stagger-2">
+                <h3 className="heading-md mb-6">Composição dos Custos</h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-glass">ITCMD</span>
+                    <span className="text-white font-semibold">{((itcmd / total) * 100).toFixed(1)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-700 rounded-full h-2">
+                    <div 
+                      className="bg-purple-500 h-2 rounded-full" 
+                      style={{ width: `${(itcmd / total) * 100}%` }}
+                    ></div>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-glass">Custas</span>
+                    <span className="text-white font-semibold">{((custas / total) * 100).toFixed(1)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-700 rounded-full h-2">
+                    <div 
+                      className="bg-blue-500 h-2 rounded-full" 
+                      style={{ width: `${(custas / total) * 100}%` }}
+                    ></div>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-glass">Honorários</span>
+                    <span className="text-white font-semibold">{((honorarios / total) * 100).toFixed(1)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-700 rounded-full h-2">
+                    <div 
+                      className="bg-green-500 h-2 rounded-full" 
+                      style={{ width: `${(honorarios / total) * 100}%` }}
+                    ></div>
+                  </div>
                 </div>
-                <h3 className="font-semibold text-white mb-1">{metric.label}</h3>
-                <p className="text-xs text-glass">{metric.description}</p>
               </GlassCard>
-            ))}
-          </div>
 
-          {/* Breakdown Chart Placeholder */}
-          <div className="grid lg:grid-cols-2 gap-8 mb-12">
-            <GlassCard className="fade-in-up stagger-2">
-              <h3 className="heading-md mb-6">Composição dos Custos</h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-glass">ITCMD</span>
-                  <span className="text-white font-semibold">{((itcmd / total) * 100).toFixed(1)}%</span>
+              <GlassCard className="fade-in-up stagger-3">
+                <h3 className="heading-md mb-6">Comparação de Processos</h3>
+                <div className="space-y-4">
+                  <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+                    <h4 className="font-semibold text-green-400 mb-2">Extrajudicial</h4>
+                    <div className="text-2xl font-bold text-white mb-1">
+                      {formatCurrency(itcmd + (patrimonio * 0.01) + (patrimonio * 0.03))}
+                    </div>
+                    <p className="text-sm text-glass">Mais rápido e econômico</p>
+                  </div>
+                  
+                  <div className="p-4 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                    <h4 className="font-semibold text-orange-400 mb-2">Judicial</h4>
+                    <div className="text-2xl font-bold text-white mb-1">
+                      {formatCurrency(itcmd + (patrimonio * 0.02) + (patrimonio * 0.05))}
+                    </div>
+                    <p className="text-sm text-glass">Processo tradicional</p>
+                  </div>
                 </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
-                  <div 
-                    className="bg-purple-500 h-2 rounded-full" 
-                    style={{ width: `${(itcmd / total) * 100}%` }}
-                  ></div>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <span className="text-glass">Custas</span>
-                  <span className="text-white font-semibold">{((custas / total) * 100).toFixed(1)}%</span>
-                </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
-                  <div 
-                    className="bg-blue-500 h-2 rounded-full" 
-                    style={{ width: `${(custas / total) * 100}%` }}
-                  ></div>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <span className="text-glass">Honorários</span>
-                  <span className="text-white font-semibold">{((honorarios / total) * 100).toFixed(1)}%</span>
-                </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
-                  <div 
-                    className="bg-green-500 h-2 rounded-full" 
-                    style={{ width: `${(honorarios / total) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-            </GlassCard>
+              </GlassCard>
+            </div>
 
-            <GlassCard className="fade-in-up stagger-3">
-              <h3 className="heading-md mb-6">Comparação de Processos</h3>
-              <div className="space-y-4">
-                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <h4 className="font-semibold text-green-400 mb-2">Extrajudicial</h4>
-                  <div className="text-2xl font-bold text-white mb-1">
-                    {formatCurrency(itcmd + (patrimonio * 0.01) + (patrimonio * 0.03))}
-                  </div>
-                  <p className="text-sm text-glass">Mais rápido e econômico</p>
-                </div>
-                
-                <div className="p-4 rounded-lg bg-orange-500/10 border border-orange-500/20">
-                  <h4 className="font-semibold text-orange-400 mb-2">Judicial</h4>
-                  <div className="text-2xl font-bold text-white mb-1">
-                    {formatCurrency(itcmd + (patrimonio * 0.02) + (patrimonio * 0.05))}
-                  </div>
-                  <p className="text-sm text-glass">Processo tradicional</p>
-                </div>
+            {/* Disclaimer */}
+            <GlassCard className="mb-12 fade-in-up stagger-4">
+              <div className="text-center">
+                <h3 className="font-semibold text-yellow-400 mb-2">⚠️ Importante</h3>
+                <p className="text-sm text-glass">
+                  Este cálculo é uma estimativa baseada em valores médios e legislação atual. 
+                  Os valores reais podem variar conforme particularidades do caso. 
+                  Recomendamos consultar um advogado especialista para orientação personalizada.
+                </p>
               </div>
             </GlassCard>
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="glass-button px-8 py-3 flex items-center space-x-2">
-              <Download className="w-4 h-4" />
-              <span>Baixar Relatório PDF</span>
-            </button>
-            
-            <button className="glass-button px-8 py-3 flex items-center space-x-2">
-              <Share className="w-4 h-4" />
-              <span>Compartilhar Resultado</span>
-            </button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <ShareMenu 
+              data={{
+                total,
+                patrimonio,
+                estado: formData.estado,
+                tipoProcesso: formData.tipoProcesso
+              }}
+            />
             
             <button 
               onClick={() => navigate('/')}
@@ -185,18 +198,6 @@ const Results = () => {
               Nova Consulta
             </button>
           </div>
-
-          {/* Disclaimer */}
-          <GlassCard className="mt-12 fade-in-up stagger-4">
-            <div className="text-center">
-              <h3 className="font-semibold text-yellow-400 mb-2">⚠️ Importante</h3>
-              <p className="text-sm text-glass">
-                Este cálculo é uma estimativa baseada em valores médios e legislação atual. 
-                Os valores reais podem variar conforme particularidades do caso. 
-                Recomendamos consultar um advogado especialista para orientação personalizada.
-              </p>
-            </div>
-          </GlassCard>
         </div>
       </main>
     </div>
