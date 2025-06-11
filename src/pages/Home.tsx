@@ -32,12 +32,10 @@ const Home = () => {
           {/* Hero Section */}
           <div className="text-center mb-16 fade-in-up">
             <h1 className="heading-xl mb-6">
-              Calcule seu ITCMD
-              <br />
-              de forma inteligente
+              Economize no Imposto de Herança
             </h1>
             <p className="text-xl text-glass max-w-2xl mx-auto leading-relaxed">
-              Estime todos os custos do seu inventário com precisão.
+              Calcule os custos e descubra como pagar menos.
               Escolha entre cálculo rápido ou análise completa.
             </p>
           </div>
