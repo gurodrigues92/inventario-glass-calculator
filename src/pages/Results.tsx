@@ -79,6 +79,11 @@ const Results = () => {
 
   const handleSalvarCalculo = async (dadosUsuario: { nome: string; email?: string; telefone?: string }) => {
     try {
+      // Converter percentual de string para number
+      const percentualNumerico = typeof resultado.resumo.percentualSobrePatrimonio === 'string' 
+        ? parseFloat(resultado.resumo.percentualSobrePatrimonio.replace('%', ''))
+        : resultado.resumo.percentualSobrePatrimonio;
+
       const dadosCalculo = {
         patrimonio: parseCurrencyValue(formData.patrimonio),
         estado: formData.estado,
@@ -97,7 +102,7 @@ const Results = () => {
         custoHonorarios: resultado.detalhamento.honorarios.valor,
         custoCustas: resultado.detalhamento.custas.valor,
         tempoEstimado: resultado.resumo.tempoEstimado,
-        percentualSobrePatrimonio: resultado.resumo.percentualSobrePatrimonio,
+        percentualSobrePatrimonio: percentualNumerico,
         insights: resultado.insights,
         alertas: resultado.alertas,
         detalhamento: resultado.detalhamento,
