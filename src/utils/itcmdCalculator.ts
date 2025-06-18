@@ -1,308 +1,20 @@
 
-import { ESTADOS_DATA } from '../data/estadosData';
 import { formatCurrency } from './formatters';
 import { gerarAlertas, verificarExtrajudicial } from './validators';
-
-export interface DadosCalculoInventario {
-  patrimonio: number;
-  estado: string;
-  tipoProcesso: 'judicial' | 'extrajudicial';
-  numeroHerdeiros?: number;
-  temTestamento?: boolean;
-  temMenoresIncapazes?: boolean;
-  temLitigio?: boolean;
-  valorImoveis?: number;
-  valorVeiculos?: number;
-  valorInvestimentos?: number;
-  valorOutrosBens?: number;
-  dividasEspolio?: number;
-  // Novos campos para versão avançada
-  valorImoveisIR?: number;
-  valorImoveisMercado?: number;
-  valorBensIR?: number;
-  valorBensMercado?: number;
-}
-
-export interface DetalhamentoCusto {
-  valor: number;
-  valorMinimo?: number;
-  valorMaximo?: number;
-  percentual?: number;
-  descricao: string;
-  isRange?: boolean;
-  informativo?: string;
-  tooltip?: string;
-}
-
-export interface ComparacaoProcesso {
-  custo: number;
-  tempo: string;
-  economia?: number;
-}
-
-export interface InsightPersonalizado {
-  tipo: 'economia' | 'estrategia' | 'informacao';
-  titulo: string;
-  descricao: string;
-  valor?: number;
-}
-
-// Dados de isenções ITBI por estado aprimorados
-const ISENCOES_ITBI = {
-  'SP': { limite: 200000, percentual: 100, descricao: 'Imóvel único até R$ 200.000' },
-  'RJ': { limite: 150000, percentual: 100, descricao: 'Primeiro imóvel até R$ 150.000' },
-  'MG': { limite: 100000, percentual: 50, descricao: '50% de redução até R$ 100.000' },
-  'RS': { limite: 250000, percentual: 100, descricao: 'Imóvel residencial único até R$ 250.000' },
-  'PR': { limite: 180000, percentual: 100, descricao: 'Imóvel único até R$ 180.000' },
-  'SC': { limite: 120000, percentual: 100, descricao: 'Imóvel residencial até R$ 120.000' }
-};
-
-export interface ResultadoCalculo {
-  patrimonio: number;
-  estado: string;
-  tipoProcesso: string;
-  detalhamento: {
-    itcmd: DetalhamentoCusto;
-    honorarios: DetalhamentoCusto;
-    custas: DetalhamentoCusto;
-    cartorio: DetalhamentoCusto;
-    itbi: DetalhamentoCusto;
-  };
-  resumo: {
-    custoTotal: number;
-    custoTotalFormatado: string;
-    tempoEstimado: string;
-    economiaHolding: number;
-    percentualSobrePatrimonio: string;
-  };
-  comparacao: {
-    judicial: ComparacaoProcesso;
-    extrajudicial: ComparacaoProcesso;
-    holding: ComparacaoProcesso;
-  };
-  insights: InsightPersonalizado[];
-  alertas: ReturnType<typeof gerarAlertas>;
-  validacao: ReturnType<typeof verificarExtrajudicial>;
-}
-
-interface DadosRefinamento {
-  valorVenalImoveis?: string;
-  valorMercadoImoveis?: string;
-  valorFipeVeiculos?: string;
-  temTestamento?: boolean;
-  temMenoresIncapazes?: boolean;
-  temLitigio?: boolean;
-  separacaoTotalBens?: boolean;
-  dividasGarantia?: string;
-  debitosTributarios?: string;
-  despesasMedicas?: string;
-  percentualHonorarios?: string;
-  comarca?: string;
-  unicoImovelResidencial?: boolean;
-  herdeirosComIsencao?: boolean;
-  empresaFamiliar?: boolean;
-}
-
-interface ResultadoRefinado {
-  totalRefinado: number;
-  patrimonioLiquido: number;
-  ajustes: Array<{
-    nome: string;
-    impacto: string;
-    descricao: string;
-  }>;
-  isencoes: Array<{
-    tipo: string;
-    valor: number;
-  }>;
-  comparativo: {
-    calculoOriginal: number;
-    calculoRefinado: number;
-    diferenca: number;
-    percentualDiferenca: string;
-  };
-  temLitigio?: boolean;
-}
-
-// Função corrigida para ITCMD progressivo (especialmente RS)
-const calcularITCMDProgressivo = (patrimonio: number, estado: string): number => {
-  const estadoData = ESTADOS_DATA[estado];
-  if (!estadoData || estadoData.itcmd.tipo !== 'progressiva') {
-    return 0;
-  }
-  
-  const faixas = estadoData.itcmd.faixas!;
-  let imposto = 0;
-  let valorRestante = patrimonio;
-  let faixaAnterior = 0;
-  
-  for (const faixa of faixas) {
-    const valorNaFaixa = Math.min(valorRestante, faixa.limite - faixaAnterior);
-    if (valorNaFaixa > 0) {
-      imposto += valorNaFaixa * faixa.aliquota;
-      valorRestante -= valorNaFaixa;
-      faixaAnterior = faixa.limite;
-    }
-    if (valorRestante <= 0) break;
-  }
-  
-  return Math.round(imposto); // Garantir valor inteiro
-};
-
-// Honorários advocatícios aprimorados (1,5% a 1,7%)
-const calcularHonorariosVariaveis = (patrimonio: number, tipoProcesso: string, temLitigio: boolean = false) => {
-  if (temLitigio) {
-    return {
-      valor: patrimonio * 0.15, // Valor médio para display
-      valorMinimo: patrimonio * 0.10,
-      valorMaximo: patrimonio * 0.20,
-      percentual: 15,
-      descricao: 'Honorários com litígio (10% a 20%)',
-      isRange: true,
-      tooltip: 'Em casos litigiosos, os honorários podem variar de 10% a 20% do patrimônio devido à complexidade adicional'
-    };
-  }
-
-  if (tipoProcesso === 'judicial') {
-    const minimo = patrimonio * 0.015; // 1,5%
-    const maximo = patrimonio * 0.017; // 1,7%
-    return {
-      valor: (minimo + maximo) / 2, // Valor médio para cálculos
-      valorMinimo: minimo,
-      valorMaximo: maximo,
-      percentual: 1.6, // Percentual médio
-      descricao: 'Honorários advocatícios judiciais',
-      isRange: true,
-      tooltip: 'Baseado na média do mercado, os honorários costumam variar entre 1,5% e 1,7% do patrimônio para processos judiciais'
-    };
-  } else {
-    const minimo = patrimonio * 0.015; // 1,5%
-    const maximo = patrimonio * 0.017; // 1,7%
-    return {
-      valor: (minimo + maximo) / 2,
-      valorMinimo: minimo,
-      valorMaximo: maximo,
-      percentual: 1.6,
-      descricao: 'Honorários advocatícios extrajudiciais',
-      isRange: true,
-      tooltip: 'Para inventário extrajudicial, os honorários também variam entre 1,5% e 1,7% do patrimônio'
-    };
-  }
-};
-
-// ITBI inteligente com isenções por estado
-const calcularITBIInteligente = (valorImoveis: number, estado: string) => {
-  const aliquotaPadrao = 0.03; // 3%
-  let itbi = valorImoveis * aliquotaPadrao;
-  let descricao = `ITBI sobre imóveis (3%)`;
-  let informativo = null;
-
-  const isencao = ISENCOES_ITBI[estado];
-  if (isencao && valorImoveis <= isencao.limite) {
-    if (isencao.percentual === 100) {
-      itbi = 0;
-      informativo = `✅ ${isencao.descricao} - Isento de ITBI em ${estado}`;
-      descricao = `ITBI - Isento em ${estado}`;
-    } else {
-      const reducao = itbi * (isencao.percentual / 100);
-      itbi = itbi - reducao;
-      informativo = `✅ ${isencao.descricao} - Redução de ${isencao.percentual}% no ITBI`;
-      descricao = `ITBI com redução de ${isencao.percentual}% (${estado})`;
-    }
-  }
-
-  return {
-    valor: itbi,
-    percentual: valorImoveis > 0 ? (itbi / valorImoveis * 100) : 0,
-    descricao,
-    informativo
-  };
-};
-
-// Insights personalizados aprimorados
-const gerarInsights = (dados: DadosCalculoInventario, custoTotal: number, economiaHolding: number): InsightPersonalizado[] => {
-  const insights: InsightPersonalizado[] = [];
-  
-  // Insight sobre economia com extrajudicial
-  if (dados.tipoProcesso === 'judicial' && !dados.temMenoresIncapazes && !dados.temLitigio) {
-    const economiaExtrajudicial = (dados.patrimonio * 0.04) + 2000;
-    insights.push({
-      tipo: 'economia',
-      titulo: '💰 Economia com Inventário Extrajudicial',
-      descricao: `Você poderia economizar aproximadamente ${formatCurrency(economiaExtrajudicial)} optando pelo inventário extrajudicial, além de reduzir significativamente o tempo de processo.`,
-      valor: economiaExtrajudicial
-    });
-  }
-  
-  // Insight sobre holding - com destaque especial para grandes patrimônios
-  if (economiaHolding > 50000) {
-    const emoji = economiaHolding > 200000 ? '🏆' : '💡';
-    const intensidade = economiaHolding > 200000 ? 'ALTAMENTE RECOMENDADO' : 'Recomendado';
-    
-    insights.push({
-      tipo: 'estrategia',
-      titulo: `${emoji} Holding Familiar S/A - ${intensidade}`,
-      descricao: `Uma Holding Familiar S/A poderia gerar economia de ${formatCurrency(economiaHolding)} nos custos sucessórios, além de profissionalizar a gestão do patrimônio, otimizar aspectos tributários e facilitar futuras transmissões.`,
-      valor: economiaHolding
-    });
-  }
-  
-  // Insight sobre testamento
-  if (!dados.temTestamento && dados.tipoProcesso === 'extrajudicial') {
-    insights.push({
-      tipo: 'informacao',
-      titulo: '📝 Testamento Acelera o Processo',
-      descricao: 'Com um testamento válido, o inventário extrajudicial pode ser concluído em até 60 dias, reduzindo custos e agilizando a transmissão do patrimônio.'
-    });
-  }
-
-  // Insight sobre planejamento sucessório para grandes patrimônios
-  if (dados.patrimonio > 3000000) {
-    insights.push({
-      tipo: 'estrategia',
-      titulo: '🎯 Planejamento Sucessório Estratégico',
-      descricao: `Para patrimônios elevados como o seu (${formatCurrency(dados.patrimonio)}), um planejamento sucessório bem estruturado pode gerar economias significativas e proteger o patrimônio familiar por gerações.`
-    });
-  }
-
-  // Insight sobre Lei da Legítima
-  insights.push({
-    tipo: 'informacao',
-    titulo: '⚖️ Lei da Legítima',
-    descricao: '50% do patrimônio obrigatoriamente pertence aos herdeiros legais (descendentes, ascendentes ou cônjuge). Os outros 50% podem ser dispostos livremente através de testamento ou doação.'
-  });
-  
-  return insights;
-};
-
-// Função para detectar complexidade do caso
-export const detectarComplexidade = (dados: DadosCalculoInventario): { nivel: 'baixo' | 'medio' | 'alto', fatores: string[], mostrarCTA: boolean } => {
-  const fatores = [];
-  
-  if (dados.temMenoresIncapazes) {
-    fatores.push('Menores ou incapazes entre herdeiros');
-  }
-  
-  if (dados.temLitigio) {
-    fatores.push('Possível conflito entre herdeiros');
-  }
-  
-  if (dados.patrimonio > 5000000) {
-    fatores.push('Patrimônio elevado');
-  }
-  
-  if (dados.valorImoveis && dados.valorImoveis > dados.patrimonio * 0.8) {
-    fatores.push('Patrimônio predominantemente imobiliário');
-  }
-  
-  if (fatores.length >= 2) {
-    return { nivel: 'alto', fatores, mostrarCTA: true };
-  } else if (fatores.length === 1) {
-    return { nivel: 'medio', fatores, mostrarCTA: dados.patrimonio > 2000000 };
-  }
-  
-  return { nivel: 'baixo', fatores: [], mostrarCTA: false };
-};
+import { calcularITCMD } from './calculators/itcmdCalculator';
+import { calcularHonorariosVariaveis } from './calculators/honorariosCalculator';
+import { calcularITBIInteligente } from './calculators/itbiCalculator';
+import { gerarInsights, detectarComplexidade } from './calculators/insightsGenerator';
+import { aplicarRefinamentos } from './calculators/refinamentoCalculator';
+import {
+  DadosCalculoInventario,
+  DetalhamentoCusto,
+  ComparacaoProcesso,
+  InsightPersonalizado,
+  ResultadoCalculo,
+  DadosRefinamento,
+  ResultadoRefinado
+} from './types/calculator';
 
 export const calcularCustosInventario = (dados: DadosCalculoInventario): ResultadoCalculo => {
   const {
@@ -316,19 +28,7 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
   } = dados;
   
   // 1. Calcular ITCMD
-  let itcmd = 0;
-  const estadoData = ESTADOS_DATA[estado];
-  let descricaoITCMD = '';
-  
-  if (estadoData) {
-    if (estadoData.itcmd.tipo === 'fixa') {
-      itcmd = patrimonio * estadoData.itcmd.aliquota!;
-      descricaoITCMD = `ITCMD ${estado} - ${(estadoData.itcmd.aliquota! * 100).toFixed(0)}%`;
-    } else {
-      itcmd = calcularITCMDProgressivo(patrimonio, estado);
-      descricaoITCMD = `ITCMD ${estado} - Alíquota progressiva`;
-    }
-  }
+  const itcmdResult = calcularITCMD(patrimonio, estado);
   
   // 2. Calcular honorários advocatícios (VARIÁVEIS APRIMORADOS)
   const honorarios = calcularHonorariosVariaveis(patrimonio, tipoProcesso, temLitigio);
@@ -356,12 +56,12 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
     : (temTestamento ? '60 a 90 dias' : '90 a 120 dias');
   
   // 8. Cálculo total
-  const custoTotal = itcmd + honorarios.valor + custas + cartorio + itbiResult.valor;
+  const custoTotal = itcmdResult.valor + honorarios.valor + custas + cartorio + itbiResult.valor;
   const economiaHolding = Math.max(0, custoTotal - custosHolding);
   
   // 9. Comparações
-  const custoJudicial = itcmd + (patrimonio * 0.016) + 5000 + cartorio + itbiResult.valor;
-  const custoExtrajudicial = itcmd + (patrimonio * 0.016) + 3000 + cartorio + itbiResult.valor;
+  const custoJudicial = itcmdResult.valor + (patrimonio * 0.016) + 5000 + cartorio + itbiResult.valor;
+  const custoExtrajudicial = itcmdResult.valor + (patrimonio * 0.016) + 3000 + cartorio + itbiResult.valor;
   
   return {
     patrimonio,
@@ -369,9 +69,9 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
     tipoProcesso,
     detalhamento: {
       itcmd: {
-        valor: itcmd,
-        percentual: (itcmd / patrimonio * 100),
-        descricao: descricaoITCMD
+        valor: itcmdResult.valor,
+        percentual: (itcmdResult.valor / patrimonio * 100),
+        descricao: itcmdResult.descricao
       },
       honorarios: {
         valor: honorarios.valor,
@@ -426,143 +126,15 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
   };
 };
 
-const parseCurrencyToNumber = (value: string | undefined): number => {
-  if (!value) return 0;
-  return parseFloat(value.replace(/[^\d,.-]/g, '').replace(',', '.')) || 0;
+// Re-export types and functions for backward compatibility
+export type {
+  DadosCalculoInventario,
+  DetalhamentoCusto,
+  ComparacaoProcesso,
+  InsightPersonalizado,
+  ResultadoCalculo,
+  DadosRefinamento,
+  ResultadoRefinado
 };
 
-export const aplicarRefinamentos = (calculoBase: ResultadoCalculo, dadosRefinados: DadosRefinamento): ResultadoRefinado => {
-  let calculoRefinado = { ...calculoBase };
-  const ajustes: Array<{ nome: string; impacto: string; descricao: string }> = [];
-  const isencoes: Array<{ tipo: string; valor: number }> = [];
-
-  // 1. Ajustar valores de patrimônio
-  let patrimonioAjustado = calculoBase.patrimonio;
-  
-  if (dadosRefinados.valorVenalImoveis) {
-    const valorVenal = parseCurrencyToNumber(dadosRefinados.valorVenalImoveis);
-    // Alguns estados usam valor venal como base
-    if (['SP', 'RJ', 'MG'].includes(calculoBase.estado)) {
-      const diferenca = valorVenal - (calculoBase.patrimonio * 0.7); // Assume que 70% do patrimônio são imóveis
-      if (Math.abs(diferenca) > 50000) {
-        patrimonioAjustado += diferenca;
-        ajustes.push({
-          nome: 'Ajuste por Valor Venal',
-          impacto: formatCurrency(diferenca),
-          descricao: `Patrimônio ajustado baseado no valor venal dos imóveis`
-        });
-      }
-    }
-  }
-
-  // 2. Deduzir dívidas
-  const dividasGarantia = parseCurrencyToNumber(dadosRefinados.dividasGarantia);
-  const debitosTributarios = parseCurrencyToNumber(dadosRefinados.debitosTributarios);
-  const despesasMedicas = parseCurrencyToNumber(dadosRefinados.despesasMedicas);
-  
-  const totalDividas = dividasGarantia + debitosTributarios + despesasMedicas;
-  const patrimonioLiquido = patrimonioAjustado - totalDividas;
-
-  if (totalDividas > 0) {
-    ajustes.push({
-      nome: 'Dedução de Dívidas',
-      impacto: formatCurrency(-totalDividas),
-      descricao: `Dívidas deduzidas do patrimônio bruto`
-    });
-  }
-
-  // 3. Recalcular ITCMD com patrimônio líquido
-  let itcmdRefinado = 0;
-  const estadoData = ESTADOS_DATA[calculoBase.estado];
-  
-  if (estadoData) {
-    if (estadoData.itcmd.tipo === 'fixa') {
-      itcmdRefinado = patrimonioLiquido * estadoData.itcmd.aliquota!;
-    } else {
-      itcmdRefinado = calcularITCMDProgressivo(patrimonioLiquido, calculoBase.estado);
-    }
-  }
-
-  // 4. Ajustar honorários baseado em informações específicas
-  let honorariosRefinados = calculoBase.detalhamento.honorarios.valor;
-  
-  if (dadosRefinados.percentualHonorarios) {
-    const percentual = parseFloat(dadosRefinados.percentualHonorarios) / 100;
-    honorariosRefinados = patrimonioLiquido * percentual;
-    
-    const diferencaHonorarios = honorariosRefinados - calculoBase.detalhamento.honorarios.valor;
-    if (Math.abs(diferencaHonorarios) > 5000) {
-      ajustes.push({
-        nome: 'Honorários Específicos',
-        impacto: formatCurrency(diferencaHonorarios),
-        descricao: `Honorários baseados na proposta específica (${dadosRefinados.percentualHonorarios}%)`
-      });
-    }
-  }
-
-  // 5. Aplicar situações especiais
-  if (dadosRefinados.temTestamento && !calculoBase.tipoProcesso.includes('testamento')) {
-    const reducaoCustas = calculoBase.detalhamento.custas.valor * 0.1;
-    ajustes.push({
-      nome: 'Benefício por Testamento',
-      impacto: formatCurrency(-reducaoCustas),
-      descricao: 'Redução de custas por existir testamento válido'
-    });
-  }
-
-  if (dadosRefinados.temLitigio && !calculoBase.tipoProcesso.includes('litígio')) {
-    const aumentoHonorarios = patrimonioLiquido * 0.10; // 10% adicional por litígio
-    honorariosRefinados += aumentoHonorarios;
-    ajustes.push({
-      nome: 'Custos por Litígio',
-      impacto: formatCurrency(aumentoHonorarios),
-      descricao: 'Aumento de honorários por possibilidade de litígio'
-    });
-  }
-
-  // 6. Aplicar isenções
-  if (dadosRefinados.unicoImovelResidencial && patrimonioLiquido < 500000) {
-    const isencao = itcmdRefinado * 0.5; // 50% de isenção em alguns estados
-    isencoes.push({
-      tipo: 'Único imóvel residencial',
-      valor: isencao
-    });
-  }
-
-  if (dadosRefinados.herdeirosComIsencao) {
-    const isencao = itcmdRefinado * 0.3; // 30% de isenção
-    isencoes.push({
-      tipo: 'Herdeiros com deficiência',
-      valor: isencao
-    });
-  }
-
-  // 7. Calcular total refinado
-  const totalIsencoes = isencoes.reduce((sum, i) => sum + i.valor, 0);
-  const totalRefinado = 
-    itcmdRefinado + 
-    honorariosRefinados + 
-    calculoBase.detalhamento.custas.valor + 
-    calculoBase.detalhamento.cartorio.valor - 
-    totalIsencoes;
-
-  // 8. Gerar comparativo
-  const diferenca = totalRefinado - calculoBase.resumo.custoTotal;
-  const percentualDiferenca = ((totalRefinado / calculoBase.resumo.custoTotal - 1) * 100).toFixed(2);
-
-  return {
-    totalRefinado,
-    patrimonioLiquido,
-    ajustes,
-    isencoes,
-    comparativo: {
-      calculoOriginal: calculoBase.resumo.custoTotal,
-      calculoRefinado: totalRefinado,
-      diferenca,
-      percentualDiferenca
-    },
-    temLitigio: dadosRefinados.temLitigio
-  };
-};
-
-export type { DadosRefinamento, ResultadoRefinado };
+export { detectarComplexidade, aplicarRefinamentos };
