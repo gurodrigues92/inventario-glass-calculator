@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,15 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// Add custom luxury colors
+				'primary-luxury': 'var(--color-primary)',
+				'secondary-luxury': 'var(--color-secondary)',
+				'tertiary-luxury': 'var(--color-tertiary)',
+				'quaternary-luxury': 'var(--color-quaternary)',
+				'glass': 'var(--text-secondary)',
+				'glass-white': 'var(--glass-white)',
+				'glass-border': 'var(--glass-border)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

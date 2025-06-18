@@ -3,13 +3,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import all style modules */
+/* Import all style modules in correct order */
 @import './styles/variables.css';
 @import './styles/base.css';
-@import './styles/animations.css';
 @import './styles/components.css';
 @import './styles/typography.css';
 @import './styles/badges.css';
 @import './styles/buttons.css';
+@import './styles/animations.css';
 @import './styles/sections.css';
 @import './styles/responsive.css';
