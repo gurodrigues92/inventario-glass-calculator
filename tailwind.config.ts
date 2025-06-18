@@ -10,6 +10,35 @@ export default {
 		"./src/**/*.{ts,tsx}",
 	],
 	prefix: "",
+	safelist: [
+		// Preserve custom classes from being purged
+		'bg-animated',
+		'glass-card',
+		'glass-button',
+		'glass-input',
+		'glass-header',
+		'luxury-card',
+		'heading-xl',
+		'heading-lg',
+		'heading-md',
+		'text-glass',
+		'golden-accent',
+		'badge-fast',
+		'badge-top',
+		'badge-premium',
+		'shadow-glow',
+		'fade-in-up',
+		'stagger-1',
+		'stagger-2',
+		'stagger-3',
+		'stagger-4',
+		'btn-primary',
+		'btn-cta-premium',
+		'holding-card',
+		'comparacao-grid',
+		'comparacao-card',
+		'cta-section'
+	],
 	theme: {
 		container: {
 			center: true,
@@ -63,14 +92,20 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Add custom luxury colors
-				'primary-luxury': 'var(--color-primary)',
-				'secondary-luxury': 'var(--color-secondary)',
-				'tertiary-luxury': 'var(--color-tertiary)',
-				'quaternary-luxury': 'var(--color-quaternary)',
-				'glass': 'var(--text-secondary)',
-				'glass-white': 'var(--glass-white)',
-				'glass-border': 'var(--glass-border)'
+				// Custom luxury colors using CSS variables
+				'luxury-primary': 'var(--color-primary)',
+				'luxury-secondary': 'var(--color-secondary)',
+				'luxury-tertiary': 'var(--color-tertiary)',
+				'luxury-quaternary': 'var(--color-quaternary)',
+				'bg-primary': 'var(--bg-primary)',
+				'bg-secondary': 'var(--bg-secondary)',
+				'bg-glass': 'var(--bg-glass)',
+				'bg-glass-hover': 'var(--bg-glass-hover)',
+				'text-primary-custom': 'var(--text-primary)',
+				'text-secondary-custom': 'var(--text-secondary)',
+				'border-light': 'var(--border-light)',
+				'border-gold': 'var(--border-gold)',
+				'border-luxury': 'var(--border-luxury)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -93,11 +128,39 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'float': {
+					'0%, 100%': { transform: 'translate(0, 0) rotate(0deg)' },
+					'33%': { transform: 'translate(-30px, -20px) rotate(120deg)' },
+					'66%': { transform: 'translate(25px, -15px) rotate(240deg)' }
+				},
+				'fadeInUp': {
+					'from': {
+						opacity: '0',
+						transform: 'translateY(30px)'
+					},
+					'to': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
+				},
+				'pulse-gold': {
+					'0%, 100%': { 
+						opacity: '1',
+						boxShadow: 'var(--shadow-gold)'
+					},
+					'50%': { 
+						opacity: '0.9',
+						boxShadow: '0 0 40px rgba(255, 215, 0, 0.5)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'float': 'float 25s ease-in-out infinite',
+				'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+				'pulse-gold': 'pulse-gold 2s infinite'
 			}
 		}
 	},
