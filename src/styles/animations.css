@@ -8,9 +8,9 @@
   width: 100%;
   height: 100%;
   background: 
-    radial-gradient(circle at 20% 20%, var(--color-primary) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, var(--color-secondary) 0%, transparent 50%),
-    radial-gradient(circle at 40% 60%, var(--color-tertiary) 0%, transparent 50%);
+    radial-gradient(circle at 30% 80%, var(--primary-blue-gray) 0%, transparent 50%),
+    radial-gradient(circle at 70% 20%, rgba(255, 215, 0, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, var(--tertiary-blue-gray) 0%, transparent 50%);
   filter: blur(120px);
   opacity: 0.2;
   animation: float 25s ease-in-out infinite;
@@ -58,4 +58,47 @@
 @keyframes shimmer {
   0% { transform: translateX(-100%) translateY(100%); }
   100% { transform: translateX(100%) translateY(-100%); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Card Hover Effects */
+.hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-luxury);
+}
+
+/* Badge Animations */
+.badge-animated {
+  animation: pulse-gold 2s infinite;
+}
+
+/* Loading Animations */
+@keyframes loading-spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+  animation: loading-spin 1s linear infinite;
+}
+
+/* Selection Cards Animation */
+.selection-card-animated::before {
+  animation: shimmer 6s infinite;
+}
+
+/* Button Press Effect */
+.btn-press {
+  transition: all 0.15s ease;
+}
+
+.btn-press:active {
+  transform: translateY(1px) scale(0.98);
 }

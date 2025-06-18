@@ -10,11 +10,12 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    display: inline-block;
   }
 
   .badge-top {
     background: var(--gradient-gold) !important;
-    color: #1a1a1a !important;
+    color: var(--primary-dark) !important;
     padding: 6px 16px;
     border-radius: 20px;
     font-size: 0.75rem;
@@ -23,11 +24,12 @@
     letter-spacing: 0.1em;
     box-shadow: var(--shadow-gold);
     animation: pulse-gold 2s infinite;
+    display: inline-block;
   }
 
   .badge-premium {
-    background: var(--gradient-gold-premium) !important;
-    color: #1a1a1a !important;
+    background: var(--gradient-gold-dark) !important;
+    color: var(--primary-dark) !important;
     font-weight: 700;
     padding: 8px 18px;
     border-radius: 25px;
@@ -35,5 +37,103 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
     font-size: 0.8rem;
+    display: inline-block;
+  }
+
+  .badge-card {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: var(--gradient-gold);
+    color: var(--primary-dark);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    z-index: 10;
+  }
+
+  .badge-holding {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gradient-gold);
+    color: var(--primary-dark);
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    box-shadow: var(--shadow-gold);
+  }
+
+  .badge-success {
+    background: linear-gradient(135deg, #10B981, #059669);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-warning {
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-info {
+    background: linear-gradient(135deg, #3B82F6, #2563EB);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+/* Badge Animation Effects */
+@keyframes badge-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+.badge-animated {
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+/* Responsive Badges */
+@media (max-width: 768px) {
+  .badge-card {
+    position: static;
+    margin-bottom: 16px;
+    display: inline-block;
+  }
+  
+  .badge-holding {
+    position: static;
+    transform: none;
+    margin-bottom: 16px;
+    display: inline-block;
   }
 }

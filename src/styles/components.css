@@ -3,8 +3,8 @@
   /* Background Animated - força aplicação */
   .bg-animated {
     position: relative;
-    background: var(--bg-primary, #1a1a1a) !important;
-    color: var(--text-primary, rgba(255, 255, 255, 0.95)) !important;
+    background: var(--primary-dark) !important;
+    color: var(--text-primary) !important;
     min-height: 100vh;
   }
 
@@ -16,70 +16,122 @@
     width: 100%;
     height: 100%;
     background: 
-      radial-gradient(circle at 20% 20%, var(--color-primary, #8595ab) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, var(--color-secondary, #a4b0c0) 0%, transparent 50%),
-      radial-gradient(circle at 40% 60%, var(--color-tertiary, #c2cad5) 0%, transparent 50%);
+      radial-gradient(circle at 30% 80%, var(--primary-blue-gray) 0%, transparent 50%),
+      radial-gradient(circle at 70% 20%, rgba(255, 215, 0, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, var(--tertiary-blue-gray) 0%, transparent 50%);
     filter: blur(120px);
     opacity: 0.2;
     animation: float 25s ease-in-out infinite;
     z-index: -1;
   }
 
-  /* Glass Cards com fallbacks */
+  /* Glass Cards Premium */
   .glass-card {
-    background: var(--bg-luxury, linear-gradient(135deg, rgba(133, 149, 171, 0.05) 0%, rgba(225, 229, 234, 0.03) 100%)) !important;
+    background: var(--gradient-card) !important;
     backdrop-filter: blur(20px);
-    border: 1px solid var(--border-luxury, rgba(255, 255, 255, 0.08));
+    border: 1px solid var(--border-luxury);
     border-radius: 24px;
     box-shadow: 
-      var(--shadow-premium, 0 8px 32px rgba(0, 0, 0, 0.2)),
+      var(--shadow-card),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    color: var(--text-primary, rgba(255, 255, 255, 0.95)) !important;
+    color: var(--text-primary) !important;
   }
 
   .glass-card:hover {
     transform: translateY(-4px);
-    box-shadow: var(--shadow-luxury, 0 10px 40px rgba(0, 0, 0, 0.3));
-    border-color: var(--border-gold, rgba(255, 215, 0, 0.3));
+    box-shadow: var(--shadow-luxury);
+    border-color: var(--border-gold);
+  }
+
+  /* Selection Cards Premium */
+  .selection-card {
+    background: var(--gradient-card) !important;
+    border: 1px solid var(--border-subtle);
+    border-radius: 24px;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    color: var(--text-primary) !important;
+  }
+
+  .selection-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-luxury);
+    border-color: var(--border-gold);
+  }
+
+  .selection-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 45%, rgba(255, 215, 0, 0.05) 50%, transparent 55%);
+    animation: shimmer 6s infinite;
+    z-index: 0;
+  }
+
+  .selection-card > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Form Cards Premium */
+  .form-card {
+    background: var(--gradient-card) !important;
+    border: 1px solid var(--border-subtle);
+    border-radius: 24px;
+    padding: 48px;
+    box-shadow: var(--shadow-card);
+    color: var(--text-primary) !important;
+  }
+
+  /* Form Sections */
+  .form-section {
+    background: rgba(133, 149, 171, 0.03) !important;
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
   }
 
   /* Luxury Cards */
   .luxury-card {
-    background: var(--bg-luxury, linear-gradient(135deg, rgba(133, 149, 171, 0.05) 0%, rgba(225, 229, 234, 0.03) 100%)) !important;
+    background: var(--gradient-card) !important;
     backdrop-filter: blur(20px);
-    border: 1px solid var(--border-luxury, rgba(255, 255, 255, 0.08));
-    box-shadow: 
-      var(--shadow-premium, 0 8px 32px rgba(0, 0, 0, 0.2)),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-luxury);
+    box-shadow: var(--shadow-card);
     border-radius: 20px;
     transition: all 0.3s ease;
-    color: var(--text-primary, rgba(255, 255, 255, 0.95)) !important;
+    color: var(--text-primary) !important;
   }
 
   .luxury-card:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-luxury, 0 10px 40px rgba(0, 0, 0, 0.3));
+    box-shadow: var(--shadow-luxury);
   }
 
   /* Glass Header */
   .glass-header {
     background: rgba(133, 149, 171, 0.08) !important;
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border-light, rgba(255, 255, 255, 0.1));
+    border-bottom: 1px solid var(--border-light);
   }
 
-  /* Glass Buttons */
+  /* Glass Buttons Premium */
   .glass-button {
-    background: var(--gradient-gold, linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%)) !important;
+    background: var(--gradient-gold) !important;
     border: none;
     border-radius: 16px;
-    color: #1a1a1a !important;
+    color: var(--primary-dark) !important;
     font-weight: 600;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    box-shadow: var(--shadow-gold, 0 0 30px rgba(255, 215, 0, 0.3));
+    box-shadow: var(--shadow-gold);
   }
 
   .glass-button::before {
@@ -102,28 +154,258 @@
     box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
   }
 
-  /* Glass Inputs */
+  /* Form Inputs Premium */
   .glass-input {
-    background: rgba(133, 149, 171, 0.05) !important;
-    border: 1px solid var(--border-luxury, rgba(255, 255, 255, 0.08));
+    background: rgba(26, 26, 26, 0.6) !important;
+    border: 1px solid var(--border-subtle);
     border-radius: 12px;
-    color: var(--text-primary, rgba(255, 255, 255, 0.95)) !important;
-    padding: 12px 16px;
+    color: var(--text-primary) !important;
+    padding: 16px 20px;
     transition: all 0.3s ease;
+    font-size: 16px;
   }
 
   .glass-input:focus {
     outline: none;
-    border-color: var(--color-primary, #8595ab);
-    box-shadow: 0 0 0 3px rgba(133, 149, 171, 0.1);
+    border-color: var(--border-gold);
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
   }
 
   .glass-input::placeholder {
-    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+    color: var(--primary-blue-gray);
+  }
+
+  /* Buttons Premium */
+  .btn-primary {
+    background: var(--gradient-gold);
+    color: var(--primary-dark);
+    font-weight: 600;
+    border: none;
+    box-shadow: var(--shadow-gold);
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    padding: 12px 24px;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    border: 2px solid var(--border-subtle);
+    color: var(--tertiary-blue-gray);
+    border-radius: 12px;
+    padding: 16px 32px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--border-gold);
+    color: #FFD700;
+    transform: translateY(-2px);
+  }
+
+  /* Selection Buttons */
+  .btn-select {
+    width: 100%;
+    padding: 16px 32px;
+    background: transparent;
+    border: 2px solid var(--border-gold);
+    color: #FFD700;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-select:hover {
+    background: var(--gradient-gold);
+    color: var(--primary-dark);
+    box-shadow: var(--shadow-gold);
+  }
+
+  /* Calculate Button */
+  .btn-calculate {
+    width: 100%;
+    padding: 20px;
+    background: var(--gradient-gold);
+    border: none;
+    border-radius: 12px;
+    color: var(--primary-dark);
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    box-shadow: var(--shadow-gold);
+  }
+
+  .btn-calculate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255, 215, 0, 0.5);
+  }
+
+  /* Radio Options */
+  .radio-option {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .radio-input {
+    position: absolute;
+    opacity: 0;
+  }
+
+  .radio-label {
+    display: block;
+    padding: 20px;
+    background: rgba(26, 26, 26, 0.4);
+    border: 2px solid var(--border-subtle);
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+    color: var(--text-primary);
+  }
+
+  .radio-input:checked + .radio-label {
+    background: rgba(255, 215, 0, 0.1);
+    border-color: var(--border-gold);
+    box-shadow: var(--shadow-gold);
+  }
+
+  /* Total Display */
+  .total-display {
+    background: rgba(255, 215, 0, 0.05);
+    border: 2px solid var(--border-gold);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    margin-top: 32px;
+  }
+
+  .total-value {
+    font-size: 36px;
+    font-weight: 700;
+    background: var(--gradient-gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-top: 8px;
+  }
+
+  /* Result Banner */
+  .result-banner {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(133, 149, 171, 0.05) 100%);
+    border: 2px solid var(--border-gold);
+    border-radius: 24px;
+    padding: 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-banner::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 45%, rgba(255, 215, 0, 0.05) 50%, transparent 55%);
+    animation: shimmer 4s infinite;
+  }
+
+  /* Holding Card Premium */
+  .holding-card {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
+    border: 2px solid var(--border-gold);
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    backdrop-filter: blur(20px);
+    transform: scale(1.02);
+    box-shadow: var(--shadow-gold);
+  }
+
+  .holding-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 45%, rgba(255, 215, 0, 0.1) 50%, transparent 55%);
+    animation: shimmer 3s infinite;
+    z-index: 0;
+  }
+
+  .holding-card > * {
+    position: relative;
+    z-index: 1;
   }
 
   /* Shadow Glow Effect */
   .shadow-glow {
-    box-shadow: var(--shadow-gold, 0 0 30px rgba(255, 215, 0, 0.3));
+    box-shadow: var(--shadow-gold);
+  }
+
+  /* Cost Cards */
+  .cost-card {
+    background: var(--gradient-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .cost-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-luxury);
+  }
+
+  /* Info Cards */
+  .info-card {
+    background: linear-gradient(135deg, rgba(133, 149, 171, 0.1) 0%, rgba(26, 26, 26, 0.4) 100%);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 24px;
+    margin: 32px 0;
+  }
+
+  /* CTA Section */
+  .cta-section {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, rgba(255, 215, 0, 0.1) 100%);
+    border: 2px solid var(--border-gold);
+    border-radius: 24px;
+    padding: 60px 40px;
+    text-align: center;
+    margin-top: 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  /* Disclaimer Box */
+  .disclaimer-box {
+    background: rgba(133, 149, 171, 0.05);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 24px;
+    margin: 48px 0;
   }
 }

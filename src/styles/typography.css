@@ -14,7 +14,7 @@
     font-size: 3.5rem !important;
     font-weight: 800 !important;
     line-height: 1.1 !important;
-    background: linear-gradient(135deg, #ffffff, var(--color-primary)) !important;
+    background: linear-gradient(135deg, #ffffff, var(--primary-blue-gray)) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
@@ -34,5 +34,88 @@
 
   .text-glass {
     color: var(--text-secondary) !important;
+  }
+
+  /* New Typography Classes */
+  .text-luxury-title {
+    font-size: 36px;
+    font-weight: 700;
+    background: var(--gradient-gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .text-card-title {
+    font-size: 28px;
+    color: var(--white);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .text-section-title {
+    font-size: 20px;
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  .text-input-label {
+    display: block;
+    color: var(--tertiary-blue-gray);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .text-result-total {
+    font-size: 48px;
+    font-weight: 700;
+    background: var(--gradient-gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-subtitle {
+    color: var(--secondary-blue-gray);
+    font-size: 18px;
+  }
+
+  .text-caption {
+    color: var(--secondary-blue-gray);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .text-disclaimer {
+    color: var(--secondary-blue-gray);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
+
+/* Mobile Typography Adjustments */
+@media (max-width: 768px) {
+  .heading-xl {
+    font-size: 2.5rem !important;
+  }
+  
+  .heading-lg {
+    font-size: 2rem !important;
+  }
+  
+  .text-luxury-title {
+    font-size: 24px;
+  }
+  
+  .text-card-title {
+    font-size: 20px;
+  }
+  
+  .text-result-total {
+    font-size: 36px;
   }
 }
