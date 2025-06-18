@@ -1,4 +1,3 @@
-
 import { ESTADOS_DATA } from '../data/estadosData';
 import { formatCurrency } from './formatters';
 import { gerarAlertas, verificarExtrajudicial } from './validators';
@@ -30,6 +29,7 @@ export interface DetalhamentoCusto {
   percentual?: number;
   descricao: string;
   isRange?: boolean;
+  informativo?: string;
 }
 
 export interface ComparacaoProcesso {
@@ -340,7 +340,8 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
       itbi: {
         valor: itbiResult.valor,
         percentual: itbiResult.percentual,
-        descricao: itbiResult.descricao
+        descricao: itbiResult.descricao,
+        informativo: itbiResult.informativo
       }
     },
     resumo: {
