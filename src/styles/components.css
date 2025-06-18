@@ -99,4 +99,28 @@
   .shadow-glow {
     box-shadow: var(--shadow-gold);
   }
+
+  /* Background Animated */
+  .bg-animated {
+    position: relative;
+    background: var(--bg-primary) !important;
+    min-height: 100vh;
+  }
+
+  .bg-animated::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      radial-gradient(circle at 20% 20%, var(--color-primary) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, var(--color-secondary) 0%, transparent 50%),
+      radial-gradient(circle at 40% 60%, var(--color-tertiary) 0%, transparent 50%);
+    filter: blur(120px);
+    opacity: 0.2;
+    animation: float 25s ease-in-out infinite;
+    z-index: -1;
+  }
 }

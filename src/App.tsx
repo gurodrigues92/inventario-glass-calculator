@@ -16,7 +16,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <div className="dark">
+      <div className="dark min-h-screen" style={{ background: 'var(--bg-primary)' }}>
         <Toaster />
         <Sonner />
         <BrowserRouter>
@@ -26,7 +26,6 @@ const App = () => (
             <Route path="/calculadora-avancada" element={<AdvancedCalculator />} />
             <Route path="/resultados" element={<Results />} />
             <Route path="/calculos-salvos" element={<CalculosSalvos />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

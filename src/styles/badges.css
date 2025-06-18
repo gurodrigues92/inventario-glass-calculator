@@ -1,37 +1,39 @@
 
 /* Badge Styles Premium */
-.badge-fast {
-  background: linear-gradient(135deg, var(--accent-green), #059669);
-  color: white;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
+@layer components {
+  .badge-fast {
+    background: linear-gradient(135deg, var(--accent-green), #059669) !important;
+    color: white !important;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
 
-.badge-top {
-  background: var(--gradient-gold);
-  color: #1a1a1a;
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  box-shadow: var(--shadow-gold);
-  animation: pulse-gold 2s infinite;
-}
+  .badge-top {
+    background: var(--gradient-gold) !important;
+    color: #1a1a1a !important;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    box-shadow: var(--shadow-gold);
+    animation: pulse-gold 2s infinite;
+  }
 
-.badge-premium {
-  background: var(--gradient-gold-premium);
-  color: #1a1a1a;
-  font-weight: 700;
-  padding: 8px 18px;
-  border-radius: 25px;
-  box-shadow: var(--shadow-gold);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 0.8rem;
+  .badge-premium {
+    background: var(--gradient-gold-premium) !important;
+    color: #1a1a1a !important;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: 25px;
+    box-shadow: var(--shadow-gold);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.8rem;
+  }
 }

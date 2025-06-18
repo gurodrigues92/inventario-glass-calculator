@@ -6,6 +6,7 @@
   
   html {
     @apply dark;
+    background: var(--bg-primary) !important;
   }
   
   body {
@@ -20,5 +21,11 @@
       radial-gradient(circle at 40% 40%, rgba(194, 202, 213, 0.06) 0%, transparent 50%);
     color: var(--text-primary) !important;
     overflow-x: hidden;
+    min-height: 100vh;
+  }
+  
+  #root {
+    background: var(--bg-primary) !important;
+    min-height: 100vh;
   }
 }
