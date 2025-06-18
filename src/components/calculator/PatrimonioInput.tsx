@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import LuxuryField from '@/components/ui/LuxuryField';
 
 interface PatrimonioInputProps {
   value: string;
@@ -29,31 +29,7 @@ const PatrimonioInput = ({ value, onChange, error }: PatrimonioInputProps) => {
   };
 
   return (
-    <div className="space-y-3">
-      <Label 
-        htmlFor="patrimonio" 
-        className="label-luxury"
-        style={{
-          color: '#c2cad5',
-          fontSize: '14px',
-          fontWeight: '600',
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}
-      >
-        💰 Valor do Patrimônio
-        <div 
-          style={{
-            height: '1px',
-            flex: '1',
-            background: 'linear-gradient(to right, rgba(255, 215, 0, 0.3), transparent)'
-          }}
-        />
-      </Label>
-      
+    <LuxuryField label="Valor do Patrimônio" icon="💰">
       <Input
         id="patrimonio"
         type="text"
@@ -83,7 +59,7 @@ const PatrimonioInput = ({ value, onChange, error }: PatrimonioInputProps) => {
       <div className="text-xs text-purple-300 italic">
         💡 Inclui todos os bens: imóveis, veículos, investimentos, etc.
       </div>
-    </div>
+    </LuxuryField>
   );
 };
 
