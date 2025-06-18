@@ -10,6 +10,8 @@ import ResultsDisclaimer from './ResultsDisclaimer';
 import ResultsActions from './ResultsActions';
 import RefinamentoCalculo from './RefinamentoCalculo';
 import ResultadoRefinado from './ResultadoRefinado';
+import LeiLegitimaCard from './LeiLegitimaCard';
+import CTAEspecialista from './CTAEspecialista';
 import { DadosCalculoInventario } from '../utils/itcmdCalculator';
 
 interface ResultsContentProps {
@@ -27,6 +29,12 @@ const ResultsContent = ({
   resultadoRefinado, 
   onRefinar 
 }: ResultsContentProps) => {
+  // Detectar complexidade automaticamente
+  const temComplexidade = 
+    dadosCalculo.temMenoresIncapazes || 
+    dadosCalculo.temLitigio || 
+    dadosCalculo.patrimonio > 5000000;
+
   return (
     <div id="results-content">
       <ResultsHeader
@@ -53,6 +61,9 @@ const ResultsContent = ({
 
       <ResultsBreakdown detalhamento={resultado.detalhamento} />
 
+      {/* Lei da Legítima Card */}
+      <LeiLegitimaCard />
+
       {/* Breakdown Chart */}
       <div className="grid lg:grid-cols-2 gap-8 mb-12">
         <ResultsCharts 
@@ -70,6 +81,13 @@ const ResultsContent = ({
       <ResultsInsights insights={resultado.insights} />
 
       <ResultsDisclaimer />
+
+      {/* CTA Especialista */}
+      <CTAEspecialista
+        patrimonio={dadosCalculo.patrimonio}
+        custoTotal={resultado.resumo.custoTotal}
+        temComplexidade={temComplexidade}
+      />
 
       {/* Componente de Refinamento */}
       <RefinamentoCalculo
