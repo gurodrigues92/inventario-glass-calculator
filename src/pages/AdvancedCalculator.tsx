@@ -95,7 +95,7 @@ const AdvancedCalculator = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="luxury-label">
                 Nome Completo *
               </label>
               <input
@@ -103,26 +103,26 @@ const AdvancedCalculator = () => {
                 value={formData.nomeCompleto}
                 onChange={(e) => handleInputChange('nomeCompleto', e.target.value)}
                 placeholder="Seu nome completo"
-                className="glass-input w-full"
+                className="luxury-input w-full"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="luxury-label">
                 Estado Civil *
               </label>
               <select
                 value={formData.estadoCivil}
                 onChange={(e) => handleInputChange('estadoCivil', e.target.value)}
-                className="glass-input w-full"
+                className="luxury-select w-full"
                 required
               >
-                <option value="" className="bg-gray-900">Selecione...</option>
-                <option value="solteiro" className="bg-gray-900">Solteiro(a)</option>
-                <option value="casado" className="bg-gray-900">Casado(a)</option>
-                <option value="divorciado" className="bg-gray-900">Divorciado(a)</option>
-                <option value="viuvo" className="bg-gray-900">Viúvo(a)</option>
+                <option value="">Selecione...</option>
+                <option value="solteiro">Solteiro(a)</option>
+                <option value="casado">Casado(a)</option>
+                <option value="divorciado">Divorciado(a)</option>
+                <option value="viuvo">Viúvo(a)</option>
               </select>
             </div>
           </div>
@@ -137,7 +137,7 @@ const AdvancedCalculator = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="luxury-label">
                 Valor Total do Patrimônio *
               </label>
               <input
@@ -145,14 +145,14 @@ const AdvancedCalculator = () => {
                 value={formData.patrimonio}
                 onChange={(e) => handleCurrencyChange('patrimonio', e.target.value)}
                 placeholder="R$ 0,00"
-                className="glass-input w-full text-lg"
+                className="luxury-input w-full text-lg"
                 required
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
+                <label className="luxury-label">
                   Imóveis
                 </label>
                 <input
@@ -160,13 +160,13 @@ const AdvancedCalculator = () => {
                   value={formData.valorImoveis}
                   onChange={(e) => handleCurrencyChange('valorImoveis', e.target.value)}
                   placeholder="R$ 0,00"
-                  className="glass-input w-full"
+                  className="luxury-input w-full"
                 />
                 <p className="text-xs text-glass mt-1">Casas, apartamentos, terrenos</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
+                <label className="luxury-label">
                   Veículos
                 </label>
                 <input
@@ -174,13 +174,13 @@ const AdvancedCalculator = () => {
                   value={formData.valorVeiculos}
                   onChange={(e) => handleCurrencyChange('valorVeiculos', e.target.value)}
                   placeholder="R$ 0,00"
-                  className="glass-input w-full"
+                  className="luxury-input w-full"
                 />
                 <p className="text-xs text-glass mt-1">Carros, motos, embarcações</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
+                <label className="luxury-label">
                   Investimentos
                 </label>
                 <input
@@ -188,13 +188,13 @@ const AdvancedCalculator = () => {
                   value={formData.valorInvestimentos}
                   onChange={(e) => handleCurrencyChange('valorInvestimentos', e.target.value)}
                   placeholder="R$ 0,00"
-                  className="glass-input w-full"
+                  className="luxury-input w-full"
                 />
                 <p className="text-xs text-glass mt-1">Ações, fundos, renda fixa</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
+                <label className="luxury-label">
                   Outros Bens
                 </label>
                 <input
@@ -202,7 +202,7 @@ const AdvancedCalculator = () => {
                   value={formData.valorOutrosBens}
                   onChange={(e) => handleCurrencyChange('valorOutrosBens', e.target.value)}
                   placeholder="R$ 0,00"
-                  className="glass-input w-full"
+                  className="luxury-input w-full"
                 />
                 <p className="text-xs text-glass mt-1">Joias, obras de arte, etc.</p>
               </div>
@@ -219,17 +219,17 @@ const AdvancedCalculator = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="luxury-label">
                 Estado onde será feito o inventário *
               </label>
               <select
                 value={formData.estado}
                 onChange={(e) => handleInputChange('estado', e.target.value)}
-                className="glass-input w-full"
+                className="luxury-select w-full"
                 required
               >
                 {estadosOptions.map(estado => (
-                  <option key={estado.value} value={estado.value} className="bg-gray-900">
+                  <option key={estado.value} value={estado.value}>
                     {estado.label}
                   </option>
                 ))}
@@ -237,17 +237,15 @@ const AdvancedCalculator = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="luxury-label">
                 Tipo de processo *
               </label>
               <div className="grid grid-cols-2 gap-4">
                 <button
                   type="button"
                   onClick={() => handleInputChange('tipoProcesso', 'extrajudicial')}
-                  className={`p-4 rounded-lg border transition-all ${
-                    formData.tipoProcesso === 'extrajudicial'
-                      ? 'border-purple-500 bg-purple-500/10'
-                      : 'border-glass-border bg-glass-white'
+                  className={`luxury-option-card ${
+                    formData.tipoProcesso === 'extrajudicial' ? 'active' : ''
                   }`}
                 >
                   <div className="font-medium text-white">Extrajudicial</div>
@@ -257,10 +255,8 @@ const AdvancedCalculator = () => {
                 <button
                   type="button"
                   onClick={() => handleInputChange('tipoProcesso', 'judicial')}
-                  className={`p-4 rounded-lg border transition-all ${
-                    formData.tipoProcesso === 'judicial'
-                      ? 'border-purple-500 bg-purple-500/10'
-                      : 'border-glass-border bg-glass-white'
+                  className={`luxury-option-card ${
+                    formData.tipoProcesso === 'judicial' ? 'active' : ''
                   }`}
                 >
                   <div className="font-medium text-white">Judicial</div>
@@ -271,7 +267,7 @@ const AdvancedCalculator = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="luxury-label">
                 Número de herdeiros
               </label>
               <input
@@ -280,7 +276,7 @@ const AdvancedCalculator = () => {
                 max="20"
                 value={formData.herdeiros}
                 onChange={(e) => handleInputChange('herdeiros', e.target.value)}
-                className="glass-input w-full"
+                className="luxury-input w-full"
               />
             </div>
           </div>
@@ -295,12 +291,12 @@ const AdvancedCalculator = () => {
             </div>
 
             <div className="space-y-4">
-              <label className="flex items-center space-x-3 p-3 rounded-lg border border-glass-border bg-glass-white">
+              <label className="luxury-checkbox-card">
                 <input
                   type="checkbox"
                   checked={formData.temTestamento}
                   onChange={(e) => handleInputChange('temTestamento', e.target.checked)}
-                  className="rounded"
+                  className="luxury-checkbox"
                 />
                 <div>
                   <div className="text-white font-medium">Existe testamento válido</div>
@@ -308,12 +304,12 @@ const AdvancedCalculator = () => {
                 </div>
               </label>
 
-              <label className="flex items-center space-x-3 p-3 rounded-lg border border-glass-border bg-glass-white">
+              <label className="luxury-checkbox-card">
                 <input
                   type="checkbox"
                   checked={formData.temMenoresIncapazes}
                   onChange={(e) => handleInputChange('temMenoresIncapazes', e.target.checked)}
-                  className="rounded"
+                  className="luxury-checkbox"
                 />
                 <div>
                   <div className="text-white font-medium">Há herdeiros menores ou incapazes</div>
@@ -321,12 +317,12 @@ const AdvancedCalculator = () => {
                 </div>
               </label>
 
-              <label className="flex items-center space-x-3 p-3 rounded-lg border border-glass-border bg-glass-white">
+              <label className="luxury-checkbox-card">
                 <input
                   type="checkbox"
                   checked={formData.temLitigio}
                   onChange={(e) => handleInputChange('temLitigio', e.target.checked)}
-                  className="rounded"
+                  className="luxury-checkbox"
                 />
                 <div>
                   <div className="text-white font-medium">Possibilidade de litígio</div>
@@ -336,7 +332,7 @@ const AdvancedCalculator = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="luxury-label">
                 Dívidas do espólio
               </label>
               <input
@@ -344,7 +340,7 @@ const AdvancedCalculator = () => {
                 value={formData.dividasEspolio}
                 onChange={(e) => handleCurrencyChange('dividasEspolio', e.target.value)}
                 placeholder="R$ 0,00"
-                className="glass-input w-full"
+                className="luxury-input w-full"
               />
               <p className="text-xs text-glass mt-1">Dívidas deixadas pelo falecido</p>
             </div>
@@ -373,7 +369,23 @@ const AdvancedCalculator = () => {
 
           {/* Header */}
           <div className="text-center mb-12 fade-in-up">
-            <div className="badge-top inline-block mb-4">Análise Completa</div>
+            <div 
+              className="badge-top inline-block mb-4"
+              style={{
+                background: 'linear-gradient(135deg, #FFD700, #FFA500)',
+                color: '#1a1a1a',
+                padding: '8px 20px',
+                borderRadius: '25px',
+                fontSize: '11px',
+                fontWeight: '700',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                boxShadow: '0 4px 15px rgba(255, 215, 0, 0.5)',
+                animation: 'pulse-gold 2s infinite'
+              }}
+            >
+              Análise Completa
+            </div>
             <h1 className="heading-lg mb-4">Calculadora Avançada</h1>
             <p className="text-glass">
               Análise detalhada com formulário completo em 4 etapas
@@ -389,9 +401,15 @@ const AdvancedCalculator = () => {
                     step < currentStep 
                       ? 'border-green-500 bg-green-500 text-white' 
                       : step === currentStep
-                      ? 'border-purple-500 bg-purple-500 text-white'
+                      ? 'border-gold bg-gold text-dark'
                       : 'border-glass-border text-glass'
-                  }`}>
+                  }`}
+                  style={{
+                    borderColor: step < currentStep ? '#10B981' : step === currentStep ? '#FFD700' : 'rgba(133, 149, 171, 0.3)',
+                    backgroundColor: step < currentStep ? '#10B981' : step === currentStep ? '#FFD700' : 'transparent',
+                    color: step < currentStep || step === currentStep ? '#1a1a1a' : '#8595ab'
+                  }}
+                  >
                     {step < currentStep ? (
                       <CheckCircle className="w-4 h-4" />
                     ) : (
@@ -399,9 +417,11 @@ const AdvancedCalculator = () => {
                     )}
                   </div>
                   {step < 4 && (
-                    <div className={`w-8 h-0.5 ${
-                      step < currentStep ? 'bg-green-500' : 'bg-glass-border'
-                    }`} />
+                    <div className={`w-8 h-0.5`}
+                    style={{
+                      backgroundColor: step < currentStep ? '#10B981' : 'rgba(133, 149, 171, 0.3)'
+                    }}
+                    />
                   )}
                 </React.Fragment>
               ))}
@@ -419,7 +439,7 @@ const AdvancedCalculator = () => {
                   <button
                     type="button"
                     onClick={prevStep}
-                    className="border border-glass-border text-white px-6 py-2 rounded-lg hover:bg-glass-white transition-all"
+                    className="luxury-btn-secondary px-6 py-2"
                   >
                     Anterior
                   </button>
@@ -431,14 +451,14 @@ const AdvancedCalculator = () => {
                       type="button"
                       onClick={nextStep}
                       disabled={!isStepValid(currentStep)}
-                      className="glass-button px-6 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="luxury-btn-primary px-6 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Próximo
                     </button>
                   ) : (
                     <button
                       type="submit"
-                      className="glass-button px-8 py-3 text-lg font-semibold"
+                      className="luxury-btn-primary px-8 py-3 text-lg font-semibold"
                     >
                       Calcular ITCMD Completo
                     </button>

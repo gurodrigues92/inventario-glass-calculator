@@ -47,7 +47,21 @@ const BasicCalculator = () => {
 
           {/* Header */}
           <div className="text-center mb-12 fade-in-up">
-            <div className="badge-fast inline-block mb-4">Cálculo Rápido</div>
+            <div 
+              className="badge-fast inline-block mb-4"
+              style={{
+                background: 'linear-gradient(135deg, #10B981, #059669)',
+                color: 'white',
+                padding: '6px 16px',
+                borderRadius: '20px',
+                fontSize: '11px',
+                fontWeight: '700',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em'
+              }}
+            >
+              Cálculo Rápido
+            </div>
             <h1 className="heading-lg mb-4">Cálculo Básico de ITCMD</h1>
             <p className="text-glass">
               Preencha os campos abaixo para uma estimativa rápida dos custos
@@ -82,8 +96,39 @@ const BasicCalculator = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="glass-button w-full py-4 text-lg font-semibold"
+                className="luxury-btn-primary w-full py-4 text-lg font-semibold"
                 disabled={!formData.patrimonio || !formData.estado}
+                style={{
+                  background: !formData.patrimonio || !formData.estado 
+                    ? 'rgba(133, 149, 171, 0.3)' 
+                    : 'linear-gradient(135deg, #FFD700, #FFA500, #FFD700)',
+                  color: !formData.patrimonio || !formData.estado ? '#8595ab' : '#1a1a1a',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: '18px',
+                  fontSize: '18px',
+                  fontWeight: '700',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  cursor: !formData.patrimonio || !formData.estado ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: !formData.patrimonio || !formData.estado 
+                    ? 'none' 
+                    : '0 6px 20px rgba(255, 215, 0, 0.3)',
+                  opacity: !formData.patrimonio || !formData.estado ? 0.5 : 1
+                }}
+                onMouseEnter={(e) => {
+                  if (formData.patrimonio && formData.estado) {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 30px rgba(255, 215, 0, 0.5)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (formData.patrimonio && formData.estado) {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 215, 0, 0.3)';
+                  }
+                }}
               >
                 Calcular ITCMD
               </button>

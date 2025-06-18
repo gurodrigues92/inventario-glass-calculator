@@ -9,18 +9,14 @@ interface TipoProcessoSelectorProps {
 const TipoProcessoSelector = ({ value, onChange }: TipoProcessoSelectorProps) => {
   return (
     <div>
-      <label className="block text-sm font-medium text-white mb-2">
+      <label className="luxury-label">
         Tipo de processo desejado *
       </label>
       <div className="grid grid-cols-2 gap-4">
         <button
           type="button"
           onClick={() => onChange('extrajudicial')}
-          className={`p-4 rounded-lg border transition-all ${
-            value === 'extrajudicial'
-              ? 'border-purple-500 bg-purple-500/10'
-              : 'border-glass-border bg-glass-white'
-          }`}
+          className={`luxury-option-card ${value === 'extrajudicial' ? 'active' : ''}`}
         >
           <div className="font-medium text-white">Extrajudicial</div>
           <div className="text-sm text-glass">60-120 dias</div>
@@ -29,11 +25,7 @@ const TipoProcessoSelector = ({ value, onChange }: TipoProcessoSelectorProps) =>
         <button
           type="button"
           onClick={() => onChange('judicial')}
-          className={`p-4 rounded-lg border transition-all ${
-            value === 'judicial'
-              ? 'border-purple-500 bg-purple-500/10'
-              : 'border-glass-border bg-glass-white'
-          }`}
+          className={`luxury-option-card ${value === 'judicial' ? 'active' : ''}`}
         >
           <div className="font-medium text-white">Judicial</div>
           <div className="text-sm text-glass">3-8 anos</div>

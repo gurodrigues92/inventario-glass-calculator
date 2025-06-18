@@ -1,4 +1,3 @@
-
 @layer components {
   /* Background Animated - força aplicação */
   .bg-animated {
@@ -540,5 +539,214 @@
     .cta-section {
       padding: 60px 24px !important;
     }
+  }
+
+  /* Luxury Form Components */
+  .luxury-label {
+    color: #c2cad5;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .luxury-input {
+    background: rgba(26, 26, 26, 0.8) !important;
+    border: 1px solid rgba(133, 149, 171, 0.3);
+    border-radius: 12px;
+    padding: 16px 20px;
+    color: #e1e5ea !important;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    width: 100%;
+  }
+
+  .luxury-input:focus {
+    outline: none;
+    border-color: rgba(255, 215, 0, 0.5);
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+  }
+
+  .luxury-input::placeholder {
+    color: #8595ab;
+  }
+
+  .luxury-select {
+    background: rgba(26, 26, 26, 0.8) !important;
+    border: 1px solid rgba(133, 149, 171, 0.3);
+    border-radius: 12px;
+    padding: 16px 20px;
+    color: #e1e5ea !important;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    width: 100%;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%23FFD700' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    padding-right: 48px;
+  }
+
+  .luxury-select:focus {
+    outline: none;
+    border-color: rgba(255, 215, 0, 0.5);
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+  }
+
+  .luxury-select option {
+    background: #1a1a1a;
+    color: #e1e5ea;
+  }
+
+  .luxury-option-card {
+    background: rgba(26, 26, 26, 0.6);
+    border: 1px solid rgba(133, 149, 171, 0.3);
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .luxury-option-card:hover {
+    border-color: rgba(255, 215, 0, 0.3);
+    background: rgba(26, 26, 26, 0.8);
+  }
+
+  .luxury-option-card.active {
+    border-color: rgba(255, 215, 0, 0.5);
+    background: rgba(255, 215, 0, 0.1);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+  }
+
+  .luxury-checkbox-card {
+    display: flex;
+    align-items: center;
+    space-x: 12px;
+    padding: 16px;
+    background: rgba(26, 26, 26, 0.4);
+    border: 1px solid rgba(133, 149, 171, 0.2);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .luxury-checkbox-card:hover {
+    border-color: rgba(255, 215, 0, 0.3);
+    background: rgba(26, 26, 26, 0.6);
+  }
+
+  .luxury-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(133, 149, 171, 0.4);
+    border-radius: 4px;
+    background: transparent;
+    margin-right: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .luxury-checkbox:checked {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    border-color: #FFD700;
+  }
+
+  .luxury-checkbox:checked::before {
+    content: '✓';
+    color: #1a1a1a;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .luxury-btn-primary {
+    background: linear-gradient(135deg, #FFD700, #FFA500, #FFD700) !important;
+    border: none;
+    border-radius: 12px;
+    color: #1a1a1a !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 16px 32px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+    cursor: pointer;
+  }
+
+  .luxury-btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.5s;
+    z-index: 1;
+  }
+
+  .luxury-btn-primary:hover::before {
+    left: 100%;
+  }
+
+  .luxury-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255, 215, 0, 0.5);
+  }
+
+  .luxury-btn-primary > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  .luxury-btn-secondary {
+    background: transparent;
+    border: 2px solid rgba(133, 149, 171, 0.4);
+    border-radius: 12px;
+    color: #c2cad5;
+    font-weight: 600;
+    padding: 16px 32px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .luxury-btn-secondary:hover {
+    border-color: rgba(255, 215, 0, 0.4);
+    color: #FFD700;
+    transform: translateY(-2px);
+  }
+
+  /* Badge styles */
+  .badge-fast {
+    background: linear-gradient(135deg, #10B981, #059669);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .badge-top {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #1a1a1a;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+    animation: pulse-gold 2s infinite;
   }
 }

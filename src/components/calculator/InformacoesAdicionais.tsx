@@ -16,35 +16,35 @@ const InformacoesAdicionais = ({
 }: InformacoesAdicionaisProps) => {
   return (
     <div className="space-y-4">
-      <h3 className="text-white font-medium">Informações Adicionais</h3>
+      <h3 className="luxury-label">Informações Adicionais</h3>
       
       <div className="grid grid-cols-1 gap-3">
-        <label className="flex items-center space-x-2">
+        <label className="luxury-checkbox-card">
           <input
             type="checkbox"
             checked={temTestamento}
             onChange={(e) => onToggle('temTestamento', e.target.checked)}
-            className="rounded border-glass-border"
+            className="luxury-checkbox"
           />
           <span className="text-sm text-white">Existe testamento válido</span>
         </label>
         
-        <label className="flex items-center space-x-2">
+        <label className="luxury-checkbox-card">
           <input
             type="checkbox"
             checked={temMenoresIncapazes}
             onChange={(e) => onToggle('temMenoresIncapazes', e.target.checked)}
-            className="rounded border-glass-border"
+            className="luxury-checkbox"
           />
           <span className="text-sm text-white">Há herdeiros menores ou incapazes</span>
         </label>
         
-        <label className="flex items-center space-x-2">
+        <label className="luxury-checkbox-card">
           <input
             type="checkbox"
             checked={temLitigio}
             onChange={(e) => onToggle('temLitigio', e.target.checked)}
-            className="rounded border-glass-border"
+            className="luxury-checkbox"
           />
           <span className="text-sm text-white">Possibilidade de litígio entre herdeiros</span>
         </label>

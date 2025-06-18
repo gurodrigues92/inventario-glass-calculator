@@ -15,17 +15,17 @@ const EstadoSelector = ({ value, onChange }: EstadoSelectorProps) => {
 
   return (
     <div>
-      <label className="block text-sm font-medium text-white mb-2">
+      <label className="luxury-label">
         Estado onde será feito o inventário *
       </label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="glass-input w-full"
+        className="luxury-select w-full"
         required
       >
         {estadosOptions.map(estado => (
-          <option key={estado.value} value={estado.value} className="bg-gray-900">
+          <option key={estado.value} value={estado.value}>
             {estado.label}
           </option>
         ))}
