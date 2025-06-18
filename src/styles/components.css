@@ -1,50 +1,77 @@
 
-/* Cards Luxuosos com Glassmorphism */
 @layer components {
+  /* Background Animated - força aplicação */
+  .bg-animated {
+    position: relative;
+    background: var(--bg-primary, #1a1a1a) !important;
+    color: var(--text-primary, rgba(255, 255, 255, 0.95)) !important;
+    min-height: 100vh;
+  }
+
+  .bg-animated::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      radial-gradient(circle at 20% 20%, var(--color-primary, #8595ab) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, var(--color-secondary, #a4b0c0) 0%, transparent 50%),
+      radial-gradient(circle at 40% 60%, var(--color-tertiary, #c2cad5) 0%, transparent 50%);
+    filter: blur(120px);
+    opacity: 0.2;
+    animation: float 25s ease-in-out infinite;
+    z-index: -1;
+  }
+
+  /* Glass Cards com fallbacks */
   .glass-card {
-    background: var(--bg-luxury) !important;
+    background: var(--bg-luxury, linear-gradient(135deg, rgba(133, 149, 171, 0.05) 0%, rgba(225, 229, 234, 0.03) 100%)) !important;
     backdrop-filter: blur(20px);
-    border: 1px solid var(--border-luxury);
+    border: 1px solid var(--border-luxury, rgba(255, 255, 255, 0.08));
     border-radius: 24px;
     box-shadow: 
-      var(--shadow-premium),
+      var(--shadow-premium, 0 8px 32px rgba(0, 0, 0, 0.2)),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    color: var(--text-primary) !important;
+    color: var(--text-primary, rgba(255, 255, 255, 0.95)) !important;
   }
 
   .glass-card:hover {
     transform: translateY(-4px);
-    box-shadow: var(--shadow-luxury);
-    border-color: var(--border-gold);
+    box-shadow: var(--shadow-luxury, 0 10px 40px rgba(0, 0, 0, 0.3));
+    border-color: var(--border-gold, rgba(255, 215, 0, 0.3));
   }
 
-  /* Cards Luxuosos Específicos */
+  /* Luxury Cards */
   .luxury-card {
-    background: var(--bg-luxury) !important;
+    background: var(--bg-luxury, linear-gradient(135deg, rgba(133, 149, 171, 0.05) 0%, rgba(225, 229, 234, 0.03) 100%)) !important;
     backdrop-filter: blur(20px);
-    border: 1px solid var(--border-luxury);
+    border: 1px solid var(--border-luxury, rgba(255, 255, 255, 0.08));
     box-shadow: 
-      var(--shadow-premium),
+      var(--shadow-premium, 0 8px 32px rgba(0, 0, 0, 0.2)),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     transition: all 0.3s ease;
-    color: var(--text-primary) !important;
+    color: var(--text-primary, rgba(255, 255, 255, 0.95)) !important;
   }
 
   .luxury-card:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-luxury);
+    box-shadow: var(--shadow-luxury, 0 10px 40px rgba(0, 0, 0, 0.3));
   }
 
+  /* Glass Header */
   .glass-header {
     background: rgba(133, 149, 171, 0.08) !important;
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border-light, rgba(255, 255, 255, 0.1));
   }
 
+  /* Glass Buttons */
   .glass-button {
-    background: var(--gradient-gold) !important;
+    background: var(--gradient-gold, linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%)) !important;
     border: none;
     border-radius: 16px;
     color: #1a1a1a !important;
@@ -52,7 +79,7 @@
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    box-shadow: var(--shadow-gold);
+    box-shadow: var(--shadow-gold, 0 0 30px rgba(255, 215, 0, 0.3));
   }
 
   .glass-button::before {
@@ -75,52 +102,28 @@
     box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
   }
 
-  /* Input Styles Luxuosos */
+  /* Glass Inputs */
   .glass-input {
     background: rgba(133, 149, 171, 0.05) !important;
-    border: 1px solid var(--border-luxury);
+    border: 1px solid var(--border-luxury, rgba(255, 255, 255, 0.08));
     border-radius: 12px;
-    color: var(--text-primary) !important;
+    color: var(--text-primary, rgba(255, 255, 255, 0.95)) !important;
     padding: 12px 16px;
     transition: all 0.3s ease;
   }
 
   .glass-input:focus {
     outline: none;
-    border-color: var(--color-primary);
+    border-color: var(--color-primary, #8595ab);
     box-shadow: 0 0 0 3px rgba(133, 149, 171, 0.1);
   }
 
   .glass-input::placeholder {
-    color: var(--text-secondary);
+    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
   }
 
   /* Shadow Glow Effect */
   .shadow-glow {
-    box-shadow: var(--shadow-gold);
-  }
-
-  /* Background Animated */
-  .bg-animated {
-    position: relative;
-    background: var(--bg-primary) !important;
-    min-height: 100vh;
-  }
-
-  .bg-animated::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: 
-      radial-gradient(circle at 20% 20%, var(--color-primary) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, var(--color-secondary) 0%, transparent 50%),
-      radial-gradient(circle at 40% 60%, var(--color-tertiary) 0%, transparent 50%);
-    filter: blur(120px);
-    opacity: 0.2;
-    animation: float 25s ease-in-out infinite;
-    z-index: -1;
+    box-shadow: var(--shadow-gold, 0 0 30px rgba(255, 215, 0, 0.3));
   }
 }

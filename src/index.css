@@ -1,10 +1,12 @@
 
+/* Import variables first to ensure they're available */
+@import './styles/variables.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Import all style modules in correct order */
-@import './styles/variables.css';
+/* Import custom styles after Tailwind to ensure precedence */
 @import './styles/base.css';
 @import './styles/components.css';
 @import './styles/typography.css';

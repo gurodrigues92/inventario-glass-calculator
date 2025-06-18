@@ -1,105 +1,112 @@
+
 /* Design System Luxuoso - Nova Paleta */
-@layer base {
-  :root {
-    /* Shadcn/UI Variables - keeping existing */
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --radius: 0.5rem;
+:root {
+  /* Shadcn/UI Variables - keeping existing */
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 210 40% 98%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 212.7 26.8% 83.9%;
+  --radius: 0.5rem;
 
-    /* Paleta Principal - Tons de Cinza Azulado Luxuosos */
-    --color-primary: #8595ab;
-    --color-secondary: #a4b0c0;
-    --color-tertiary: #c2cad5;
-    --color-quaternary: #e1e5ea;
-    --color-white: #ffffff;
-    
-    /* Gradientes Dourados Premium */
-    --gradient-gold: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%);
-    --gradient-gold-subtle: linear-gradient(135deg, #F4E4C1 0%, #E5C77E 50%, #F4E4C1 100%);
-    --gradient-gold-premium: linear-gradient(135deg, #B8860B 0%, #FFD700 50%, #B8860B 100%);
-    
-    /* Backgrounds Luxuosos */
-    --bg-primary: #1a1a1a;
-    --bg-secondary: rgba(133, 149, 171, 0.05);
-    --bg-glass: rgba(255, 255, 255, 0.03);
-    --bg-glass-hover: rgba(255, 255, 255, 0.06);
-    --bg-luxury: linear-gradient(135deg, rgba(133, 149, 171, 0.05) 0%, rgba(225, 229, 234, 0.03) 100%);
-    
-    /* Bordas Premium */
-    --border-light: rgba(255, 255, 255, 0.1);
-    --border-gold: rgba(255, 215, 0, 0.3);
-    --border-luxury: rgba(255, 255, 255, 0.08);
-    
-    /* Sombras Luxuosas */
-    --shadow-gold: 0 0 30px rgba(255, 215, 0, 0.3);
-    --shadow-luxury: 0 10px 40px rgba(0, 0, 0, 0.3);
-    --shadow-premium: 0 8px 32px rgba(0, 0, 0, 0.2);
-
-    /* Glassmorphism Variables */
-    --bg-dark: #1a1a1a;
-    --glass-white: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --text-primary: rgba(255, 255, 255, 0.95);
-    --text-secondary: rgba(255, 255, 255, 0.7);
-    --accent-purple: #8B5CF6;
-    --accent-pink: #FF006E;
-    --accent-green: #10B981;
-    --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.3);
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-  }
-
-  /* Utility classes for our custom variables */
-  .bg-primary-luxury { background-color: var(--color-primary); }
-  .bg-secondary-luxury { background-color: var(--color-secondary); }
-  .bg-tertiary-luxury { background-color: var(--color-tertiary); }
-  .bg-quaternary-luxury { background-color: var(--color-quaternary); }
+  /* Paleta Principal - Tons de Cinza Azulado Luxuosos */
+  --color-primary: #8595ab;
+  --color-secondary: #a4b0c0;
+  --color-tertiary: #c2cad5;
+  --color-quaternary: #e1e5ea;
+  --color-white: #ffffff;
   
-  .text-primary-luxury { color: var(--text-primary); }
-  .text-secondary-luxury { color: var(--text-secondary); }
-  .text-glass { color: var(--text-secondary); }
+  /* Gradientes Dourados Premium */
+  --gradient-gold: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%);
+  --gradient-gold-subtle: linear-gradient(135deg, #F4E4C1 0%, #E5C77E 50%, #F4E4C1 100%);
+  --gradient-gold-premium: linear-gradient(135deg, #B8860B 0%, #FFD700 50%, #B8860B 100%);
   
-  .border-luxury { border-color: var(--border-luxury); }
-  .border-gold { border-color: var(--border-gold); }
-  .border-glass-border { border-color: var(--glass-border); }
+  /* Backgrounds Luxuosos */
+  --bg-primary: #1a1a1a;
+  --bg-secondary: rgba(133, 149, 171, 0.05);
+  --bg-glass: rgba(255, 255, 255, 0.03);
+  --bg-glass-hover: rgba(255, 255, 255, 0.06);
+  --bg-luxury: linear-gradient(135deg, rgba(133, 149, 171, 0.05) 0%, rgba(225, 229, 234, 0.03) 100%);
   
-  .bg-glass-white { background-color: var(--glass-white); }
-  .bg-glass-hover { background-color: var(--bg-glass-hover); }
+  /* Bordas Premium */
+  --border-light: rgba(255, 255, 255, 0.1);
+  --border-gold: rgba(255, 215, 0, 0.3);
+  --border-luxury: rgba(255, 255, 255, 0.08);
+  
+  /* Sombras Luxuosas */
+  --shadow-gold: 0 0 30px rgba(255, 215, 0, 0.3);
+  --shadow-luxury: 0 10px 40px rgba(0, 0, 0, 0.3);
+  --shadow-premium: 0 8px 32px rgba(0, 0, 0, 0.2);
+
+  /* Glassmorphism Variables */
+  --bg-dark: #1a1a1a;
+  --glass-white: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --text-primary: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --accent-purple: #8B5CF6;
+  --accent-pink: #FF006E;
+  --accent-green: #10B981;
+  --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.3);
+}
+
+/* Force dark theme application */
+* {
+  color-scheme: dark;
+}
+
+html {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+body {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(133, 149, 171, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(164, 176, 192, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(194, 202, 213, 0.06) 0%, transparent 50%) !important;
+}
+
+#root {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  min-height: 100vh;
+}
+
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 210 40% 98%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 212.7 26.8% 83.9%;
 }

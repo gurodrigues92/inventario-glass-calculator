@@ -2,30 +2,34 @@
 @layer base {
   * {
     @apply border-border;
+    box-sizing: border-box;
   }
   
   html {
     @apply dark;
     background: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
   
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     
-    /* Force dark theme styles */
-    background: var(--bg-primary) !important;
+    /* Force dark theme styles with fallbacks */
+    background: var(--bg-primary, #1a1a1a) !important;
     background-image: 
       radial-gradient(circle at 20% 80%, rgba(133, 149, 171, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 80% 20%, rgba(164, 176, 192, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(194, 202, 213, 0.06) 0%, transparent 50%);
-    color: var(--text-primary) !important;
+      radial-gradient(circle at 40% 40%, rgba(194, 202, 213, 0.06) 0%, transparent 50%) !important;
+    color: var(--text-primary, rgba(255, 255, 255, 0.95)) !important;
     overflow-x: hidden;
     min-height: 100vh;
   }
   
   #root {
-    background: var(--bg-primary) !important;
+    background: var(--bg-primary, #1a1a1a) !important;
+    color: var(--text-primary, rgba(255, 255, 255, 0.95)) !important;
     min-height: 100vh;
   }
 }
