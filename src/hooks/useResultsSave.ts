@@ -40,7 +40,11 @@ export const useResultsSave = (resultado: any, formData: any, calculationType: s
         comparacao: resultado.comparacao
       };
 
-      const calculoId = await salvarCalculo(dadosUsuario, dadosCalculo, calculationType || 'basica');
+      // Type guard to ensure calculationType is valid
+      const tipoCalculadora: 'basica' | 'avancada' = 
+        calculationType === 'advanced' ? 'avancada' : 'basica';
+
+      const calculoId = await salvarCalculo(dadosUsuario, dadosCalculo, tipoCalculadora);
       setCalculoSalvoId(calculoId);
     } catch (error) {
       console.error('Erro ao salvar cálculo:', error);
