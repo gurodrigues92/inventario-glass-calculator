@@ -23,7 +23,8 @@ const ResultsBreakdown = ({ detalhamento }: ResultsBreakdownProps) => {
       value: formatCurrency(detalhamento.itcmd.valor),
       subtitle: detalhamento.itcmd.descricao,
       percentage: `${detalhamento.itcmd.percentual?.toFixed(1)}% do patrimônio`,
-      color: 'purple' as const
+      color: 'from-purple-400 to-purple-600' as const,
+      bgColor: 'bg-gradient-to-r from-purple-500/10 to-purple-600/10'
     },
     {
       icon: '⚖️',
@@ -35,8 +36,9 @@ const ResultsBreakdown = ({ detalhamento }: ResultsBreakdownProps) => {
       percentage: detalhamento.honorarios.isRange 
         ? '1,5% a 1,7% do patrimônio'
         : `${detalhamento.honorarios.percentual?.toFixed(1)}% do patrimônio`,
-      color: 'green' as const,
-      tooltip: 'Baseado na média do mercado, os honorários costumam variar entre 1,5% e 1,7% do patrimônio. Para patrimônios litigiosos, esse valor pode ser maior.'
+      color: 'from-green-400 to-green-600' as const,
+      bgColor: 'bg-gradient-to-r from-green-500/10 to-green-600/10',
+      tooltip: detalhamento.honorarios.tooltip
     },
     {
       icon: '📋',
@@ -44,7 +46,8 @@ const ResultsBreakdown = ({ detalhamento }: ResultsBreakdownProps) => {
       value: formatCurrency(detalhamento.custas.valor),
       subtitle: detalhamento.custas.descricao,
       percentage: '',
-      color: 'blue' as const
+      color: 'from-blue-400 to-blue-600' as const,
+      bgColor: 'bg-gradient-to-r from-blue-500/10 to-blue-600/10'
     },
     {
       icon: '🏢',
@@ -52,64 +55,74 @@ const ResultsBreakdown = ({ detalhamento }: ResultsBreakdownProps) => {
       value: formatCurrency(detalhamento.cartorio.valor),
       subtitle: detalhamento.cartorio.descricao,
       percentage: `${detalhamento.cartorio.percentual}% do patrimônio`,
-      color: 'orange' as const
+      color: 'from-orange-400 to-orange-600' as const,
+      bgColor: 'bg-gradient-to-r from-orange-500/10 to-orange-600/10'
     }
   ];
 
   return (
     <>
-      {/* Metrics Grid */}
+      {/* Metrics Grid Premium */}
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         {breakdownCards.map((card, index) => (
           <div key={index} className="fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
-            <GlassCard className="text-center h-full">
-              <div className="text-3xl mb-3">{card.icon}</div>
-              <div className="mb-3">
-                <div className={`text-2xl font-bold mb-1 ${
-                  card.color === 'purple' ? 'text-purple-400' :
-                  card.color === 'green' ? 'text-green-400' :
-                  card.color === 'blue' ? 'text-blue-400' :
-                  'text-orange-400'
-                }`}>
+            <div className={`luxury-card text-center h-full p-6 ${card.bgColor} border-2 border-white/10`}>
+              <div className="text-4xl mb-4">{card.icon}</div>
+              <div className="mb-4">
+                <div className={`text-2xl font-bold mb-2 bg-gradient-to-r ${card.color} bg-clip-text text-transparent`}>
                   {card.value}
                 </div>
                 {card.percentage && (
-                  <div className="text-sm text-glass mb-2">
+                  <div className="text-sm text-glass mb-2 font-medium">
                     {card.percentage}
                   </div>
                 )}
               </div>
               <h3 className="font-semibold text-white mb-2 text-sm">{card.label}</h3>
-              <p className="text-xs text-glass">{card.subtitle}</p>
+              <p className="text-xs text-glass leading-relaxed">{card.subtitle}</p>
               {card.tooltip && (
-                <div className="mt-2 p-2 bg-blue-500/10 border border-blue-500/30 rounded text-xs text-blue-300">
-                  💡 {card.tooltip}
+                <div className="mt-3 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg text-left">
+                  <div className="flex items-start space-x-2">
+                    <span className="text-blue-400 text-sm">💡</span>
+                    <p className="text-blue-300 text-xs leading-relaxed">{card.tooltip}</p>
+                  </div>
                 </div>
               )}
-            </GlassCard>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* ITBI Card se houver imóveis */}
+      {/* ITBI Card Premium se houver imóveis */}
       {detalhamento.itbi.valor > 0 && (
         <div className="mb-8">
-          <GlassCard>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-orange-400 mb-2">
-                {formatCurrency(detalhamento.itbi.valor)}
-              </div>
-              <div className="text-sm text-glass mb-2">
-                {detalhamento.itbi.percentual?.toFixed(1)}% do valor dos imóveis
-              </div>
-              <h3 className="font-semibold text-white mb-1">{detalhamento.itbi.descricao}</h3>
-              {detalhamento.itbi.informativo && (
-                <div className="mt-3 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
-                  <p className="text-green-300 text-sm">✅ {detalhamento.itbi.informativo}</p>
+          <div className="luxury-card p-6 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 border-2 border-orange-500/30">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <span className="text-3xl">🏠</span>
+                <div>
+                  <h3 className="font-semibold text-white text-lg">{detalhamento.itbi.descricao}</h3>
+                  <p className="text-sm text-glass">
+                    {detalhamento.itbi.percentual?.toFixed(1)}% do valor dos imóveis
+                  </p>
                 </div>
-              )}
+              </div>
+              <div className="text-right">
+                <div className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-yellow-500 bg-clip-text text-transparent">
+                  {formatCurrency(detalhamento.itbi.valor)}
+                </div>
+              </div>
             </div>
-          </GlassCard>
+            
+            {detalhamento.itbi.informativo && (
+              <div className="mt-4 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
+                <div className="flex items-start space-x-2">
+                  <span className="text-green-400 text-lg">✅</span>
+                  <p className="text-green-300 text-sm font-medium">{detalhamento.itbi.informativo}</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </>

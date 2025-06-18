@@ -1,3 +1,4 @@
+
 import { ESTADOS_DATA } from '../data/estadosData';
 import { formatCurrency } from './formatters';
 import { gerarAlertas, verificarExtrajudicial } from './validators';
@@ -30,6 +31,7 @@ export interface DetalhamentoCusto {
   descricao: string;
   isRange?: boolean;
   informativo?: string;
+  tooltip?: string;
 }
 
 export interface ComparacaoProcesso {
@@ -45,13 +47,14 @@ export interface InsightPersonalizado {
   valor?: number;
 }
 
-// Dados de isenções ITBI por estado
+// Dados de isenções ITBI por estado aprimorados
 const ISENCOES_ITBI = {
-  'SP': { limite: 200000, percentual: 100 }, // Isenção total até R$ 200k
-  'RJ': { limite: 150000, percentual: 100 }, // Isenção total até R$ 150k
-  'MG': { limite: 100000, percentual: 50 },  // 50% de redução até R$ 100k
-  'RS': { limite: 250000, percentual: 100 }, // Isenção total até R$ 250k
-  'PR': { limite: 180000, percentual: 100 }, // Isenção total até R$ 180k
+  'SP': { limite: 200000, percentual: 100, descricao: 'Imóvel único até R$ 200.000' },
+  'RJ': { limite: 150000, percentual: 100, descricao: 'Primeiro imóvel até R$ 150.000' },
+  'MG': { limite: 100000, percentual: 50, descricao: '50% de redução até R$ 100.000' },
+  'RS': { limite: 250000, percentual: 100, descricao: 'Imóvel residencial único até R$ 250.000' },
+  'PR': { limite: 180000, percentual: 100, descricao: 'Imóvel único até R$ 180.000' },
+  'SC': { limite: 120000, percentual: 100, descricao: 'Imóvel residencial até R$ 120.000' }
 };
 
 export interface ResultadoCalculo {
@@ -121,6 +124,7 @@ interface ResultadoRefinado {
   temLitigio?: boolean;
 }
 
+// Função corrigida para ITCMD progressivo (especialmente RS)
 const calcularITCMDProgressivo = (patrimonio: number, estado: string): number => {
   const estadoData = ESTADOS_DATA[estado];
   if (!estadoData || estadoData.itcmd.tipo !== 'progressiva') {
@@ -142,16 +146,20 @@ const calcularITCMDProgressivo = (patrimonio: number, estado: string): number =>
     if (valorRestante <= 0) break;
   }
   
-  return imposto;
+  return Math.round(imposto); // Garantir valor inteiro
 };
 
+// Honorários advocatícios aprimorados (1,5% a 1,7%)
 const calcularHonorariosVariaveis = (patrimonio: number, tipoProcesso: string, temLitigio: boolean = false) => {
   if (temLitigio) {
     return {
-      valor: patrimonio * 0.20,
-      percentual: 20,
-      descricao: 'Honorários com litígio (20%)',
-      isRange: false
+      valor: patrimonio * 0.15, // Valor médio para display
+      valorMinimo: patrimonio * 0.10,
+      valorMaximo: patrimonio * 0.20,
+      percentual: 15,
+      descricao: 'Honorários com litígio (10% a 20%)',
+      isRange: true,
+      tooltip: 'Em casos litigiosos, os honorários podem variar de 10% a 20% do patrimônio devido à complexidade adicional'
     };
   }
 
@@ -163,8 +171,9 @@ const calcularHonorariosVariaveis = (patrimonio: number, tipoProcesso: string, t
       valorMinimo: minimo,
       valorMaximo: maximo,
       percentual: 1.6, // Percentual médio
-      descricao: 'Honorários advocatícios (1,5% a 1,7%)',
-      isRange: true
+      descricao: 'Honorários advocatícios judiciais',
+      isRange: true,
+      tooltip: 'Baseado na média do mercado, os honorários costumam variar entre 1,5% e 1,7% do patrimônio para processos judiciais'
     };
   } else {
     const minimo = patrimonio * 0.015; // 1,5%
@@ -174,12 +183,14 @@ const calcularHonorariosVariaveis = (patrimonio: number, tipoProcesso: string, t
       valorMinimo: minimo,
       valorMaximo: maximo,
       percentual: 1.6,
-      descricao: 'Honorários extrajudiciais (1,5% a 1,7%)',
-      isRange: true
+      descricao: 'Honorários advocatícios extrajudiciais',
+      isRange: true,
+      tooltip: 'Para inventário extrajudicial, os honorários também variam entre 1,5% e 1,7% do patrimônio'
     };
   }
 };
 
+// ITBI inteligente com isenções por estado
 const calcularITBIInteligente = (valorImoveis: number, estado: string) => {
   const aliquotaPadrao = 0.03; // 3%
   let itbi = valorImoveis * aliquotaPadrao;
@@ -190,12 +201,12 @@ const calcularITBIInteligente = (valorImoveis: number, estado: string) => {
   if (isencao && valorImoveis <= isencao.limite) {
     if (isencao.percentual === 100) {
       itbi = 0;
-      informativo = `Imóvel isento de ITBI em ${estado} até ${formatCurrency(isencao.limite)}`;
+      informativo = `✅ ${isencao.descricao} - Isento de ITBI em ${estado}`;
       descricao = `ITBI - Isento em ${estado}`;
     } else {
       const reducao = itbi * (isencao.percentual / 100);
       itbi = itbi - reducao;
-      informativo = `Redução de ${isencao.percentual}% no ITBI em ${estado} até ${formatCurrency(isencao.limite)}`;
+      informativo = `✅ ${isencao.descricao} - Redução de ${isencao.percentual}% no ITBI`;
       descricao = `ITBI com redução de ${isencao.percentual}% (${estado})`;
     }
   }
@@ -208,6 +219,7 @@ const calcularITBIInteligente = (valorImoveis: number, estado: string) => {
   };
 };
 
+// Insights personalizados aprimorados
 const gerarInsights = (dados: DadosCalculoInventario, custoTotal: number, economiaHolding: number): InsightPersonalizado[] => {
   const insights: InsightPersonalizado[] = [];
   
@@ -216,18 +228,21 @@ const gerarInsights = (dados: DadosCalculoInventario, custoTotal: number, econom
     const economiaExtrajudicial = (dados.patrimonio * 0.04) + 2000;
     insights.push({
       tipo: 'economia',
-      titulo: 'Economia com Inventário Extrajudicial',
-      descricao: `Você poderia economizar aproximadamente ${formatCurrency(economiaExtrajudicial)} optando pelo inventário extrajudicial.`,
+      titulo: '💰 Economia com Inventário Extrajudicial',
+      descricao: `Você poderia economizar aproximadamente ${formatCurrency(economiaExtrajudicial)} optando pelo inventário extrajudicial, além de reduzir significativamente o tempo de processo.`,
       valor: economiaExtrajudicial
     });
   }
   
-  // Insight sobre holding - com destaque especial
-  if (economiaHolding > 100000) {
+  // Insight sobre holding - com destaque especial para grandes patrimônios
+  if (economiaHolding > 50000) {
+    const emoji = economiaHolding > 200000 ? '🏆' : '💡';
+    const intensidade = economiaHolding > 200000 ? 'ALTAMENTE RECOMENDADO' : 'Recomendado';
+    
     insights.push({
       tipo: 'estrategia',
-      titulo: '💡 Holding Familiar S/A - Recomendado para Grandes Patrimônios',
-      descricao: `Uma Holding Familiar S/A poderia gerar economia de ${formatCurrency(economiaHolding)} nos custos sucessórios e ainda profissionalizar a gestão do patrimônio.`,
+      titulo: `${emoji} Holding Familiar S/A - ${intensidade}`,
+      descricao: `Uma Holding Familiar S/A poderia gerar economia de ${formatCurrency(economiaHolding)} nos custos sucessórios, além de profissionalizar a gestão do patrimônio, otimizar aspectos tributários e facilitar futuras transmissões.`,
       valor: economiaHolding
     });
   }
@@ -236,19 +251,57 @@ const gerarInsights = (dados: DadosCalculoInventario, custoTotal: number, econom
   if (!dados.temTestamento && dados.tipoProcesso === 'extrajudicial') {
     insights.push({
       tipo: 'informacao',
-      titulo: 'Testamento Acelera o Processo',
-      descricao: 'Com um testamento válido, o inventário extrajudicial pode ser concluído em até 60 dias.'
+      titulo: '📝 Testamento Acelera o Processo',
+      descricao: 'Com um testamento válido, o inventário extrajudicial pode ser concluído em até 60 dias, reduzindo custos e agilizando a transmissão do patrimônio.'
+    });
+  }
+
+  // Insight sobre planejamento sucessório para grandes patrimônios
+  if (dados.patrimonio > 3000000) {
+    insights.push({
+      tipo: 'estrategia',
+      titulo: '🎯 Planejamento Sucessório Estratégico',
+      descricao: `Para patrimônios elevados como o seu (${formatCurrency(dados.patrimonio)}), um planejamento sucessório bem estruturado pode gerar economias significativas e proteger o patrimônio familiar por gerações.`
     });
   }
 
   // Insight sobre Lei da Legítima
   insights.push({
     tipo: 'informacao',
-    titulo: 'Lei da Legítima',
-    descricao: '50% do patrimônio obrigatoriamente pertence aos herdeiros legais (descendentes, ascendentes ou cônjuge). Os outros 50% podem ser dispostos livremente.'
+    titulo: '⚖️ Lei da Legítima',
+    descricao: '50% do patrimônio obrigatoriamente pertence aos herdeiros legais (descendentes, ascendentes ou cônjuge). Os outros 50% podem ser dispostos livremente através de testamento ou doação.'
   });
   
   return insights;
+};
+
+// Função para detectar complexidade do caso
+export const detectarComplexidade = (dados: DadosCalculoInventario): { nivel: 'baixo' | 'medio' | 'alto', fatores: string[], mostrarCTA: boolean } => {
+  const fatores = [];
+  
+  if (dados.temMenoresIncapazes) {
+    fatores.push('Menores ou incapazes entre herdeiros');
+  }
+  
+  if (dados.temLitigio) {
+    fatores.push('Possível conflito entre herdeiros');
+  }
+  
+  if (dados.patrimonio > 5000000) {
+    fatores.push('Patrimônio elevado');
+  }
+  
+  if (dados.valorImoveis && dados.valorImoveis > dados.patrimonio * 0.8) {
+    fatores.push('Patrimônio predominantemente imobiliário');
+  }
+  
+  if (fatores.length >= 2) {
+    return { nivel: 'alto', fatores, mostrarCTA: true };
+  } else if (fatores.length === 1) {
+    return { nivel: 'medio', fatores, mostrarCTA: dados.patrimonio > 2000000 };
+  }
+  
+  return { nivel: 'baixo', fatores: [], mostrarCTA: false };
 };
 
 export const calcularCustosInventario = (dados: DadosCalculoInventario): ResultadoCalculo => {
@@ -277,7 +330,7 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
     }
   }
   
-  // 2. Calcular honorários advocatícios (VARIÁVEIS)
+  // 2. Calcular honorários advocatícios (VARIÁVEIS APRIMORADOS)
   const honorarios = calcularHonorariosVariaveis(patrimonio, tipoProcesso, temLitigio);
   
   // 3. Calcular custas e emolumentos
@@ -294,7 +347,7 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
   // 5. Calcular ITBI inteligente com isenções
   const itbiResult = calcularITBIInteligente(valorImoveis, estado);
   
-  // 6. Calcular custos holding
+  // 6. Calcular custos holding (estrutura completa)
   const custosHolding = patrimonio * 0.045;
   
   // 7. Tempo estimado
@@ -307,7 +360,7 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
   const economiaHolding = Math.max(0, custoTotal - custosHolding);
   
   // 9. Comparações
-  const custoJudicial = itcmd + (patrimonio * 0.016) + 5000 + cartorio + itbiResult.valor; // Usando média dos honorários
+  const custoJudicial = itcmd + (patrimonio * 0.016) + 5000 + cartorio + itbiResult.valor;
   const custoExtrajudicial = itcmd + (patrimonio * 0.016) + 3000 + cartorio + itbiResult.valor;
   
   return {
@@ -326,7 +379,8 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
         valorMaximo: honorarios.valorMaximo,
         percentual: honorarios.percentual,
         descricao: honorarios.descricao,
-        isRange: honorarios.isRange
+        isRange: honorarios.isRange,
+        tooltip: honorarios.tooltip
       },
       custas: {
         valor: custas,
