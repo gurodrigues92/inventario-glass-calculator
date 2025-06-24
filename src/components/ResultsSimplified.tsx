@@ -110,7 +110,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
       </GlassCard>
 
       {/* Destaque Holding S/A */}
-      <GlassCard style={{ border: '2px solid rgba(255, 215, 0, 0.3)' }}>
+      <GlassCard premium={true}>
         <div className="text-center mb-6">
           <div 
             className="inline-block px-6 py-2 rounded-full mb-4"
@@ -191,7 +191,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
       </GlassCard>
 
       {/* Aviso Reforma Tributária */}
-      <GlassCard style={{ border: '1px solid rgba(255, 165, 0, 0.3)' }}>
+      <GlassCard className="border border-orange-300/30">
         <div className="flex items-start gap-4">
           <span className="text-3xl">⚠️</span>
           <div>
@@ -208,7 +208,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
       </GlassCard>
 
       {/* CTA Final */}
-      <GlassCard className="text-center" style={{ border: '2px solid rgba(255, 215, 0, 0.5)' }}>
+      <GlassCard premium={true} className="text-center">
         <div className="mb-6">
           <h3 
             className="text-3xl font-bold mb-2"
