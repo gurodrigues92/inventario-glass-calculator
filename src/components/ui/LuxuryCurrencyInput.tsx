@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import LuxuryField from './LuxuryField';
-import { formatSmartCurrencyInput } from '../../utils/formatters';
+import { formatCurrencyInput, formatCurrencyInputWithoutDecimals } from '../../utils/formatters';
 
 interface LuxuryCurrencyInputProps {
   label: string;
@@ -29,7 +29,7 @@ const LuxuryCurrencyInput = ({
   className = '',
   error,
   hint,
-  allowDecimals = false
+  allowDecimals = true
 }: LuxuryCurrencyInputProps) => {
   const [rawInput, setRawInput] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -37,49 +37,61 @@ const LuxuryCurrencyInput = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     setRawInput(inputValue);
-    
-    // Durante a digitação, permite entrada mais livre
-    if (isFocused) {
-      // Apenas remove caracteres completamente inválidos
-      const cleanInput = inputValue.replace(/[^\d,\.\s]/g, '');
-      if (cleanInput !== inputValue) {
-        setRawInput(cleanInput);
-      }
-    }
   };
 
-  const handleBlur = () => {
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     setIsFocused(false);
-    // Quando sai do campo, formata o valor
-    const formattedValue = formatSmartCurrencyInput(rawInput || value, allowDecimals);
-    if (formattedValue) {
-      onChange(formattedValue);
-      setRawInput('');
-    } else if (rawInput === '') {
-      onChange('');
+    
+    // Format the currency value
+    let formattedValue = '';
+    if (rawInput || value) {
+      const inputToFormat = rawInput || value;
+      if (allowDecimals) {
+        formattedValue = formatCurrencyInput(inputToFormat);
+      } else {
+        formattedValue = formatCurrencyInputWithoutDecimals(inputToFormat);
+      }
     }
+    
+    onChange(formattedValue);
+    setRawInput('');
+    
+    // Reset border styling
+    e.target.style.borderColor = '#E8E2DD';
+    e.target.style.boxShadow = 'none';
   };
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     setIsFocused(true);
-    // Quando foca, mostra valor sem formatação para facilitar edição
+    
+    // Show unformatted value for easier editing
     if (value && !rawInput) {
       const unformatted = value.replace(/R\$\s?/, '').replace(/\./g, '');
       setRawInput(unformatted);
     }
     
+    // Apply focus styling
     e.target.style.borderColor = '#9FB7D4';
     e.target.style.boxShadow = '0 0 0 3px rgba(159, 183, 212, 0.1)';
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Permite Enter para formatar imediatamente
+    // Allow Enter to format immediately
     if (e.key === 'Enter') {
-      handleBlur();
+      e.currentTarget.blur();
+    }
+    
+    // Allow only numbers, comma, period, and navigation keys
+    const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'];
+    const isNumber = /[0-9]/.test(e.key);
+    const isDecimalSeparator = e.key === ',' || e.key === '.';
+    
+    if (!allowedKeys.includes(e.key) && !isNumber && !isDecimalSeparator) {
+      e.preventDefault();
     }
   };
 
-  // Mostra rawInput durante edição, value formatado quando não está editando
+  // Show rawInput during editing, formatted value when not editing
   const displayValue = isFocused ? rawInput : value;
 
   return (
@@ -104,11 +116,6 @@ const LuxuryCurrencyInput = ({
           fontSize: '16px',
           fontWeight: '500',
           transition: 'all 0.3s ease'
-        }}
-        onBlur={(e) => {
-          handleBlur();
-          e.target.style.borderColor = '#E8E2DD';
-          e.target.style.boxShadow = 'none';
         }}
       />
       
