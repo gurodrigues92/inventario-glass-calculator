@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import LuxuryField from './LuxuryField';
-import { formatCurrencyInputWithoutDecimals } from '../../utils/formatters';
+import { formatSmartCurrencyInput } from '../../utils/formatters';
 
 interface LuxuryCurrencyInputProps {
   label: string;
@@ -23,7 +23,7 @@ const LuxuryCurrencyInput = ({
   icon, 
   value, 
   onChange, 
-  placeholder = 'R$ 0',
+  placeholder = 'Ex: 500.000,00',
   required = false,
   disabled = false,
   className = '',
@@ -31,43 +31,66 @@ const LuxuryCurrencyInput = ({
   hint,
   allowDecimals = false
 }: LuxuryCurrencyInputProps) => {
+  const [rawInput, setRawInput] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let inputValue = e.target.value;
+    const inputValue = e.target.value;
+    setRawInput(inputValue);
     
-    if (allowDecimals) {
-      // Para valores com decimais, permite entrada mais flexível
-      inputValue = inputValue.replace(/[^\d,]/g, '');
-      
-      if (inputValue) {
-        // Converte vírgula para ponto temporariamente
-        const numericValue = parseFloat(inputValue.replace(',', '.'));
-        if (!isNaN(numericValue)) {
-          const formattedValue = new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(numericValue);
-          onChange(formattedValue);
-        } else {
-          onChange('');
-        }
-      } else {
-        onChange('');
+    // Durante a digitação, permite entrada mais livre
+    if (isFocused) {
+      // Apenas remove caracteres completamente inválidos
+      const cleanInput = inputValue.replace(/[^\d,\.\s]/g, '');
+      if (cleanInput !== inputValue) {
+        setRawInput(cleanInput);
       }
-    } else {
-      // Para valores sem decimais (comportamento original)
-      const formattedValue = formatCurrencyInputWithoutDecimals(inputValue);
-      onChange(formattedValue);
     }
   };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+    // Quando sai do campo, formata o valor
+    const formattedValue = formatSmartCurrencyInput(rawInput || value, allowDecimals);
+    if (formattedValue) {
+      onChange(formattedValue);
+      setRawInput('');
+    } else if (rawInput === '') {
+      onChange('');
+    }
+  };
+
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(true);
+    // Quando foca, mostra valor sem formatação para facilitar edição
+    if (value && !rawInput) {
+      const unformatted = value.replace(/R\$\s?/, '').replace(/\./g, '');
+      setRawInput(unformatted);
+    }
+    
+    e.target.style.borderColor = '#9FB7D4';
+    e.target.style.boxShadow = '0 0 0 3px rgba(159, 183, 212, 0.1)';
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Permite Enter para formatar imediatamente
+    if (e.key === 'Enter') {
+      handleBlur();
+    }
+  };
+
+  // Mostra rawInput durante edição, value formatado quando não está editando
+  const displayValue = isFocused ? rawInput : value;
 
   return (
     <LuxuryField label={label} icon={icon} className={className}>
       <Input
         type="text"
-        value={value}
+        value={displayValue}
         onChange={handleChange}
+        onBlur={handleBlur}
+        onFocus={handleFocus}
+        onKeyDown={handleKeyDown}
         placeholder={placeholder}
         required={required}
         disabled={disabled}
@@ -82,11 +105,8 @@ const LuxuryCurrencyInput = ({
           fontWeight: '500',
           transition: 'all 0.3s ease'
         }}
-        onFocus={(e) => {
-          e.target.style.borderColor = '#9FB7D4';
-          e.target.style.boxShadow = '0 0 0 3px rgba(159, 183, 212, 0.1)';
-        }}
         onBlur={(e) => {
+          handleBlur();
           e.target.style.borderColor = '#E8E2DD';
           e.target.style.boxShadow = 'none';
         }}
@@ -104,6 +124,13 @@ const LuxuryCurrencyInput = ({
           💡 {hint}
         </div>
       )}
+      
+      <div className="text-xs mt-1" style={{ color: '#9FB7D4' }}>
+        {allowDecimals ? 
+          'Digite naturalmente: 500000, 500.000, 500000,50 ou 500.000,50' : 
+          'Digite apenas números: 500000 ou 500.000'
+        }
+      </div>
     </LuxuryField>
   );
 };
