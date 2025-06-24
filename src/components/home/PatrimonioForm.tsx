@@ -1,0 +1,175 @@
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import GlassCard from '../GlassCard';
+import LuxuryCurrencyInput from '../ui/LuxuryCurrencyInput';
+import LuxurySelect from '../ui/LuxurySelect';
+import { ESTADOS_DATA } from '../../data/estadosData';
+import { parseCurrencyValue, formatCurrency } from '../../utils/formatters';
+
+const PatrimonioForm = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    estado: '',
+    valorImoveis: '',
+    valorVeiculos: '',
+    valorInvestimentos: ''
+  });
+
+  const [totalPatrimonio, setTotalPatrimonio] = useState(0);
+
+  // Calcular total automaticamente
+  useEffect(() => {
+    const imoveis = parseCurrencyValue(formData.valorImoveis) || 0;
+    const veiculos = parseCurrencyValue(formData.valorVeiculos) || 0;
+    const investimentos = parseCurrencyValue(formData.valorInvestimentos) || 0;
+    setTotalPatrimonio(imoveis + veiculos + investimentos);
+  }, [formData.valorImoveis, formData.valorVeiculos, formData.valorInvestimentos]);
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.estado || totalPatrimonio === 0) return;
+    
+    const dadosParaCalculo = {
+      ...formData,
+      patrimonio: formatCurrency(totalPatrimonio),
+      tipoProcesso: 'extrajudicial',
+      herdeiros: '1',
+      temTestamento: false,
+      temMenoresIncapazes: false,
+      temLitigio: false
+    };
+    
+    navigate('/resultados', { state: { formData: dadosParaCalculo, calculationType: 'simplified' } });
+  };
+
+  const estadosOptions = Object.values(ESTADOS_DATA).map(estado => ({
+    value: estado.uf,
+    label: `${estado.nome} - ITCMD ${estado.itcmd.tipo === 'fixa' ? 
+      `${(estado.itcmd.aliquota! * 100).toFixed(0)}%` : 
+      'Progressivo'}`
+  }));
+
+  const isFormValid = formData.estado && totalPatrimonio > 0;
+
+  return (
+    <GlassCard className="fade-in-up">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <LuxurySelect
+          label="Estado de Residência"
+          icon="📍"
+          value={formData.estado}
+          onChange={(value) => handleInputChange('estado', value)}
+          options={estadosOptions}
+          placeholder="Selecione seu Estado"
+          required
+          hint="Para calcular o ITCMD correto"
+        />
+
+        <LuxuryCurrencyInput
+          label="Valor de Mercado dos Imóveis"
+          icon="🏠"
+          value={formData.valorImoveis}
+          onChange={(value) => handleInputChange('valorImoveis', value)}
+          placeholder="R$ 0,00"
+          allowDecimals={true}
+          hint="Casas, apartamentos, terrenos - pelo valor real de mercado atual (não valor venal)"
+        />
+
+        <LuxuryCurrencyInput
+          label="Valor de Mercado dos Veículos"
+          icon="🚗"
+          value={formData.valorVeiculos}
+          onChange={(value) => handleInputChange('valorVeiculos', value)}
+          placeholder="R$ 0,00"
+          allowDecimals={true}
+          hint="Carros, motos, embarcações - conforme tabela FIPE ou avaliação especializada"
+        />
+
+        <LuxuryCurrencyInput
+          label="Valor de Mercado dos Investimentos"
+          icon="💎"
+          value={formData.valorInvestimentos}
+          onChange={(value) => handleInputChange('valorInvestimentos', value)}
+          placeholder="R$ 0,00"
+          allowDecimals={true}
+          hint="Ações, fundos, poupança, joias, obras de arte - valor atual de mercado real"
+        />
+
+        {/* Total do Patrimônio */}
+        <div 
+          className="total-patrimonio p-6 rounded-xl border"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.05))',
+            border: '1px solid rgba(255, 215, 0, 0.3)',
+            boxShadow: '0 4px 20px rgba(255, 215, 0, 0.1)'
+          }}
+        >
+          <div className="flex justify-between items-center">
+            <span 
+              className="text-lg font-semibold"
+              style={{ color: '#FFD700' }}
+            >
+              Total do Patrimônio (Valor de Mercado):
+            </span>
+            <span 
+              className="text-2xl font-bold"
+              style={{ color: '#FFD700' }}
+            >
+              {formatCurrency(totalPatrimonio)}
+            </span>
+          </div>
+          <div className="text-xs mt-2" style={{ color: 'rgba(255, 215, 0, 0.7)' }}>
+            Este será o valor base para cálculo do ITCMD e demais custos
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={!isFormValid}
+          className="luxury-btn-primary w-full py-4 text-lg font-semibold"
+          style={{
+            background: !isFormValid 
+              ? 'rgba(133, 149, 171, 0.3)' 
+              : 'linear-gradient(135deg, #FFD700, #FFA500, #FFD700)',
+            color: !isFormValid ? '#8595ab' : '#1a1a1a',
+            border: 'none',
+            borderRadius: '12px',
+            padding: '18px',
+            fontSize: '18px',
+            fontWeight: '700',
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            cursor: !isFormValid ? 'not-allowed' : 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: !isFormValid 
+              ? 'none' 
+              : '0 6px 20px rgba(255, 215, 0, 0.3)',
+            opacity: !isFormValid ? 0.5 : 1
+          }}
+          onMouseEnter={(e) => {
+            if (isFormValid) {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 8px 30px rgba(255, 215, 0, 0.5)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (isFormValid) {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 215, 0, 0.3)';
+            }
+          }}
+        >
+          Calcular Custos do Inventário
+        </button>
+      </form>
+    </GlassCard>
+  );
+};
+
+export default PatrimonioForm;
