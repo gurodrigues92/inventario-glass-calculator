@@ -60,8 +60,8 @@ const Header = () => {
             href="#" 
             className="font-medium relative group transition-all duration-300"
             style={{ color: '#476D9E' }}
-            onMouseEnter={(e) => e.target.style.color = '#0C2C45'}
-            onMouseLeave={(e) => e.target.style.color = '#476D9E'}
+            onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#0C2C45'}
+            onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#476D9E'}
           >
             Como funciona
             <span 
@@ -73,8 +73,8 @@ const Header = () => {
             href="#" 
             className="font-medium relative group transition-all duration-300"
             style={{ color: '#476D9E' }}
-            onMouseEnter={(e) => e.target.style.color = '#0C2C45'}
-            onMouseLeave={(e) => e.target.style.color = '#476D9E'}
+            onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#0C2C45'}
+            onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#476D9E'}
           >
             Contato
             <span 
@@ -101,12 +101,12 @@ const Header = () => {
               cursor: 'pointer'
             }}
             onMouseEnter={(e) => {
-              e.target.style.transform = 'translateY(-2px)';
-              e.target.style.boxShadow = '0 8px 24px rgba(12, 44, 69, 0.3)';
+              (e.target as HTMLElement).style.transform = 'translateY(-2px)';
+              (e.target as HTMLElement).style.boxShadow = '0 8px 24px rgba(12, 44, 69, 0.3)';
             }}
             onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 4px 16px rgba(12, 44, 69, 0.2)';
+              (e.target as HTMLElement).style.transform = 'translateY(0)';
+              (e.target as HTMLElement).style.boxShadow = '0 4px 16px rgba(12, 44, 69, 0.2)';
             }}
           >
             Falar com especialista
