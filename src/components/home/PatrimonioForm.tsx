@@ -7,7 +7,7 @@ import LuxuryCurrencyInput from '../ui/LuxuryCurrencyInput';
 import LuxurySelect from '../ui/LuxurySelect';
 import IconWrapper from '../ui/IconWrapper';
 import { ESTADOS_DATA } from '../../data/estadosData';
-import { parseCurrencyValue, formatCurrency } from '../../utils/formatters';
+import { parseCurrencyValue, formatCurrency, numeroParaExtenso } from '../../utils/formatters';
 
 const PatrimonioForm = () => {
   const navigate = useNavigate();
@@ -125,6 +125,18 @@ const PatrimonioForm = () => {
               {formatCurrency(totalPatrimonio)}
             </span>
           </div>
+          
+          {/* Valor por extenso */}
+          {totalPatrimonio > 0 && (
+            <div 
+              className="text-sm italic flex items-center gap-2 mt-2"
+              style={{ color: '#476D9E' }}
+            >
+              <span>💰</span>
+              "{numeroParaExtenso(totalPatrimonio)}"
+            </div>
+          )}
+          
           <div className="text-xs mt-2" style={{ color: '#476D9E' }}>
             Este será o valor base para cálculo do ITCMD e demais custos
           </div>

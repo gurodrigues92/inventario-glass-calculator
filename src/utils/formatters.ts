@@ -165,3 +165,97 @@ export const formatLargeNumber = (value: number): string => {
   }
   return value.toString();
 };
+
+// Função para converter números para extenso em português brasileiro
+export const numeroParaExtenso = (numero: number): string => {
+  if (numero === 0) return 'zero reais';
+
+  const unidades = ['', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 'oito', 'nove'];
+  const especiais = ['dez', 'onze', 'doze', 'treze', 'quatorze', 'quinze', 'dezesseis', 'dezessete', 'dezoito', 'dezenove'];
+  const dezenas = ['', '', 'vinte', 'trinta', 'quarenta', 'cinquenta', 'sessenta', 'setenta', 'oitenta', 'noventa'];
+  const centenas = ['', 'cento', 'duzentos', 'trezentos', 'quatrocentos', 'quinhentos', 'seiscentos', 'setecentos', 'oitocentos', 'novecentos'];
+
+  const converterGrupo = (num: number): string => {
+    if (num === 0) return '';
+    
+    let resultado = '';
+    const centena = Math.floor(num / 100);
+    const resto = num % 100;
+    const dezena = Math.floor(resto / 10);
+    const unidade = resto % 10;
+
+    if (centena === 1 && resto === 0) {
+      resultado = 'cem';
+    } else if (centena > 0) {
+      resultado = centenas[centena];
+    }
+
+    if (resto >= 10 && resto <= 19) {
+      if (resultado) resultado += ' e ';
+      resultado += especiais[resto - 10];
+    } else {
+      if (dezena > 0) {
+        if (resultado) resultado += ' e ';
+        resultado += dezenas[dezena];
+      }
+      if (unidade > 0) {
+        if (resultado) resultado += ' e ';
+        resultado += unidades[unidade];
+      }
+    }
+
+    return resultado;
+  };
+
+  // Separar reais e centavos
+  const reais = Math.floor(numero);
+  const centavos = Math.round((numero - reais) * 100);
+
+  let resultado = '';
+
+  if (reais > 0) {
+    const bilhoes = Math.floor(reais / 1000000000);
+    const milhoes = Math.floor((reais % 1000000000) / 1000000);
+    const milhares = Math.floor((reais % 1000000) / 1000);
+    const resto = reais % 1000;
+
+    if (bilhoes > 0) {
+      resultado += converterGrupo(bilhoes);
+      resultado += bilhoes === 1 ? ' bilhão' : ' bilhões';
+      if (milhoes > 0 || milhares > 0 || resto > 0) {
+        resultado += (milhoes === 0 && milhares === 0) ? ' e ' : ', ';
+      }
+    }
+
+    if (milhoes > 0) {
+      resultado += converterGrupo(milhoes);
+      resultado += milhoes === 1 ? ' milhão' : ' milhões';
+      if (milhares > 0 || resto > 0) {
+        resultado += milhares === 0 ? ' e ' : ', ';
+      }
+    }
+
+    if (milhares > 0) {
+      resultado += converterGrupo(milhares);
+      resultado += ' mil';
+      if (resto > 0) {
+        resultado += resto < 100 ? ' e ' : ', ';
+      }
+    }
+
+    if (resto > 0) {
+      resultado += converterGrupo(resto);
+    }
+
+    resultado += reais === 1 ? ' real' : ' reais';
+  }
+
+  if (centavos > 0) {
+    if (reais > 0) resultado += ' e ';
+    resultado += converterGrupo(centavos);
+    resultado += centavos === 1 ? ' centavo' : ' centavos';
+  }
+
+  // Capitalizar primeira letra
+  return resultado.charAt(0).toUpperCase() + resultado.slice(1);
+};
