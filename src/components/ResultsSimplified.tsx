@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { formatCurrency } from '../utils/formatters';
+import { formatCurrency, numeroParaExtenso } from '../utils/formatters';
 import GlassCard from './GlassCard';
 import { DadosCalculoInventario } from '../utils/itcmdCalculator';
 
@@ -32,6 +32,12 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
           >
             {resultado.resumo.custoTotalFormatado}
           </div>
+          <div 
+            className="text-lg italic mb-4"
+            style={{ color: '#476D9E' }}
+          >
+            "{numeroParaExtenso(resultado.resumo.custoTotal)}"
+          </div>
           <span 
             className="text-xl"
             style={{ color: '#476D9E' }}
@@ -48,7 +54,13 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
             color: '#0C2C45'
           }}
         >
-          💰 Patrimônio: {formatCurrency(dadosCalculo.patrimonio)}
+          <div>💰 Patrimônio: {formatCurrency(dadosCalculo.patrimonio)}</div>
+          <div 
+            className="text-xs italic mt-1"
+            style={{ color: '#476D9E' }}
+          >
+            "{numeroParaExtenso(dadosCalculo.patrimonio)}"
+          </div>
         </div>
       </GlassCard>
 
@@ -88,6 +100,12 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                 {formatCurrency(resultado.detalhamento.itcmd.valor)}
               </div>
               <div 
+                className="text-xs italic"
+                style={{ color: '#476D9E' }}
+              >
+                "{numeroParaExtenso(resultado.detalhamento.itcmd.valor)}"
+              </div>
+              <div 
                 className="text-sm" 
                 style={{ color: '#D1BFA3' }}
               >
@@ -122,6 +140,12 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                 {formatCurrency(resultado.detalhamento.honorarios.valor)}
               </div>
               <div 
+                className="text-xs italic"
+                style={{ color: '#476D9E' }}
+              >
+                "{numeroParaExtenso(resultado.detalhamento.honorarios.valor)}"
+              </div>
+              <div 
                 className="text-sm" 
                 style={{ color: '#D1BFA3' }}
               >
@@ -154,6 +178,12 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                 style={{ color: '#0C2C45' }}
               >
                 {formatCurrency(resultado.detalhamento.custas.valor)}
+              </div>
+              <div 
+                className="text-xs italic"
+                style={{ color: '#476D9E' }}
+              >
+                "{numeroParaExtenso(resultado.detalhamento.custas.valor)}"
               </div>
               <div 
                 className="text-sm" 
@@ -198,10 +228,16 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
           </p>
           
           <div 
-            className="text-3xl font-bold mb-6"
+            className="text-3xl font-bold mb-2"
             style={{ color: '#27AE60' }}
           >
             Economia estimada: {formatCurrency(resultado.resumo.economiaHolding)}
+          </div>
+          <div 
+            className="text-lg italic mb-6"
+            style={{ color: '#476D9E' }}
+          >
+            "{numeroParaExtenso(resultado.resumo.economiaHolding)}"
           </div>
         </div>
 
@@ -255,21 +291,37 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span style={{ color: '#476D9E' }}>Honorários Constituição:</span>
-                <span 
-                  className="font-medium"
-                  style={{ color: '#0C2C45' }}
-                >
-                  R$ 150.000
-                </span>
+                <div className="text-right">
+                  <span 
+                    className="font-medium"
+                    style={{ color: '#0C2C45' }}
+                  >
+                    R$ 150.000
+                  </span>
+                  <div 
+                    className="text-xs italic"
+                    style={{ color: '#476D9E' }}
+                  >
+                    "{numeroParaExtenso(150000)}"
+                  </div>
+                </div>
               </div>
               <div className="flex justify-between text-sm">
                 <span style={{ color: '#476D9E' }}>Custos Cartório:</span>
-                <span 
-                  className="font-medium"
-                  style={{ color: '#0C2C45' }}
-                >
-                  R$ 16.000
-                </span>
+                <div className="text-right">
+                  <span 
+                    className="font-medium"
+                    style={{ color: '#0C2C45' }}
+                  >
+                    R$ 16.000
+                  </span>
+                  <div 
+                    className="text-xs italic"
+                    style={{ color: '#476D9E' }}
+                  >
+                    "{numeroParaExtenso(16000)}"
+                  </div>
+                </div>
               </div>
               <div 
                 className="border-t pt-2 mt-2"
@@ -277,7 +329,15 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
               >
                 <div className="flex justify-between font-semibold">
                   <span style={{ color: '#0C2C45' }}>Total:</span>
-                  <span style={{ color: '#27AE60' }}>R$ 166.000</span>
+                  <div className="text-right">
+                    <span style={{ color: '#27AE60' }}>R$ 166.000</span>
+                    <div 
+                      className="text-xs italic font-normal"
+                      style={{ color: '#476D9E' }}
+                    >
+                      "{numeroParaExtenso(166000)}"
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
