@@ -5,8 +5,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import BasicCalculator from "./pages/BasicCalculator";
-import AdvancedCalculator from "./pages/AdvancedCalculator";
 import Results from "./pages/Results";
 import CalculosSalvos from "./pages/CalculosSalvos";
 import NotFound from "./pages/NotFound";
@@ -34,8 +32,6 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/calculadora-basica" element={<BasicCalculator />} />
-            <Route path="/calculadora-avancada" element={<AdvancedCalculator />} />
             <Route path="/resultados" element={<Results />} />
             <Route path="/calculos-salvos" element={<CalculosSalvos />} />
             <Route path="*" element={<NotFound />} />
