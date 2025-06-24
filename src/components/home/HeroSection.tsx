@@ -16,17 +16,33 @@ const HeroSection = () => {
           WebkitTextFillColor: 'transparent'
         }}
       >
-        Calculadora de Inventário
+        Reduza Legalmente o Imposto de Herança e Proteja seu Patrimônio
       </h1>
       <p 
         className="text-xl max-w-2xl mx-auto leading-relaxed mb-8"
         style={{ color: 'rgba(255, 255, 255, 0.7)' }}
       >
-        Descubra os custos do seu inventário com precisão.<br />
-        Informe os <strong>valores de mercado</strong> reais dos bens para uma estimativa precisa.
+        Descubra agora quanto você pode economizar com nosso cálculo inteligente – 
+        <strong> rápido e preciso!</strong>
       </p>
       
-      {/* Aviso sobre Valor de Mercado */}
+      {/* Elementos de Confiança */}
+      <div className="flex justify-center items-center gap-6 mb-8 flex-wrap">
+        <div className="flex items-center gap-2 text-sm" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+          <span className="text-green-400">✓</span>
+          <span>100% Legal</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+          <span className="text-green-400">✓</span>
+          <span>Resultado em Segundos</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+          <span className="text-green-400">✓</span>
+          <span>Economia até 90%</span>
+        </div>
+      </div>
+      
+      {/* Aviso sobre Valor de Mercado - Reposicionado e Simplificado */}
       <div 
         className="max-w-2xl mx-auto p-4 rounded-lg mb-8"
         style={{
@@ -37,8 +53,8 @@ const HeroSection = () => {
         <div className="flex items-center gap-3 text-sm" style={{ color: '#FFD700' }}>
           <span className="text-lg">💡</span>
           <div className="text-left">
-            <strong>Importante:</strong> Use sempre os <strong>valores de mercado reais</strong> dos bens. 
-            Valores incorretos podem gerar problemas com a Receita Federal e custos adicionais.
+            <strong>Importante:</strong> Para cálculos precisos, informe os <strong>valores reais de mercado</strong> dos bens. 
+            Isso garante conformidade legal e evita problemas futuros.
           </div>
         </div>
       </div>
