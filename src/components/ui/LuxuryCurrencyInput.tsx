@@ -6,7 +6,7 @@ import { formatCurrencyInputWithoutDecimals } from '../../utils/formatters';
 
 interface LuxuryCurrencyInputProps {
   label: string;
-  icon?: string;
+  icon?: React.ReactNode;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -20,7 +20,7 @@ interface LuxuryCurrencyInputProps {
 
 const LuxuryCurrencyInput = ({ 
   label, 
-  icon = '💰', 
+  icon, 
   value, 
   onChange, 
   placeholder = 'R$ 0',
