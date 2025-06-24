@@ -5,6 +5,7 @@ import { MapPin, Home, Car, Gem } from 'lucide-react';
 import GlassCard from '../GlassCard';
 import LuxuryCurrencyInput from '../ui/LuxuryCurrencyInput';
 import LuxurySelect from '../ui/LuxurySelect';
+import IconWrapper from '../ui/IconWrapper';
 import { ESTADOS_DATA } from '../../data/estadosData';
 import { parseCurrencyValue, formatCurrency } from '../../utils/formatters';
 
@@ -62,7 +63,7 @@ const PatrimonioForm = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         <LuxurySelect
           label="Estado de Residência"
-          icon={<MapPin size={16} color="#476D9E" strokeWidth={1.5} />}
+          icon={<IconWrapper icon={MapPin} size={16} />}
           value={formData.estado}
           onChange={(value) => handleInputChange('estado', value)}
           options={estadosOptions}
@@ -73,7 +74,7 @@ const PatrimonioForm = () => {
 
         <LuxuryCurrencyInput
           label="Valor de Mercado dos Imóveis"
-          icon={<Home size={16} color="#476D9E" strokeWidth={1.5} />}
+          icon={<IconWrapper icon={Home} size={16} />}
           value={formData.valorImoveis}
           onChange={(value) => handleInputChange('valorImoveis', value)}
           placeholder="R$ 0,00"
@@ -83,7 +84,7 @@ const PatrimonioForm = () => {
 
         <LuxuryCurrencyInput
           label="Valor de Mercado dos Veículos"
-          icon={<Car size={16} color="#476D9E" strokeWidth={1.5} />}
+          icon={<IconWrapper icon={Car} size={16} />}
           value={formData.valorVeiculos}
           onChange={(value) => handleInputChange('valorVeiculos', value)}
           placeholder="R$ 0,00"
@@ -93,7 +94,7 @@ const PatrimonioForm = () => {
 
         <LuxuryCurrencyInput
           label="Valor de Mercado dos Investimentos"
-          icon={<Gem size={16} color="#476D9E" strokeWidth={1.5} />}
+          icon={<IconWrapper icon={Gem} size={16} />}
           value={formData.valorInvestimentos}
           onChange={(value) => handleInputChange('valorInvestimentos', value)}
           placeholder="R$ 0,00"
