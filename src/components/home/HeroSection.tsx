@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Check, Lightbulb } from 'lucide-react';
 
 const HeroSection = () => {
   return (
@@ -29,15 +30,15 @@ const HeroSection = () => {
       {/* Elementos de Confiança */}
       <div className="flex justify-center items-center gap-6 mb-8 flex-wrap">
         <div className="flex items-center gap-2 text-sm" style={{ color: '#476D9E' }}>
-          <span style={{ color: '#27AE60' }}>✓</span>
+          <Check size={16} color="#27AE60" strokeWidth={2} />
           <span>100% Legal</span>
         </div>
         <div className="flex items-center gap-2 text-sm" style={{ color: '#476D9E' }}>
-          <span style={{ color: '#27AE60' }}>✓</span>
+          <Check size={16} color="#27AE60" strokeWidth={2} />
           <span>Resultado em Segundos</span>
         </div>
         <div className="flex items-center gap-2 text-sm" style={{ color: '#476D9E' }}>
-          <span style={{ color: '#27AE60' }}>✓</span>
+          <Check size={16} color="#27AE60" strokeWidth={2} />
           <span>Economia até 90%</span>
         </div>
       </div>
@@ -52,7 +53,7 @@ const HeroSection = () => {
         }}
       >
         <div className="flex items-center gap-3 text-sm" style={{ color: '#0C2C45' }}>
-          <span className="text-lg">💡</span>
+          <Lightbulb size={20} color="#0C2C45" strokeWidth={1.5} />
           <div className="text-left">
             <strong>Importante:</strong> Para cálculos precisos, informe os <strong>valores reais de mercado</strong> dos bens. 
             Isso garante conformidade legal e evita problemas futuros.

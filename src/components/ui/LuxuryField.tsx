@@ -3,7 +3,7 @@ import React from 'react';
 
 interface LuxuryFieldProps {
   label: string;
-  icon?: string;
+  icon?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
 }

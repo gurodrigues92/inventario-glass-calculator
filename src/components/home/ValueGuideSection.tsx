@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Target, Check } from 'lucide-react';
 import GlassCard from '../GlassCard';
 
 const ValueGuideSection = () => {
@@ -8,10 +9,11 @@ const ValueGuideSection = () => {
       <GlassCard>
         <div className="text-center mb-6">
           <h3 
-            className="text-xl font-semibold mb-4"
+            className="text-xl font-semibold mb-4 flex items-center justify-center gap-2"
             style={{ color: '#0C2C45' }}
           >
-            🎯 Por que usar Valor de Mercado?
+            <Target size={24} color="#0C2C45" strokeWidth={1.5} />
+            Por que usar Valor de Mercado?
           </h3>
         </div>
         
@@ -21,7 +23,7 @@ const ValueGuideSection = () => {
               className="font-semibold mb-3 flex items-center gap-2"
               style={{ color: '#0C2C45' }}
             >
-              <span style={{ color: '#27AE60' }}>✓</span>
+              <Check size={20} color="#27AE60" strokeWidth={2} />
               Precisão Legal
             </h4>
             <p className="text-sm" style={{ color: '#476D9E' }}>
@@ -35,7 +37,7 @@ const ValueGuideSection = () => {
               className="font-semibold mb-3 flex items-center gap-2"
               style={{ color: '#0C2C45' }}
             >
-              <span style={{ color: '#27AE60' }}>✓</span>
+              <Check size={20} color="#27AE60" strokeWidth={2} />
               Cálculo Correto
             </h4>
             <p className="text-sm" style={{ color: '#476D9E' }}>

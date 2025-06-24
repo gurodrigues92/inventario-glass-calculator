@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { Gem } from 'lucide-react';
 
 const Header = () => {
   return (
@@ -31,7 +31,9 @@ const Header = () => {
               transition: 'all 0.3s ease'
             }}
           >
-            <span style={{ transform: 'rotate(-45deg)', color: '#FFFFFF' }}>💎</span>
+            <div style={{ transform: 'rotate(-45deg)' }}>
+              <Gem size={28} color="#FFFFFF" strokeWidth={1.5} />
+            </div>
           </div>
           <div className="flex flex-col">
             <h1 

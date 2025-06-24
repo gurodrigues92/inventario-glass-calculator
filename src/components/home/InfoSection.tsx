@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Target, Zap, Lightbulb } from 'lucide-react';
 
 const InfoSection = () => {
   return (
@@ -16,7 +17,9 @@ const InfoSection = () => {
       >
         <div className="grid md:grid-cols-3 gap-6 text-center">
           <div>
-            <div className="text-3xl mb-3">🎯</div>
+            <div className="flex justify-center mb-3">
+              <Target size={32} color="#0C2C45" strokeWidth={1.5} />
+            </div>
             <h3 
               className="font-semibold mb-2"
               style={{ color: '#0C2C45' }}
@@ -28,7 +31,9 @@ const InfoSection = () => {
             </p>
           </div>
           <div>
-            <div className="text-3xl mb-3">⚡</div>
+            <div className="flex justify-center mb-3">
+              <Zap size={32} color="#0C2C45" strokeWidth={1.5} />
+            </div>
             <h3 
               className="font-semibold mb-2"
               style={{ color: '#0C2C45' }}
@@ -40,7 +45,9 @@ const InfoSection = () => {
             </p>
           </div>
           <div>
-            <div className="text-3xl mb-3">💡</div>
+            <div className="flex justify-center mb-3">
+              <Lightbulb size={32} color="#0C2C45" strokeWidth={1.5} />
+            </div>
             <h3 
               className="font-semibold mb-2"
               style={{ color: '#0C2C45' }}
