@@ -84,8 +84,25 @@ const Home = () => {
               style={{ color: 'rgba(255, 255, 255, 0.7)' }}
             >
               Descubra os custos do seu inventário com precisão.<br />
-              Preencha apenas 4 campos e obtenha uma estimativa completa.
+              Informe os <strong>valores de mercado</strong> reais dos bens para uma estimativa precisa.
             </p>
+            
+            {/* Aviso sobre Valor de Mercado */}
+            <div 
+              className="max-w-2xl mx-auto p-4 rounded-lg mb-8"
+              style={{
+                background: 'rgba(255, 215, 0, 0.1)',
+                border: '1px solid rgba(255, 215, 0, 0.3)'
+              }}
+            >
+              <div className="flex items-center gap-3 text-sm" style={{ color: '#FFD700' }}>
+                <span className="text-lg">💡</span>
+                <div className="text-left">
+                  <strong>Importante:</strong> Use sempre os <strong>valores de mercado reais</strong> dos bens. 
+                  Valores incorretos podem gerar problemas com a Receita Federal e custos adicionais.
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Formulário Simplificado */}
@@ -103,30 +120,30 @@ const Home = () => {
               />
 
               <LuxuryCurrencyInput
-                label="Valor dos Imóveis"
+                label="Valor de Mercado dos Imóveis"
                 icon="🏠"
                 value={formData.valorImoveis}
                 onChange={(value) => handleInputChange('valorImoveis', value)}
                 placeholder="R$ 0"
-                hint="Casas, apartamentos, terrenos"
+                hint="Casas, apartamentos, terrenos - pelo valor real de mercado atual"
               />
 
               <LuxuryCurrencyInput
-                label="Valor dos Veículos"
+                label="Valor de Mercado dos Veículos"
                 icon="🚗"
                 value={formData.valorVeiculos}
                 onChange={(value) => handleInputChange('valorVeiculos', value)}
                 placeholder="R$ 0"
-                hint="Carros, motos, embarcações"
+                hint="Carros, motos, embarcações - conforme tabela FIPE ou avaliação"
               />
 
               <LuxuryCurrencyInput
-                label="Investimentos e Outros Bens"
+                label="Valor de Mercado dos Investimentos"
                 icon="💎"
                 value={formData.valorInvestimentos}
                 onChange={(value) => handleInputChange('valorInvestimentos', value)}
                 placeholder="R$ 0"
-                hint="Ações, fundos, joias, obras de arte"
+                hint="Ações, fundos, poupança, joias, obras de arte - valor atual de mercado"
               />
 
               {/* Total do Patrimônio */}
@@ -143,7 +160,7 @@ const Home = () => {
                     className="text-lg font-semibold"
                     style={{ color: '#FFD700' }}
                   >
-                    Total do Patrimônio:
+                    Total do Patrimônio (Valor de Mercado):
                   </span>
                   <span 
                     className="text-2xl font-bold"
@@ -151,6 +168,9 @@ const Home = () => {
                   >
                     {formatCurrency(totalPatrimonio)}
                   </span>
+                </div>
+                <div className="text-xs mt-2" style={{ color: 'rgba(255, 215, 0, 0.7)' }}>
+                  Este será o valor base para cálculo do ITCMD e demais custos
                 </div>
               </div>
 
@@ -196,8 +216,50 @@ const Home = () => {
             </form>
           </GlassCard>
 
-          {/* Info Section */}
-          <div className="mt-16 text-center fade-in-up">
+          {/* Info Section - Valor de Mercado */}
+          <div className="mt-16 fade-in-up">
+            <GlassCard>
+              <div className="text-center mb-6">
+                <h3 className="text-xl font-semibold text-white mb-4">
+                  🎯 Por que usar Valor de Mercado?
+                </h3>
+              </div>
+              
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
+                    <span style={{ color: '#10B981' }}>✓</span>
+                    Precisão Legal
+                  </h4>
+                  <p className="text-sm" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                    A Receita Federal exige a declaração pelo valor real de mercado. 
+                    Valores subdeclarados podem gerar multas e problemas futuros.
+                  </p>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
+                    <span style={{ color: '#10B981' }}>✓</span>
+                    Cálculo Correto
+                  </h4>
+                  <p className="text-sm" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                    O ITCMD é calculado sobre o valor real dos bens. 
+                    Nossa calculadora usa os valores que você informar para dar uma estimativa precisa.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="mt-6 p-4 rounded-lg" style={{ background: 'rgba(255, 165, 0, 0.1)' }}>
+                <p className="text-sm text-center" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+                  <strong>Dica:</strong> Para imóveis, consulte sites especializados ou avaliações recentes. 
+                  Para veículos, use a tabela FIPE. Para investimentos, considere o valor atual da carteira.
+                </p>
+              </div>
+            </GlassCard>
+          </div>
+
+          {/* Info Section Original */}
+          <div className="mt-8 text-center fade-in-up">
             <div 
               className="glass-card max-w-4xl mx-auto p-8"
               style={{

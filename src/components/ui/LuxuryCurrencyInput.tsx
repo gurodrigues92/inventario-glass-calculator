@@ -2,6 +2,7 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import LuxuryField from './LuxuryField';
+import { formatCurrencyInputWithoutDecimals } from '../../utils/formatters';
 
 interface LuxuryCurrencyInputProps {
   label: string;
@@ -14,6 +15,7 @@ interface LuxuryCurrencyInputProps {
   className?: string;
   error?: string;
   hint?: string;
+  allowDecimals?: boolean;
 }
 
 const LuxuryCurrencyInput = ({ 
@@ -21,28 +23,42 @@ const LuxuryCurrencyInput = ({
   icon = '💰', 
   value, 
   onChange, 
-  placeholder = 'R$ 0,00',
+  placeholder = 'R$ 0',
   required = false,
   disabled = false,
   className = '',
   error,
-  hint
+  hint,
+  allowDecimals = false
 }: LuxuryCurrencyInputProps) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let inputValue = e.target.value.replace(/\D/g, '');
+    let inputValue = e.target.value;
     
-    if (inputValue) {
-      const numericValue = parseInt(inputValue);
-      const formattedValue = new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }).format(numericValue);
+    if (allowDecimals) {
+      // Para valores com decimais, permite entrada mais flexível
+      inputValue = inputValue.replace(/[^\d,]/g, '');
       
-      onChange(formattedValue);
+      if (inputValue) {
+        // Converte vírgula para ponto temporariamente
+        const numericValue = parseFloat(inputValue.replace(',', '.'));
+        if (!isNaN(numericValue)) {
+          const formattedValue = new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(numericValue);
+          onChange(formattedValue);
+        } else {
+          onChange('');
+        }
+      } else {
+        onChange('');
+      }
     } else {
-      onChange('');
+      // Para valores sem decimais (comportamento original)
+      const formattedValue = formatCurrencyInputWithoutDecimals(inputValue);
+      onChange(formattedValue);
     }
   };
 
