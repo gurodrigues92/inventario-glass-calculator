@@ -20,21 +20,35 @@ const GlassCard = ({ children, className, hover = true, premium = false }: Glass
       )}
       style={{
         background: premium 
-          ? 'linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(133, 149, 171, 0.05) 100%)'
-          : 'linear-gradient(135deg, rgba(133, 149, 171, 0.05) 0%, rgba(225, 229, 234, 0.02) 100%)',
-        backdropFilter: 'blur(20px)',
+          ? 'linear-gradient(135deg, rgba(209, 191, 163, 0.1) 0%, rgba(255, 255, 255, 0.95) 100%)'
+          : '#FFFFFF',
+        backdropFilter: 'blur(10px)',
         border: premium 
-          ? '2px solid rgba(255, 215, 0, 0.4)'
-          : '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '24px',
+          ? '2px solid rgba(209, 191, 163, 0.4)'
+          : '1px solid #E8E2DD',
+        borderRadius: '16px',
         boxShadow: premium
-          ? '0 0 30px rgba(255, 215, 0, 0.3), 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-          : '0 4px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+          ? '0 8px 24px rgba(209, 191, 163, 0.2), 0 4px 16px rgba(12, 44, 69, 0.1)'
+          : '0 4px 16px rgba(12, 44, 69, 0.08)',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        color: 'rgba(255, 255, 255, 0.95)',
+        color: '#2C2C2C',
         position: 'relative',
         overflow: 'hidden'
       }}
+      onMouseEnter={hover ? (e) => {
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = premium
+          ? '0 12px 32px rgba(209, 191, 163, 0.3), 0 8px 24px rgba(12, 44, 69, 0.15)'
+          : '0 8px 24px rgba(12, 44, 69, 0.12)';
+        e.currentTarget.style.borderColor = premium ? 'rgba(209, 191, 163, 0.6)' : '#9FB7D4';
+      } : undefined}
+      onMouseLeave={hover ? (e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = premium
+          ? '0 8px 24px rgba(209, 191, 163, 0.2), 0 4px 16px rgba(12, 44, 69, 0.1)'
+          : '0 4px 16px rgba(12, 44, 69, 0.08)';
+        e.currentTarget.style.borderColor = premium ? 'rgba(209, 191, 163, 0.4)' : '#E8E2DD';
+      } : undefined}
     >
       {premium && (
         <div 
@@ -44,7 +58,7 @@ const GlassCard = ({ children, className, hover = true, premium = false }: Glass
             right: '-50%',
             width: '200%',
             height: '200%',
-            background: 'linear-gradient(45deg, transparent 45%, rgba(255, 215, 0, 0.05) 50%, transparent 55%)',
+            background: 'linear-gradient(45deg, transparent 45%, rgba(209, 191, 163, 0.05) 50%, transparent 55%)',
             animation: 'shimmer 4s infinite',
             zIndex: 0
           }}

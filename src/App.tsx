@@ -15,15 +15,10 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <div 
-        className="dark min-h-screen bg-animated"
+        className="light min-h-screen bg-animated"
         style={{ 
-          backgroundColor: '#1a1a1a',
-          color: 'rgba(255, 255, 255, 0.95)',
-          backgroundImage: `
-            radial-gradient(circle at 20% 80%, rgba(133, 149, 171, 0.1) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(164, 176, 192, 0.08) 0%, transparent 50%),
-            radial-gradient(circle at 40% 40%, rgba(194, 202, 213, 0.06) 0%, transparent 50%)
-          `,
+          backgroundColor: '#F5EFEB',
+          color: '#2C2C2C',
           minHeight: '100vh'
         }}
       >

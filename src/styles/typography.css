@@ -1,20 +1,19 @@
 
-/* Elementos Dourados de Destaque */
+/* Elementos de Destaque Clean */
 @layer components {
   .golden-accent {
-    background: var(--gradient-gold);
+    background: linear-gradient(135deg, #D1BFA3, #E5D4B1);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
   }
 
-  /* Typography Premium */
+  /* Typography Clean */
   .heading-xl {
     font-size: 3.5rem !important;
     font-weight: 800 !important;
     line-height: 1.1 !important;
-    background: linear-gradient(135deg, #ffffff, var(--primary-blue-gray)) !important;
+    background: linear-gradient(135deg, #0C2C45, #476D9E) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
@@ -23,24 +22,24 @@
   .heading-lg {
     font-size: 2.5rem !important;
     font-weight: 700 !important;
-    color: var(--text-primary) !important;
+    color: #0C2C45 !important;
   }
 
   .heading-md {
     font-size: 1.875rem !important;
     font-weight: 600 !important;
-    color: var(--text-primary) !important;
+    color: #0C2C45 !important;
   }
 
   .text-glass {
-    color: var(--text-secondary) !important;
+    color: #476D9E !important;
   }
 
-  /* New Typography Classes */
+  /* Typography Classes Atualizadas */
   .text-luxury-title {
     font-size: 36px;
     font-weight: 700;
-    background: var(--gradient-gold);
+    background: linear-gradient(135deg, #0C2C45, #476D9E);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     text-transform: uppercase;
@@ -49,20 +48,20 @@
 
   .text-card-title {
     font-size: 28px;
-    color: var(--white);
+    color: #0C2C45;
     font-weight: 600;
     margin-bottom: 12px;
   }
 
   .text-section-title {
     font-size: 20px;
-    color: var(--white);
+    color: #0C2C45;
     font-weight: 600;
   }
 
   .text-input-label {
     display: block;
-    color: var(--tertiary-blue-gray);
+    color: #0C2C45;
     font-size: 14px;
     font-weight: 600;
     margin-bottom: 12px;
@@ -73,25 +72,25 @@
   .text-result-total {
     font-size: 48px;
     font-weight: 700;
-    background: var(--gradient-gold);
+    background: linear-gradient(135deg, #0C2C45, #476D9E);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
   .text-subtitle {
-    color: var(--secondary-blue-gray);
+    color: #476D9E;
     font-size: 18px;
   }
 
   .text-caption {
-    color: var(--secondary-blue-gray);
+    color: #476D9E;
     font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 0.1em;
   }
 
   .text-disclaimer {
-    color: var(--secondary-blue-gray);
+    color: #476D9E;
     font-size: 14px;
     line-height: 1.6;
   }

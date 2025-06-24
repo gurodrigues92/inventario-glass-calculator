@@ -38,26 +38,26 @@ const LuxurySelect = ({
         disabled={disabled}
         className="w-full"
         style={{
-          background: 'rgba(26, 26, 26, 0.7)',
-          border: '1px solid rgba(133, 149, 171, 0.3)',
-          borderRadius: '12px',
-          color: '#e1e5ea',
-          padding: '20px',
-          fontSize: '18px',
-          fontWeight: '600',
+          background: '#FFFFFF',
+          border: '1px solid #E8E2DD',
+          borderRadius: '8px',
+          color: '#2C2C2C',
+          padding: '16px',
+          fontSize: '16px',
+          fontWeight: '500',
           transition: 'all 0.3s ease',
           appearance: 'none',
-          backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%23FFD700' d='M6 8L0 0h12z'/%3E%3C/svg%3E\")",
+          backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%23476D9E' d='M6 8L0 0h12z'/%3E%3C/svg%3E\")",
           backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'right 20px center',
-          paddingRight: '48px'
+          backgroundPosition: 'right 16px center',
+          paddingRight: '40px'
         }}
         onFocus={(e) => {
-          e.target.style.borderColor = 'rgba(255, 215, 0, 0.5)';
-          e.target.style.boxShadow = '0 0 0 3px rgba(255, 215, 0, 0.1)';
+          e.target.style.borderColor = '#9FB7D4';
+          e.target.style.boxShadow = '0 0 0 3px rgba(159, 183, 212, 0.1)';
         }}
         onBlur={(e) => {
-          e.target.style.borderColor = 'rgba(133, 149, 171, 0.3)';
+          e.target.style.borderColor = '#E8E2DD';
           e.target.style.boxShadow = 'none';
         }}
       >
@@ -67,8 +67,8 @@ const LuxurySelect = ({
             key={option.value} 
             value={option.value}
             style={{
-              background: '#1a1a1a',
-              color: '#e1e5ea'
+              background: '#FFFFFF',
+              color: '#2C2C2C'
             }}
           >
             {option.label}
@@ -77,14 +77,14 @@ const LuxurySelect = ({
       </select>
       
       {error && (
-        <p className="text-sm text-red-400 flex items-center gap-2">
+        <p className="text-sm flex items-center gap-2" style={{ color: '#E74C3C' }}>
           <span>⚠️</span>
           {error}
         </p>
       )}
       
       {hint && (
-        <div className="text-xs text-purple-300 italic">
+        <div className="text-xs italic" style={{ color: '#476D9E' }}>
           💡 {hint}
         </div>
       )}

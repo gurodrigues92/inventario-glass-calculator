@@ -104,26 +104,26 @@ const PatrimonioForm = () => {
         <div 
           className="total-patrimonio p-6 rounded-xl border"
           style={{
-            background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.05))',
-            border: '1px solid rgba(255, 215, 0, 0.3)',
-            boxShadow: '0 4px 20px rgba(255, 215, 0, 0.1)'
+            background: 'linear-gradient(135deg, rgba(209, 191, 163, 0.1), rgba(245, 239, 235, 0.5))',
+            border: '1px solid rgba(209, 191, 163, 0.3)',
+            boxShadow: '0 4px 16px rgba(209, 191, 163, 0.1)'
           }}
         >
           <div className="flex justify-between items-center">
             <span 
               className="text-lg font-semibold"
-              style={{ color: '#FFD700' }}
+              style={{ color: '#0C2C45' }}
             >
               Total do Patrimônio (Valor de Mercado):
             </span>
             <span 
               className="text-2xl font-bold"
-              style={{ color: '#FFD700' }}
+              style={{ color: '#0C2C45' }}
             >
               {formatCurrency(totalPatrimonio)}
             </span>
           </div>
-          <div className="text-xs mt-2" style={{ color: 'rgba(255, 215, 0, 0.7)' }}>
+          <div className="text-xs mt-2" style={{ color: '#476D9E' }}>
             Este será o valor base para cálculo do ITCMD e demais custos
           </div>
         </div>
@@ -135,33 +135,33 @@ const PatrimonioForm = () => {
           className="luxury-btn-primary w-full py-4 text-lg font-semibold"
           style={{
             background: !isFormValid 
-              ? 'rgba(133, 149, 171, 0.3)' 
-              : 'linear-gradient(135deg, #FFD700, #FFA500, #FFD700)',
-            color: !isFormValid ? '#8595ab' : '#1a1a1a',
+              ? '#E8E2DD' 
+              : 'linear-gradient(135deg, #0C2C45, #476D9E)',
+            color: !isFormValid ? '#9FB7D4' : '#FFFFFF',
             border: 'none',
             borderRadius: '12px',
             padding: '18px',
             fontSize: '18px',
             fontWeight: '700',
             textTransform: 'uppercase',
-            letterSpacing: '0.1em',
+            letterSpacing: '0.05em',
             cursor: !isFormValid ? 'not-allowed' : 'pointer',
             transition: 'all 0.3s ease',
             boxShadow: !isFormValid 
               ? 'none' 
-              : '0 6px 20px rgba(255, 215, 0, 0.3)',
+              : '0 6px 20px rgba(12, 44, 69, 0.2)',
             opacity: !isFormValid ? 0.5 : 1
           }}
           onMouseEnter={(e) => {
             if (isFormValid) {
               e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 8px 30px rgba(255, 215, 0, 0.5)';
+              e.currentTarget.style.boxShadow = '0 8px 30px rgba(12, 44, 69, 0.3)';
             }
           }}
           onMouseLeave={(e) => {
             if (isFormValid) {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 215, 0, 0.3)';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(12, 44, 69, 0.2)';
             }
           }}
         >

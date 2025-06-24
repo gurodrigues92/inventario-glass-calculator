@@ -6,9 +6,10 @@ const Header = () => {
     <header 
       className="header-luxury fixed top-0 left-0 right-0 z-50 px-6 py-6"
       style={{
-        background: 'rgba(26, 26, 26, 0.98)',
-        backdropFilter: 'blur(30px)',
-        borderBottom: '1px solid rgba(255, 215, 0, 0.1)',
+        background: '#FFFFFF',
+        backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid #E8E2DD',
+        boxShadow: '0 2px 8px rgba(12, 44, 69, 0.08)',
         transition: 'all 0.3s ease'
       }}
     >
@@ -19,25 +20,30 @@ const Header = () => {
             style={{
               width: '56px',
               height: '56px',
-              background: 'linear-gradient(135deg, #FFD700, #B8860B)',
+              background: '#0C2C45',
               borderRadius: '16px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '28px',
-              boxShadow: '0 4px 20px rgba(255, 215, 0, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.3)',
+              boxShadow: '0 4px 16px rgba(12, 44, 69, 0.2)',
               transform: 'rotate(45deg)',
               transition: 'all 0.3s ease'
             }}
           >
-            <span style={{ transform: 'rotate(-45deg)' }}>💎</span>
+            <span style={{ transform: 'rotate(-45deg)', color: '#FFFFFF' }}>💎</span>
           </div>
           <div className="flex flex-col">
-            <h1 className="text-2xl font-bold text-white tracking-wide">Inventário</h1>
+            <h1 
+              className="text-2xl font-bold tracking-wide"
+              style={{ color: '#0C2C45' }}
+            >
+              Inventário
+            </h1>
             <span 
               className="text-sm font-bold tracking-widest"
               style={{
-                background: 'linear-gradient(135deg, #FFD700, #FFA500)',
+                background: 'linear-gradient(135deg, #D1BFA3, #E5D4B1)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 textTransform: 'uppercase',
@@ -52,53 +58,58 @@ const Header = () => {
         <nav className="hidden md:flex items-center space-x-8">
           <a 
             href="#" 
-            className="text-glass hover:text-white transition-all duration-300 font-medium relative group"
+            className="font-medium relative group transition-all duration-300"
+            style={{ color: '#476D9E' }}
+            onMouseEnter={(e) => e.target.style.color = '#0C2C45'}
+            onMouseLeave={(e) => e.target.style.color = '#476D9E'}
           >
             Como funciona
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-yellow-400 to-yellow-600 transition-all duration-300 group-hover:w-full"></span>
+            <span 
+              className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full"
+              style={{ background: 'linear-gradient(135deg, #D1BFA3, #E5D4B1)' }}
+            ></span>
           </a>
           <a 
             href="#" 
-            className="text-glass hover:text-white transition-all duration-300 font-medium relative group"
+            className="font-medium relative group transition-all duration-300"
+            style={{ color: '#476D9E' }}
+            onMouseEnter={(e) => e.target.style.color = '#0C2C45'}
+            onMouseLeave={(e) => e.target.style.color = '#476D9E'}
           >
             Contato
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-yellow-400 to-yellow-600 transition-all duration-300 group-hover:w-full"></span>
+            <span 
+              className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full"
+              style={{ background: 'linear-gradient(135deg, #D1BFA3, #E5D4B1)' }}
+            ></span>
           </a>
           <button 
             className="btn-luxury-cta"
             style={{
-              background: 'linear-gradient(135deg, #FFD700, #FFA500, #FFD700)',
+              background: 'linear-gradient(135deg, #0C2C45, #476D9E)',
               border: 'none',
-              borderRadius: '16px',
-              color: '#1a1a1a',
-              fontWeight: '700',
+              borderRadius: '12px',
+              color: '#FFFFFF',
+              fontWeight: '600',
               textTransform: 'uppercase',
-              letterSpacing: '0.1em',
+              letterSpacing: '0.05em',
               padding: '12px 24px',
               fontSize: '14px',
               position: 'relative',
               overflow: 'hidden',
               transition: 'all 0.3s ease',
-              boxShadow: '0 4px 20px rgba(255, 215, 0, 0.4)',
+              boxShadow: '0 4px 16px rgba(12, 44, 69, 0.2)',
               cursor: 'pointer'
             }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 8px 24px rgba(12, 44, 69, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 4px 16px rgba(12, 44, 69, 0.2)';
+            }}
           >
-            <span style={{ position: 'relative', zIndex: 2 }}>
-              Falar com especialista
-            </span>
-            <div 
-              style={{
-                position: 'absolute',
-                top: '0',
-                left: '-100%',
-                width: '100%',
-                height: '100%',
-                background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent)',
-                transition: 'left 0.5s',
-                zIndex: 1
-              }}
-              className="shimmer-effect"
-            />
+            Falar com especialista
           </button>
         </nav>
       </div>

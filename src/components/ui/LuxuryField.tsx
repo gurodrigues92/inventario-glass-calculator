@@ -14,11 +14,11 @@ const LuxuryField = ({ label, icon, children, className = '' }: LuxuryFieldProps
       <label 
         className="label-luxury"
         style={{
-          color: '#c2cad5',
+          color: '#0C2C45',
           fontSize: '14px',
           fontWeight: '600',
           textTransform: 'uppercase',
-          letterSpacing: '0.08em',
+          letterSpacing: '0.05em',
           display: 'flex',
           alignItems: 'center',
           gap: '8px'
@@ -29,7 +29,7 @@ const LuxuryField = ({ label, icon, children, className = '' }: LuxuryFieldProps
           style={{
             height: '1px',
             flex: '1',
-            background: 'linear-gradient(to right, rgba(255, 215, 0, 0.3), transparent)'
+            background: 'linear-gradient(to right, rgba(209, 191, 163, 0.3), transparent)'
           }}
         />
       </label>

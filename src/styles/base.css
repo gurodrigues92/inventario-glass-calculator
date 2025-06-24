@@ -6,9 +6,9 @@
   }
   
   html {
-    @apply dark;
-    background: var(--bg-primary) !important;
-    color: var(--text-primary) !important;
+    @apply light;
+    background: var(--bg-principal, #FFFFFF) !important;
+    color: var(--text-primary, #2C2C2C) !important;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
   
@@ -16,20 +16,26 @@
     @apply bg-background text-foreground;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     
-    /* Force dark theme styles with fallbacks */
-    background: var(--bg-primary, #1a1a1a) !important;
-    background-image: 
-      radial-gradient(circle at 20% 80%, rgba(133, 149, 171, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(164, 176, 192, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(194, 202, 213, 0.06) 0%, transparent 50%) !important;
-    color: var(--text-primary, rgba(255, 255, 255, 0.95)) !important;
+    /* Force light theme styles */
+    background: var(--bg-principal, #FFFFFF) !important;
+    color: var(--text-primary, #2C2C2C) !important;
     overflow-x: hidden;
     min-height: 100vh;
   }
   
   #root {
-    background: var(--bg-primary, #1a1a1a) !important;
-    color: var(--text-primary, rgba(255, 255, 255, 0.95)) !important;
+    background: var(--bg-principal, #FFFFFF) !important;
+    color: var(--text-primary, #2C2C2C) !important;
     min-height: 100vh;
   }
+}
+
+/* Classe para background animado clean */
+.bg-animated {
+  background: var(--bg-secundario, #F5EFEB) !important;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(209, 191, 163, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(71, 109, 158, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(159, 183, 212, 0.04) 0%, transparent 50%) !important;
+  min-height: 100vh;
 }
