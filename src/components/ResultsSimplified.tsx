@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { formatCurrency, numeroParaExtenso } from '../utils/formatters';
+import { formatCurrencyWithDecimals, numeroParaExtenso } from '../utils/formatters';
 import GlassCard from './GlassCard';
 import { DadosCalculoInventario } from '../utils/itcmdCalculator';
 
@@ -30,7 +30,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
             className="text-5xl font-bold mb-2"
             style={{ color: '#D1BFA3' }}
           >
-            {resultado.resumo.custoTotalFormatado}
+            {formatCurrencyWithDecimals(resultado.resumo.custoTotal)}
           </div>
           <div 
             className="text-lg italic mb-4"
@@ -54,7 +54,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
             color: '#0C2C45'
           }}
         >
-          <div>💰 Patrimônio: {formatCurrency(dadosCalculo.patrimonio)}</div>
+          <div>💰 Patrimônio: {formatCurrencyWithDecimals(dadosCalculo.patrimonio)}</div>
           <div 
             className="text-xs italic mt-1"
             style={{ color: '#476D9E' }}
@@ -97,7 +97,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                 className="font-semibold"
                 style={{ color: '#0C2C45' }}
               >
-                {formatCurrency(resultado.detalhamento.itcmd.valor)}
+                {formatCurrencyWithDecimals(resultado.detalhamento.itcmd.valor)}
               </div>
               <div 
                 className="text-xs italic"
@@ -137,7 +137,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                 className="font-semibold"
                 style={{ color: '#0C2C45' }}
               >
-                {formatCurrency(resultado.detalhamento.honorarios.valor)}
+                {formatCurrencyWithDecimals(resultado.detalhamento.honorarios.valor)}
               </div>
               <div 
                 className="text-xs italic"
@@ -177,7 +177,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                 className="font-semibold"
                 style={{ color: '#0C2C45' }}
               >
-                {formatCurrency(resultado.detalhamento.custas.valor)}
+                {formatCurrencyWithDecimals(resultado.detalhamento.custas.valor)}
               </div>
               <div 
                 className="text-xs italic"
@@ -231,7 +231,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
             className="text-3xl font-bold mb-2"
             style={{ color: '#27AE60' }}
           >
-            Economia estimada: {formatCurrency(resultado.resumo.economiaHolding)}
+            Economia estimada: {formatCurrencyWithDecimals(resultado.resumo.economiaHolding)}
           </div>
           <div 
             className="text-lg italic mb-6"
@@ -296,7 +296,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                     className="font-medium"
                     style={{ color: '#0C2C45' }}
                   >
-                    R$ 150.000
+                    {formatCurrencyWithDecimals(150000)}
                   </span>
                   <div 
                     className="text-xs italic"
@@ -313,7 +313,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                     className="font-medium"
                     style={{ color: '#0C2C45' }}
                   >
-                    R$ 16.000
+                    {formatCurrencyWithDecimals(16000)}
                   </span>
                   <div 
                     className="text-xs italic"
@@ -330,7 +330,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                 <div className="flex justify-between font-semibold">
                   <span style={{ color: '#0C2C45' }}>Total:</span>
                   <div className="text-right">
-                    <span style={{ color: '#27AE60' }}>R$ 166.000</span>
+                    <span style={{ color: '#27AE60' }}>{formatCurrencyWithDecimals(166000)}</span>
                     <div 
                       className="text-xs italic font-normal"
                       style={{ color: '#476D9E' }}
