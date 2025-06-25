@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Home, Car, Gem } from 'lucide-react';
@@ -8,9 +7,11 @@ import LuxurySelect from '../ui/LuxurySelect';
 import IconWrapper from '../ui/IconWrapper';
 import { ESTADOS_DATA } from '../../data/estadosData';
 import { parseCurrencyValue, formatCurrency, numeroParaExtenso } from '../../utils/formatters';
+import { useIsMobile } from '../../hooks/use-mobile';
 
 const PatrimonioForm = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [formData, setFormData] = useState({
     estado: '',
     valorImoveis: '',
@@ -102,51 +103,53 @@ const PatrimonioForm = () => {
           hint="Ações, fundos, poupança, joias, obras de arte - valor atual de mercado real"
         />
 
-        {/* Total do Patrimônio */}
+        {/* Total do Patrimônio - Responsivo */}
         <div 
-          className="total-patrimonio p-6 rounded-xl border"
+          className="total-patrimonio p-4 md:p-6 rounded-xl border"
           style={{
             background: 'linear-gradient(135deg, rgba(209, 191, 163, 0.1), rgba(245, 239, 235, 0.5))',
             border: '1px solid rgba(209, 191, 163, 0.3)',
             boxShadow: '0 4px 16px rgba(209, 191, 163, 0.1)'
           }}
         >
-          <div className="flex justify-between items-center">
+          <div className={`${isMobile ? 'space-y-3' : 'flex justify-between items-center'}`}>
             <span 
-              className="text-lg font-semibold"
+              className={`font-semibold ${isMobile ? 'text-base block' : 'text-lg'}`}
               style={{ color: '#0C2C45' }}
             >
               Total do Patrimônio (Valor de Mercado):
             </span>
             <span 
-              className="text-2xl font-bold"
+              className={`font-bold ${isMobile ? 'text-xl block' : 'text-2xl'}`}
               style={{ color: '#0C2C45' }}
             >
               {formatCurrency(totalPatrimonio)}
             </span>
           </div>
           
-          {/* Valor por extenso */}
+          {/* Valor por extenso - Responsivo */}
           {totalPatrimonio > 0 && (
             <div 
-              className="text-sm italic flex items-center gap-2 mt-2"
+              className={`flex items-start gap-2 mt-2 ${isMobile ? 'text-xs' : 'text-sm'}`}
               style={{ color: '#476D9E' }}
             >
               <span>💰</span>
-              "{numeroParaExtenso(totalPatrimonio)}"
+              <span className="italic flex-1">
+                "{numeroParaExtenso(totalPatrimonio)}"
+              </span>
             </div>
           )}
           
-          <div className="text-xs mt-2" style={{ color: '#476D9E' }}>
+          <div className={`mt-2 ${isMobile ? 'text-xs' : 'text-xs'}`} style={{ color: '#476D9E' }}>
             Este será o valor base para cálculo do ITCMD e demais custos
           </div>
         </div>
 
-        {/* Submit Button */}
+        {/* Submit Button - Responsivo */}
         <button
           type="submit"
           disabled={!isFormValid}
-          className="luxury-btn-primary w-full py-4 text-lg font-semibold"
+          className={`luxury-btn-primary w-full font-semibold ${isMobile ? 'py-4 text-base' : 'py-4 text-lg'}`}
           style={{
             background: !isFormValid 
               ? '#E8E2DD' 
@@ -154,8 +157,8 @@ const PatrimonioForm = () => {
             color: !isFormValid ? '#9FB7D4' : '#FFFFFF',
             border: 'none',
             borderRadius: '12px',
-            padding: '18px',
-            fontSize: '18px',
+            padding: isMobile ? '16px' : '18px',
+            fontSize: isMobile ? '16px' : '18px',
             fontWeight: '700',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',

@@ -1,35 +1,227 @@
 
 /* Responsividade Premium */
-@media (max-width: 768px) {
+
+/* Mobile First - Base styles */
+@media (max-width: 640px) {
+  /* Tipografia Mobile */
+  .heading-xl {
+    font-size: 2rem !important;
+    line-height: 1.2;
+  }
+  
+  .heading-lg {
+    font-size: 1.75rem !important;
+    line-height: 1.3;
+  }
+  
+  .heading-md {
+    font-size: 1.5rem !important;
+    line-height: 1.4;
+  }
+  
+  /* Cards e Containers */
+  .glass-card, .luxury-card {
+    border-radius: 12px !important;
+    padding: 16px !important;
+    margin: 12px 0 !important;
+  }
+  
+  /* Background animado mais sutil no mobile */
+  .bg-animated::before {
+    filter: blur(60px);
+    opacity: 0.1;
+  }
+  
+  /* Grids responsivos */
+  .comparacao-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  
+  /* Formulários */
+  .luxury-btn-primary {
+    padding: 16px 20px !important;
+    font-size: 16px !important;
+    border-radius: 10px !important;
+  }
+  
+  /* Loading específico */
+  .loading-container {
+    padding: 16px !important;
+  }
+  
+  /* Header mobile */
+  .header-luxury {
+    padding: 16px 20px !important;
+  }
+  
+  /* Espaçamentos gerais */
+  .space-y-6 > * + * {
+    margin-top: 1rem !important;
+  }
+  
+  .space-y-8 > * + * {
+    margin-top: 1.5rem !important;
+  }
+}
+
+/* Tablet */
+@media (min-width: 641px) and (max-width: 768px) {
+  .heading-xl {
+    font-size: 2.25rem;
+  }
+  
+  .glass-card, .luxury-card {
+    border-radius: 14px;
+    padding: 20px;
+  }
+  
+  .bg-animated::before {
+    filter: blur(70px);
+    opacity: 0.12;
+  }
+}
+
+/* Desktop pequeno */
+@media (min-width: 769px) and (max-width: 1024px) {
   .heading-xl {
     font-size: 2.5rem;
   }
   
-  .glass-card, .luxury-card {
-    border-radius: 16px;
-  }
-  
-  .bg-animated::before {
-    filter: blur(80px);
-    opacity: 0.15;
-  }
-  
   .comparacao-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile landscape */
+@media (max-width: 768px) and (orientation: landscape) {
+  .loading-container {
+    padding: 12px !important;
   }
   
-  .holding-card {
-    margin-top: 32px;
-    padding: 24px;
+  .heading-lg {
+    font-size: 1.5rem !important;
   }
   
-  .cta-section {
-    padding: 32px 20px;
+  /* Ajustar altura para landscape */
+  .min-h-screen {
+    min-height: 100vh;
+  }
+}
+
+/* Correções específicas para componentes */
+@media (max-width: 640px) {
+  /* PatrimonioForm mobile */
+  .total-patrimonio {
+    padding: 16px !important;
   }
   
+  .total-patrimonio .flex {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+  
+  /* Results mobile */
+  .results-header {
+    flex-direction: column !important;
+    gap: 16px !important;
+    align-items: stretch !important;
+  }
+  
+  .results-actions {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  
+  /* Input fields mobile */
+  .luxury-input, .glass-input {
+    padding: 14px 16px !important;
+    font-size: 16px !important; /* Evita zoom no iOS */
+  }
+  
+  /* Select mobile */
+  select {
+    padding: 14px 16px !important;
+    font-size: 16px !important;
+  }
+  
+  /* Progress bar mobile */
+  .progress-container {
+    max-width: 280px !important;
+  }
+  
+  /* Modal mobile */
+  .modal-content {
+    margin: 20px !important;
+    max-height: calc(100vh - 40px) !important;
+    border-radius: 12px !important;
+  }
+  
+  /* Skeleton mobile */
+  .skeleton-card {
+    padding: 12px !important;
+  }
+  
+  /* Navigation mobile */
+  .mobile-menu {
+    padding: 20px !important;
+  }
+  
+  /* Botões mobile */
   .btn-cta-premium {
-    width: 100%;
-    padding: 16px 24px;
-    font-size: 16px;
+    width: 100% !important;
+    padding: 16px 24px !important;
+    font-size: 16px !important;
+    margin-top: 16px !important;
+  }
+  
+  /* Text wrapping mobile */
+  .text-wrap {
+    word-break: break-word !important;
+    hyphens: auto !important;
+  }
+  
+  /* Hover effects desabilitados no mobile */
+  .hover-disabled {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Touch improvements */
+@media (pointer: coarse) {
+  button, .clickable {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+  
+  /* Hover effects removidos para touch */
+  *:hover {
+    transform: none !important;
+  }
+}
+
+/* High DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .glass-card {
+    border-width: 0.5px !important;
+  }
+  
+  .logo-diamond {
+    box-shadow: 0 2px 8px rgba(12, 44, 69, 0.15) !important;
+  }
+}
+
+/* Safe areas para devices com notch */
+@supports (padding: max(0px)) {
+  .header-luxury {
+    padding-top: max(16px, env(safe-area-inset-top)) !important;
+    padding-left: max(20px, env(safe-area-inset-left)) !important;
+    padding-right: max(20px, env(safe-area-inset-right)) !important;
+  }
+  
+  .loading-container {
+    padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
   }
 }

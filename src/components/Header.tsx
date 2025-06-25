@@ -1,10 +1,17 @@
 
 import React from 'react';
+import { useIsMobile } from '../hooks/use-mobile';
+import MobileHeader from './MobileHeader';
 import { Gem } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return <MobileHeader />;
+  }
 
   return (
     <header 
