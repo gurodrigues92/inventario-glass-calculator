@@ -1,6 +1,6 @@
 
 import React from 'react';
-import ResultsPageLayout from './ResultsPageLayout';
+import LoadingLayout from './LoadingLayout';
 import LoadingCalculator from './LoadingCalculator';
 
 interface ResultsLoadingStateProps {
@@ -13,9 +13,9 @@ const ResultsLoadingState = ({
   message = 'Carregando resultados...' 
 }: ResultsLoadingStateProps) => {
   return (
-    <ResultsPageLayout>
+    <LoadingLayout>
       <LoadingCalculator progress={progress} message={message} />
-    </ResultsPageLayout>
+    </LoadingLayout>
   );
 };
 
