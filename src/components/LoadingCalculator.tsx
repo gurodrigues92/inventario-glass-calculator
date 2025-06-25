@@ -14,10 +14,10 @@ const LoadingCalculator = ({ progress, message }: LoadingCalculatorProps) => {
   const isMobile = useIsMobile();
   
   return (
-    <div className="w-full max-w-4xl mx-auto px-4">
+    <div className={`w-full max-w-4xl mx-auto ${isMobile ? 'mobile-container px-4' : 'px-4'}`}>
       {/* Loading Header */}
-      <div className="text-center mb-6 md:mb-8 fade-in-up">
-        <div className="flex items-center justify-center mb-4 md:mb-6">
+      <div className={`text-center fade-in-up ${isMobile ? 'mb-6' : 'mb-8'}`}>
+        <div className={`flex items-center justify-center ${isMobile ? 'mb-4' : 'mb-6'}`}>
           <div className="relative">
             <div 
               className="rounded-2xl flex items-center justify-center"
@@ -45,10 +45,20 @@ const LoadingCalculator = ({ progress, message }: LoadingCalculatorProps) => {
           </div>
         </div>
         
-        <h1 className={`font-bold mb-2 ${isMobile ? 'text-2xl' : 'text-4xl'}`} style={{ color: '#FFFFFF' }}>
+        <h1 
+          className={`font-bold mb-2 ${isMobile ? 'text-2xl mobile-text' : 'text-4xl'}`} 
+          style={{ 
+            color: '#FFFFFF',
+            lineHeight: isMobile ? '1.3' : '1.2',
+            wordBreak: 'break-word'
+          }}
+        >
           Calculando custos do inventário
         </h1>
-        <p className={`text-glass mb-6 md:mb-8 ${isMobile ? 'text-base px-4' : 'text-lg'}`}>
+        <p 
+          className={`text-glass ${isMobile ? 'text-base mobile-text px-4 mb-6' : 'text-lg mb-8'}`}
+          style={{ lineHeight: '1.5' }}
+        >
           {message}
         </p>
         
@@ -61,7 +71,7 @@ const LoadingCalculator = ({ progress, message }: LoadingCalculatorProps) => {
               background: 'rgba(255, 255, 255, 0.1)',
             }}
           />
-          <div className={`flex justify-between text-glass ${isMobile ? 'text-xs' : 'text-sm'}`}>
+          <div className={`flex justify-between text-glass ${isMobile ? 'text-xs mobile-text' : 'text-sm'}`}>
             <span>Progresso</span>
             <span>{progress}%</span>
           </div>
@@ -72,7 +82,7 @@ const LoadingCalculator = ({ progress, message }: LoadingCalculatorProps) => {
       <div className={`space-y-3 md:space-y-4 opacity-30 mx-auto ${isMobile ? 'max-w-sm' : 'max-w-3xl'}`}>
         {/* Resumo Skeleton */}
         <div 
-          className={`glass-card rounded-2xl ${isMobile ? 'p-4' : 'p-6'}`}
+          className={`glass-card rounded-2xl ${isMobile ? 'section-mobile p-4' : 'p-6'}`}
           style={{
             background: 'rgba(255, 255, 255, 0.05)',
             backdropFilter: 'blur(20px)',
@@ -99,7 +109,7 @@ const LoadingCalculator = ({ progress, message }: LoadingCalculatorProps) => {
           {[1, 2].map((i) => (
             <div 
               key={i}
-              className={`glass-card rounded-2xl ${isMobile ? 'p-3' : 'p-4'}`}
+              className={`glass-card rounded-2xl ${isMobile ? 'section-mobile p-3' : 'p-4'}`}
               style={{
                 background: 'rgba(255, 255, 255, 0.05)',
                 backdropFilter: 'blur(20px)',
