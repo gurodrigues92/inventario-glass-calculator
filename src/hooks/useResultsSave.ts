@@ -1,13 +1,15 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCalculoStorage } from './useCalculoStorage';
 import { parseCurrencyValue } from '../utils/formatters';
 
 export const useResultsSave = (resultado: any, formData: any, calculationType: string) => {
+  const navigate = useNavigate();
   const [calculoSalvoId, setCalculoSalvoId] = useState<string | null>(null);
   const { salvarCalculo, salvarRefinamento, isLoading: isSaving } = useCalculoStorage();
 
-  const handleSalvarCalculo = async (dadosUsuario: { nome: string; email?: string; telefone?: string }) => {
+  const handleSalvarCalculo = async (dadosUsuario: { nome: string }) => {
     if (!resultado || !formData) return;
 
     try {
@@ -46,6 +48,9 @@ export const useResultsSave = (resultado: any, formData: any, calculationType: s
 
       const calculoId = await salvarCalculo(dadosUsuario, dadosCalculo, tipoCalculadora);
       setCalculoSalvoId(calculoId);
+      
+      // Navegar para a página de cálculos salvos após salvar com sucesso
+      navigate('/calculos-salvos');
     } catch (error) {
       console.error('Erro ao salvar cálculo:', error);
     }

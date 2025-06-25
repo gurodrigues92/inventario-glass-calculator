@@ -5,8 +5,6 @@ import { toast } from 'sonner';
 
 interface DadosUsuario {
   nome: string;
-  email?: string;
-  telefone?: string;
 }
 
 interface DadosCalculo {
@@ -45,58 +43,17 @@ export const useCalculoStorage = () => {
     setIsLoading(true);
     
     try {
-      // Primeiro, criar ou buscar o perfil do usuário
-      let profileId: string;
+      // Criar novo perfil apenas com nome
+      const { data: newProfile, error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          nome: dadosUsuario.nome
+        })
+        .select('id')
+        .single();
       
-      if (dadosUsuario.email) {
-        // Verificar se já existe um perfil com este email
-        const { data: existingProfile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('email', dadosUsuario.email)
-          .single();
-        
-        if (existingProfile) {
-          profileId = existingProfile.id;
-          
-          // Atualizar dados do perfil se necessário
-          await supabase
-            .from('profiles')
-            .update({
-              nome: dadosUsuario.nome,
-              telefone: dadosUsuario.telefone,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', profileId);
-        } else {
-          // Criar novo perfil
-          const { data: newProfile, error: profileError } = await supabase
-            .from('profiles')
-            .insert({
-              nome: dadosUsuario.nome,
-              email: dadosUsuario.email,
-              telefone: dadosUsuario.telefone
-            })
-            .select('id')
-            .single();
-          
-          if (profileError) throw profileError;
-          profileId = newProfile.id;
-        }
-      } else {
-        // Criar perfil sem email
-        const { data: newProfile, error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            nome: dadosUsuario.nome,
-            telefone: dadosUsuario.telefone
-          })
-          .select('id')
-          .single();
-        
-        if (profileError) throw profileError;
-        profileId = newProfile.id;
-      }
+      if (profileError) throw profileError;
+      const profileId = newProfile.id;
 
       // Salvar o cálculo
       const { data: calculo, error: calculoError } = await supabase
@@ -137,7 +94,7 @@ export const useCalculoStorage = () => {
         .insert({
           profile_id: profileId,
           tipo_calculadora: tipoCalculadora,
-          ip_address: null, // Pode ser implementado posteriormente
+          ip_address: null,
           user_agent: navigator.userAgent
         });
 

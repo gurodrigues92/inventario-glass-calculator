@@ -9,7 +9,7 @@ import { Loader2 } from 'lucide-react';
 interface SalvarCalculoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSalvar: (dados: { nome: string; email?: string; telefone?: string }) => Promise<void>;
+  onSalvar: (dados: { nome: string }) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -19,28 +19,22 @@ const SalvarCalculoModal: React.FC<SalvarCalculoModalProps> = ({
   onSalvar,
   isLoading
 }) => {
-  const [formData, setFormData] = useState({
-    nome: '',
-    email: '',
-    telefone: ''
-  });
+  const [nome, setNome] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.nome.trim()) {
+    if (!nome.trim()) {
       return;
     }
 
     try {
       await onSalvar({
-        nome: formData.nome.trim(),
-        email: formData.email.trim() || undefined,
-        telefone: formData.telefone.trim() || undefined
+        nome: nome.trim()
       });
       
       // Reset form and close modal on success
-      setFormData({ nome: '', email: '', telefone: '' });
+      setNome('');
       onClose();
     } catch (error) {
       // Error is handled in the hook
@@ -49,7 +43,7 @@ const SalvarCalculoModal: React.FC<SalvarCalculoModalProps> = ({
 
   const handleClose = () => {
     if (!isLoading) {
-      setFormData({ nome: '', email: '', telefone: '' });
+      setNome('');
       onClose();
     }
   };
@@ -63,54 +57,24 @@ const SalvarCalculoModal: React.FC<SalvarCalculoModalProps> = ({
           </DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="nome" className="text-glass">
-              Nome completo *
+              Seu nome
             </Label>
             <Input
               id="nome"
               type="text"
-              value={formData.nome}
-              onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
               className="bg-glass/10 border-glass text-white placeholder:text-glass/60"
-              placeholder="Digite seu nome completo"
+              placeholder="Digite seu nome"
               required
               disabled={isLoading}
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-glass">
-              Email
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-              className="bg-glass/10 border-glass text-white placeholder:text-glass/60"
-              placeholder="seu.email@exemplo.com"
-              disabled={isLoading}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="telefone" className="text-glass">
-              Telefone
-            </Label>
-            <Input
-              id="telefone"
-              type="tel"
-              value={formData.telefone}
-              onChange={(e) => setFormData(prev => ({ ...prev, telefone: e.target.value }))}
-              className="bg-glass/10 border-glass text-white placeholder:text-glass/60"
-              placeholder="(11) 99999-9999"
-              disabled={isLoading}
-            />
-          </div>
-
-          <div className="flex space-x-3 pt-4">
+          <div className="flex space-x-3 pt-2">
             <Button
               type="button"
               variant="outline"
@@ -122,7 +86,7 @@ const SalvarCalculoModal: React.FC<SalvarCalculoModalProps> = ({
             </Button>
             <Button
               type="submit"
-              disabled={isLoading || !formData.nome.trim()}
+              disabled={isLoading || !nome.trim()}
               className="flex-1 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
             >
               {isLoading ? (
@@ -138,7 +102,7 @@ const SalvarCalculoModal: React.FC<SalvarCalculoModalProps> = ({
         </form>
 
         <p className="text-glass/60 text-xs mt-4">
-          * Campos obrigatórios. Seus dados serão utilizados apenas para organizar seus cálculos e futuras consultas.
+          Seu cálculo será salvo e você poderá acessá-lo na página "Meus Cálculos".
         </p>
       </DialogContent>
     </Dialog>
