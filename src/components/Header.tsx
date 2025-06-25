@@ -1,7 +1,11 @@
+
 import React from 'react';
 import { Gem } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
+  const navigate = useNavigate();
+
   return (
     <header 
       className="header-luxury fixed top-0 left-0 right-0 z-50 px-6 py-6"
@@ -71,19 +75,19 @@ const Header = () => {
               style={{ background: 'linear-gradient(135deg, #D1BFA3, #E5D4B1)' }}
             ></span>
           </a>
-          <a 
-            href="#" 
+          <button 
+            onClick={() => navigate('/calculos-salvos')}
             className="font-medium relative group transition-all duration-300"
             style={{ color: '#476D9E' }}
             onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#0C2C45'}
             onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#476D9E'}
           >
-            Contato
+            Meus Cálculos
             <span 
               className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full"
               style={{ background: 'linear-gradient(135deg, #D1BFA3, #E5D4B1)' }}
             ></span>
-          </a>
+          </button>
           <button 
             className="btn-luxury-cta"
             style={{

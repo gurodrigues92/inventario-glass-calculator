@@ -52,20 +52,15 @@ const ResultsActions = ({ shareData }: ResultsActionsProps) => {
       <button 
         onClick={handleDownloadPDF}
         disabled={isGenerating}
-        className="glass-button px-8 py-3 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        style={{
-          background: isGenerating ? 'rgba(209, 191, 163, 0.3)' : 'rgba(209, 191, 163, 0.1)',
-          border: '1px solid rgba(209, 191, 163, 0.5)',
-          color: '#0C2C45'
-        }}
+        className="btn-standard px-8 py-3 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <Download className="w-4 h-4" />
-        <span>{isGenerating ? 'Gerando PDF...' : 'Baixar PDF (2 páginas)'}</span>
+        <span>{isGenerating ? 'Gerando PDF...' : 'Baixar PDF'}</span>
       </button>
       
       <button 
         onClick={() => navigate('/')}
-        className="border border-glass-border text-white px-8 py-3 rounded-lg hover:bg-glass-white transition-all"
+        className="btn-secondary px-8 py-3"
       >
         Nova Consulta
       </button>
