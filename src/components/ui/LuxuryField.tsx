@@ -24,7 +24,7 @@ const LuxuryField = ({ label, icon, children, className = '' }: LuxuryFieldProps
           gap: '8px'
         }}
       >
-        {icon && <span>{icon}</span>} {label}
+        {icon && <span style={{ color: '#476D9E' }}>{icon}</span>} {label}
         <div 
           style={{
             height: '1px',

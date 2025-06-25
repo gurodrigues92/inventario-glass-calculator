@@ -15,14 +15,14 @@ const ComparisonCard = ({ tipo, custo, tempo, destaque, economia, especial }: Co
   return (
     <div className={`p-6 rounded-lg border transition-all ${
       destaque 
-        ? 'border-purple-500 bg-purple-500/10' 
+        ? 'border-purple-400 bg-purple-50' 
         : especial
-        ? 'border-green-500 bg-green-500/10'
-        : 'border-glass-border bg-glass-white'
+        ? 'border-green-400 bg-green-50'
+        : 'border-[#E8E2DD] bg-white'
     }`}>
       <div className="flex items-center justify-between mb-3">
         <h4 className={`font-semibold ${
-          destaque ? 'text-purple-400' : especial ? 'text-green-400' : 'text-white'
+          destaque ? 'text-purple-700' : especial ? 'text-green-700' : 'text-[#0C2C45]'
         }`}>
           {tipo}
         </h4>
@@ -38,16 +38,16 @@ const ComparisonCard = ({ tipo, custo, tempo, destaque, economia, especial }: Co
         )}
       </div>
       
-      <div className="text-2xl font-bold text-white mb-2">
+      <div className="text-2xl font-bold mb-2" style={{ color: '#0C2C45' }}>
         {formatCurrency(custo)}
       </div>
       
-      <div className="text-sm text-glass mb-3">
+      <div className="text-sm mb-3" style={{ color: '#476D9E' }}>
         ⏱️ {tempo}
       </div>
       
       {economia && economia > 0 && (
-        <div className="text-sm text-green-400">
+        <div className="text-sm text-green-600">
           💰 Economia: {formatCurrency(economia)}
         </div>
       )}
