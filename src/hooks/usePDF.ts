@@ -23,43 +23,39 @@ export const usePDF = () => {
       // Aguardar um pouco para garantir que o elemento esteja totalmente renderizado
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      const element = document.getElementById(elementId);
-      if (!element) {
-        throw new Error(`Elemento com ID '${elementId}' não foi encontrado. Verifique se o conteúdo está carregado.`);
+      console.log('Iniciando geração de PDF com duas páginas separadas');
+
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = 210;
+      const pageHeight = 295;
+      const margin = 15;
+      const contentWidth = pageWidth - (margin * 2);
+
+      // PÁGINA 1 - CUSTOS E DETALHAMENTO
+      const page1Element = document.getElementById('results-page-1');
+      if (!page1Element) {
+        throw new Error('Elemento da página 1 não foi encontrado');
       }
 
-      // Verificar se o elemento está visível
-      const rect = element.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) {
-        throw new Error('O elemento não está visível ou não possui dimensões válidas.');
-      }
-
-      console.log('Iniciando captura do elemento:', { 
-        id: elementId, 
-        width: rect.width, 
-        height: rect.height 
-      });
-
-      // Configurações otimizadas para html2canvas
-      const canvas = await html2canvas(element, {
-        scale: 2, // Alta qualidade
+      console.log('Capturando página 1 (custos e detalhamento)');
+      const canvas1 = await html2canvas(page1Element, {
+        scale: 2,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: '#ffffff', // Fundo branco para PDF
+        backgroundColor: '#ffffff',
         removeContainer: true,
-        imageTimeout: 15000, // 15 segundos de timeout para imagens
+        imageTimeout: 15000,
         scrollX: 0,
         scrollY: 0,
-        windowWidth: element.scrollWidth,
-        windowHeight: element.scrollHeight,
+        windowWidth: page1Element.scrollWidth,
+        windowHeight: page1Element.scrollHeight,
         onclone: (clonedDoc) => {
-          // Garantir que os estilos sejam aplicados corretamente no clone
-          const clonedElement = clonedDoc.getElementById(elementId);
+          const clonedElement = clonedDoc.getElementById('results-page-1');
           if (clonedElement) {
             clonedElement.style.backgroundColor = '#ffffff';
             clonedElement.style.padding = '20px';
+            clonedElement.style.pageBreakAfter = 'auto';
             
-            // Forçar cores para impressão
             const allElements = clonedElement.querySelectorAll('*');
             allElements.forEach((el: any) => {
               if (el.style.color === 'transparent' || el.style.color === '') {
@@ -70,37 +66,18 @@ export const usePDF = () => {
         }
       });
 
-      console.log('Canvas gerado com sucesso:', { 
-        width: canvas.width, 
-        height: canvas.height 
-      });
-
-      const imgData = canvas.toDataURL('image/png', 1.0); // Máxima qualidade
-      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgData1 = canvas1.toDataURL('image/png', 1.0);
       
-      // Dimensões da página A4
-      const pageWidth = 210;
-      const pageHeight = 295;
-      const margin = 15;
-      const contentWidth = pageWidth - (margin * 2);
-      
-      // Calcular dimensões da imagem
-      const imgWidth = contentWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      // Header do PDF
+      // Header da página 1
       pdf.setFontSize(18);
-      pdf.setTextColor(12, 44, 69); // Cor primária do sistema
+      pdf.setTextColor(12, 44, 69);
       pdf.text('Relatório de Inventário ITCMD', margin, 20);
       
       pdf.setFontSize(9);
       pdf.setTextColor(100, 100, 100);
       pdf.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, margin, 28);
 
-      // Dados do relatório se fornecidos
+      // Dados do relatório na página 1
       if (data) {
         pdf.setFontSize(10);
         pdf.setTextColor(60, 60, 60);
@@ -118,23 +95,70 @@ export const usePDF = () => {
         pdf.setFontSize(8);
         pdf.setTextColor(150, 150, 150);
         pdf.text('────────────────────────────────────────────────────────────────────────', margin, yPos + 3);
-        
-        position = yPos + 10;
-      } else {
-        position = 35;
       }
 
-      // Adicionar primeira página da imagem
-      pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight, undefined, 'FAST');
-      heightLeft -= (pageHeight - position);
+      // Adicionar imagem da página 1
+      const imgWidth1 = contentWidth;
+      const imgHeight1 = (canvas1.height * imgWidth1) / canvas1.width;
+      const startY1 = data ? 55 : 35;
+      
+      pdf.addImage(imgData1, 'PNG', margin, startY1, imgWidth1, imgHeight1, undefined, 'FAST');
 
-      // Adicionar páginas adicionais se necessário
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight + margin;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight, undefined, 'FAST');
-        heightLeft -= (pageHeight - margin);
+      // PÁGINA 2 - HOLDING S/A E CTA
+      const page2Element = document.getElementById('results-page-2');
+      if (!page2Element) {
+        throw new Error('Elemento da página 2 não foi encontrado');
       }
+
+      console.log('Capturando página 2 (holding e CTA)');
+      const canvas2 = await html2canvas(page2Element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        removeContainer: true,
+        imageTimeout: 15000,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: page2Element.scrollWidth,
+        windowHeight: page2Element.scrollHeight,
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.getElementById('results-page-2');
+          if (clonedElement) {
+            clonedElement.style.backgroundColor = '#ffffff';
+            clonedElement.style.padding = '20px';
+            clonedElement.style.pageBreakBefore = 'auto';
+            
+            const allElements = clonedElement.querySelectorAll('*');
+            allElements.forEach((el: any) => {
+              if (el.style.color === 'transparent' || el.style.color === '') {
+                el.style.color = '#000000';
+              }
+            });
+          }
+        }
+      });
+
+      const imgData2 = canvas2.toDataURL('image/png', 1.0);
+
+      // Adicionar nova página
+      pdf.addPage();
+
+      // Header da página 2
+      pdf.setFontSize(16);
+      pdf.setTextColor(12, 44, 69);
+      pdf.text('Planejamento Sucessório - Holding Familiar', margin, 20);
+      
+      pdf.setFontSize(8);
+      pdf.setTextColor(150, 150, 150);
+      pdf.text('────────────────────────────────────────────────────────────────────────', margin, 25);
+
+      // Adicionar imagem da página 2
+      const imgWidth2 = contentWidth;
+      const imgHeight2 = (canvas2.height * imgWidth2) / canvas2.width;
+      const startY2 = 35;
+      
+      pdf.addImage(imgData2, 'PNG', margin, startY2, imgWidth2, imgHeight2, undefined, 'FAST');
 
       // Footer em todas as páginas
       const pageCount = pdf.getNumberOfPages();
@@ -155,7 +179,8 @@ export const usePDF = () => {
       console.log('PDF gerado com sucesso:', { 
         fileName, 
         pages: pageCount,
-        fileSize: `${(imgData.length * 0.75 / 1024).toFixed(0)}KB`
+        page1Size: `${(imgData1.length * 0.75 / 1024).toFixed(0)}KB`,
+        page2Size: `${(imgData2.length * 0.75 / 1024).toFixed(0)}KB`
       });
 
       pdf.save(fileName);
@@ -163,7 +188,6 @@ export const usePDF = () => {
     } catch (error) {
       console.error('Erro detalhado ao gerar PDF:', error);
       
-      // Melhor tratamento de erros com mensagens específicas
       if (error instanceof Error) {
         if (error.message.includes('não foi encontrado')) {
           throw new Error('Conteúdo não encontrado. Aguarde o carregamento completo da página.');

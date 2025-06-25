@@ -26,15 +26,16 @@ const ResultsActions = ({ shareData }: ResultsActionsProps) => {
       
       console.log('Iniciando geração de PDF com dados:', shareData);
       
+      // Usar um ID genérico pois agora capturamos páginas específicas
       await generatePDF(
-        'results-pdf-content', // ID correto do container
+        'results-content', // ID genérico, não usado mais
         `inventario-itcmd-${Date.now()}.pdf`, 
         shareData
       );
       
       toast({
         title: 'PDF Gerado com Sucesso!',
-        description: 'Relatório baixado e salvo na pasta de downloads'
+        description: 'Relatório com 2 páginas baixado e salvo na pasta de downloads'
       });
     } catch (error) {
       console.error('Erro na geração de PDF:', error);
@@ -59,7 +60,7 @@ const ResultsActions = ({ shareData }: ResultsActionsProps) => {
         }}
       >
         <Download className="w-4 h-4" />
-        <span>{isGenerating ? 'Gerando PDF...' : 'Baixar PDF'}</span>
+        <span>{isGenerating ? 'Gerando PDF...' : 'Baixar PDF (2 páginas)'}</span>
       </button>
       
       <button 
