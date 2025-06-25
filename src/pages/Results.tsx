@@ -4,6 +4,7 @@ import { ArrowLeft, Save } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import ResultsSimplified from '../components/ResultsSimplified';
+import ResultsActions from '../components/ResultsActions';
 import SalvarCalculoModal from '../components/SalvarCalculoModal';
 import ResultsLoadingState from '../components/ResultsLoadingState';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,14 @@ const Results = () => {
   if (isLoading || !hasValidData) {
     return <ResultsLoadingState />;
   }
+
+  // Preparar dados para o componente ResultsActions
+  const shareData = {
+    total: resultado.resumo.custoTotal,
+    patrimonio: dadosCalculo.patrimonio,
+    estado: formData.estado,
+    tipoProcesso: formData.tipoProcesso
+  };
 
   return (
     <div className="min-h-screen bg-animated">
@@ -66,6 +75,11 @@ const Results = () => {
               dadosCalculo={dadosCalculo}
               formData={formData}
             />
+          </div>
+
+          {/* Actions Section - Download PDF and New Consultation */}
+          <div className="mt-12 fade-in-up">
+            <ResultsActions shareData={shareData} />
           </div>
         </div>
       </main>
