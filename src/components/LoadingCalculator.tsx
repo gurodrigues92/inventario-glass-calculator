@@ -48,7 +48,7 @@ const LoadingCalculator = ({ progress, message }: LoadingCalculatorProps) => {
         <h1 
           className={`font-bold mb-2 ${isMobile ? 'text-2xl mobile-text' : 'text-4xl'}`} 
           style={{ 
-            color: '#FFFFFF',
+            color: '#0C2C45',
             lineHeight: isMobile ? '1.3' : '1.2',
             wordBreak: 'break-word'
           }}

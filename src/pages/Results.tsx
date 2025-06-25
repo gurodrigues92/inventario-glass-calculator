@@ -78,7 +78,7 @@ const Results = () => {
 
           {/* Header - Responsivo */}
           <div className={`text-center fade-in-up ${isMobile ? 'mb-8' : 'mb-12'}`}>
-            <h1 className={`font-bold mb-4 ${isMobile ? 'text-2xl' : 'text-4xl'}`} style={{ color: '#FFFFFF' }}>
+            <h1 className={`font-bold mb-4 ${isMobile ? 'text-2xl' : 'text-4xl'}`} style={{ color: '#0C2C45' }}>
               Resultados do Cálculo
             </h1>
             <p className={`text-glass ${isMobile ? 'text-sm px-4' : 'text-base'}`}>
