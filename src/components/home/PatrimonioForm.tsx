@@ -1,11 +1,11 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Home, Car, Gem } from 'lucide-react';
+import { MapPin, Home, Car, Gem, Calculator } from 'lucide-react';
 import GlassCard from '../GlassCard';
 import LuxuryCurrencyInput from '../ui/LuxuryCurrencyInput';
 import LuxurySelect from '../ui/LuxurySelect';
 import IconWrapper from '../ui/IconWrapper';
+import FormStep from '../ui/FormStep';
 import { ESTADOS_DATA } from '../../data/estadosData';
 import { parseCurrencyValue, formatCurrency, numeroParaExtenso } from '../../utils/formatters';
 import { useIsMobile } from '../../hooks/use-mobile';
@@ -13,6 +13,7 @@ import { useIsMobile } from '../../hooks/use-mobile';
 const PatrimonioForm = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  
   const [formData, setFormData] = useState({
     estado: '',
     valorImoveis: '',
@@ -78,8 +79,17 @@ const PatrimonioForm = () => {
   return (
     <div className={isMobile ? 'mobile-container' : ''}>
       <GlassCard className={`fade-in-up ${isMobile ? 'section-mobile' : ''}`}>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className={isMobile ? 'input-group-mobile' : ''}>
+        <form onSubmit={handleSubmit} className="space-y-0">
+          
+          {/* Etapa 1: Localização */}
+          <FormStep
+            stepNumber={1}
+            title="Localização"
+            subtitle="Informe seu estado para calcular o ITCMD correto"
+            icon={<MapPin size={24} />}
+            accentColor="#2563EB"
+            borderColor="#DBEAFE"
+          >
             <LuxurySelect
               label="Estado de Residência"
               icon={<IconWrapper icon={MapPin} size={16} />}
@@ -90,9 +100,17 @@ const PatrimonioForm = () => {
               required
               hint="Para calcular o ITCMD correto"
             />
-          </div>
+          </FormStep>
 
-          <div className={isMobile ? 'input-group-mobile' : ''}>
+          {/* Etapa 2: Patrimônio - Imóveis */}
+          <FormStep
+            stepNumber={2}
+            title="Imóveis"
+            subtitle="Casas, apartamentos, terrenos - valor real de mercado"
+            icon={<Home size={24} />}
+            accentColor="#059669"
+            borderColor="#D1FAE5"
+          >
             <LuxuryCurrencyInput
               label="Valor de Mercado dos Imóveis"
               icon={<IconWrapper icon={Home} size={16} />}
@@ -102,9 +120,17 @@ const PatrimonioForm = () => {
               allowDecimals={true}
               hint="Casas, apartamentos, terrenos - pelo valor real de mercado atual (não valor venal)"
             />
-          </div>
+          </FormStep>
 
-          <div className={isMobile ? 'input-group-mobile' : ''}>
+          {/* Etapa 3: Patrimônio - Veículos */}
+          <FormStep
+            stepNumber={3}
+            title="Veículos"
+            subtitle="Carros, motos, embarcações - conforme tabela FIPE"
+            icon={<Car size={24} />}
+            accentColor="#DC2626"
+            borderColor="#FEE2E2"
+          >
             <LuxuryCurrencyInput
               label="Valor de Mercado dos Veículos"
               icon={<IconWrapper icon={Car} size={16} />}
@@ -114,9 +140,17 @@ const PatrimonioForm = () => {
               allowDecimals={true}
               hint="Carros, motos, embarcações - conforme tabela FIPE ou avaliação especializada"
             />
-          </div>
+          </FormStep>
 
-          <div className={isMobile ? 'input-group-mobile' : ''}>
+          {/* Etapa 4: Patrimônio - Investimentos */}
+          <FormStep
+            stepNumber={4}
+            title="Investimentos"
+            subtitle="Ações, fundos, poupança, joias, obras de arte"
+            icon={<Gem size={24} />}
+            accentColor="#7C3AED"
+            borderColor="#EDE9FE"
+          >
             <LuxuryCurrencyInput
               label="Valor de Mercado dos Investimentos"
               icon={<IconWrapper icon={Gem} size={16} />}
@@ -126,119 +160,129 @@ const PatrimonioForm = () => {
               allowDecimals={true}
               hint="Ações, fundos, poupança, joias, obras de arte - valor atual de mercado real"
             />
-          </div>
+          </FormStep>
 
-          {/* Total do Patrimônio - Otimizado para Mobile */}
-          <div 
-            className={`total-patrimonio ${isMobile ? 'highlight-card' : ''}`}
-            style={{
-              background: isMobile ? 
-                'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)' :
-                'linear-gradient(135deg, rgba(209, 191, 163, 0.1), rgba(245, 239, 235, 0.5))',
-              border: isMobile ? 
-                '2px solid #e3f2fd' :
-                '1px solid rgba(209, 191, 163, 0.3)',
-              boxShadow: isMobile ?
-                '0 2px 8px rgba(0, 0, 0, 0.06)' :
-                '0 4px 16px rgba(209, 191, 163, 0.1)',
-              padding: isMobile ? '16px' : '24px',
-              borderRadius: '12px'
-            }}
+          {/* Etapa 5: Resumo */}
+          <FormStep
+            stepNumber={5}
+            title="Resumo do Patrimônio"
+            subtitle="Total calculado automaticamente"
+            icon={<Calculator size={24} />}
+            accentColor="#EA580C"
+            borderColor="#FED7AA"
           >
-            <div className={`value-container ${isMobile ? 'mobile-text' : ''}`}>
-              <span 
-                className={`${isMobile ? 'mobile-label section-title-mobile' : 'font-semibold text-lg'}`}
-                style={{ 
-                  color: '#0C2C45',
-                  marginBottom: isMobile ? '12px' : '8px',
-                  display: 'block',
-                  textAlign: isMobile ? 'center' : 'left'
-                }}
-              >
-                Total do Patrimônio (Valor de Mercado):
-              </span>
-              <span 
-                className={`${isMobile ? 'total-value-mobile' : 'font-bold text-2xl'} total-value`}
-                style={{ 
-                  color: '#0C2C45',
-                  display: 'block',
-                  wordBreak: 'break-word',
-                  textAlign: 'center'
-                }}
-              >
-                {formatValueForDisplay(totalPatrimonio)}
-              </span>
-              
-              {/* Valor completo em mobile se abreviado */}
-              {isMobile && totalPatrimonio >= 1000000 && (
-                <div 
-                  className="text-xs mt-2"
-                  style={{ 
-                    color: '#476D9E',
-                    textAlign: 'center',
-                    fontStyle: 'italic'
-                  }}
-                >
-                  Valor completo: {formatCurrency(totalPatrimonio)}
-                </div>
-              )}
-            </div>
-            
-            {/* Valor por extenso - Responsivo */}
-            {totalPatrimonio > 0 && (
-              <div 
-                className={`flex items-start gap-2 mt-3 ${isMobile ? 'mobile-text' : 'text-sm'}`}
-                style={{ color: '#476D9E' }}
-              >
-                <span>💰</span>
-                <span className="italic flex-1" style={{ lineHeight: '1.4' }}>
-                  "{numeroParaExtenso(totalPatrimonio)}"
-                </span>
-              </div>
-            )}
-            
+            {/* Total do Patrimônio - Otimizado para Mobile */}
             <div 
-              className={`mt-2 ${isMobile ? 'text-xs mobile-text' : 'text-xs'}`} 
-              style={{ 
-                color: '#476D9E',
-                textAlign: isMobile ? 'center' : 'left',
-                lineHeight: '1.4'
+              className={`total-patrimonio ${isMobile ? 'highlight-card' : ''}`}
+              style={{
+                background: isMobile ? 
+                  'linear-gradient(135deg, #FFF7ED 0%, #FFFFFF 100%)' :
+                  'linear-gradient(135deg, rgba(234, 88, 12, 0.1), rgba(254, 215, 170, 0.5))',
+                border: isMobile ? 
+                  '2px solid #FED7AA' :
+                  '1px solid rgba(234, 88, 12, 0.3)',
+                boxShadow: isMobile ?
+                  '0 2px 8px rgba(0, 0, 0, 0.06)' :
+                  '0 4px 16px rgba(234, 88, 12, 0.1)',
+                padding: isMobile ? '20px' : '28px',
+                borderRadius: '12px'
               }}
             >
-              Este será o valor base para cálculo do ITCMD e demais custos
+              <div className={`value-container ${isMobile ? 'mobile-text' : ''}`}>
+                <span 
+                  className={`${isMobile ? 'mobile-label section-title-mobile' : 'font-semibold text-lg'}`}
+                  style={{ 
+                    color: '#EA580C',
+                    marginBottom: isMobile ? '12px' : '8px',
+                    display: 'block',
+                    textAlign: 'center'
+                  }}
+                >
+                  Total do Patrimônio (Valor de Mercado):
+                </span>
+                <span 
+                  className={`${isMobile ? 'total-value-mobile' : 'font-bold text-2xl'} total-value`}
+                  style={{ 
+                    color: '#EA580C',
+                    display: 'block',
+                    wordBreak: 'break-word',
+                    textAlign: 'center'
+                  }}
+                >
+                  {formatValueForDisplay(totalPatrimonio)}
+                </span>
+                
+                {/* Valor completo em mobile se abreviado */}
+                {isMobile && totalPatrimonio >= 1000000 && (
+                  <div 
+                    className="text-xs mt-2"
+                    style={{ 
+                      color: '#C2410C',
+                      textAlign: 'center',
+                      fontStyle: 'italic'
+                    }}
+                  >
+                    Valor completo: {formatCurrency(totalPatrimonio)}
+                  </div>
+                )}
+              </div>
+              
+              {/* Valor por extenso - Responsivo */}
+              {totalPatrimonio > 0 && (
+                <div 
+                  className={`flex items-start gap-2 mt-3 ${isMobile ? 'mobile-text' : 'text-sm'}`}
+                  style={{ color: '#C2410C' }}
+                >
+                  <span>💰</span>
+                  <span className="italic flex-1" style={{ lineHeight: '1.4' }}>
+                    "{numeroParaExtenso(totalPatrimonio)}"
+                  </span>
+                </div>
+              )}
+              
+              <div 
+                className={`mt-2 ${isMobile ? 'text-xs mobile-text' : 'text-xs'}`} 
+                style={{ 
+                  color: '#C2410C',
+                  textAlign: 'center',
+                  lineHeight: '1.4'
+                }}
+              >
+                Este será o valor base para cálculo do ITCMD e demais custos
+              </div>
             </div>
-          </div>
 
-          {/* Submit Button - Otimizado para Mobile */}
-          <button
-            type="submit"
-            disabled={!isFormValid}
-            className={`luxury-btn-primary button-mobile touchable w-full font-semibold transition-all`}
-            style={{
-              background: !isFormValid 
-                ? '#E8E2DD' 
-                : 'linear-gradient(135deg, #0C2C45, #476D9E)',
-              color: !isFormValid ? '#9FB7D4' : '#FFFFFF',
-              border: 'none',
-              borderRadius: '12px',
-              padding: isMobile ? '16px 24px' : '18px 24px',
-              fontSize: isMobile ? '16px' : '18px',
-              fontWeight: '700',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              cursor: !isFormValid ? 'not-allowed' : 'pointer',
-              boxShadow: !isFormValid 
-                ? 'none' 
-                : '0 6px 20px rgba(12, 44, 69, 0.2)',
-              opacity: !isFormValid ? 0.5 : 1,
-              minHeight: '48px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            Calcular Custos do Inventário
-          </button>
+            {/* Submit Button - Otimizado para Mobile */}
+            <button
+              type="submit"
+              disabled={!isFormValid}
+              className={`luxury-btn-primary button-mobile touchable w-full font-semibold transition-all mt-6`}
+              style={{
+                background: !isFormValid 
+                  ? '#E8E2DD' 
+                  : 'linear-gradient(135deg, #EA580C, #FB923C)',
+                color: !isFormValid ? '#9FB7D4' : '#FFFFFF',
+                border: 'none',
+                borderRadius: '12px',
+                padding: isMobile ? '16px 24px' : '18px 24px',
+                fontSize: isMobile ? '16px' : '18px',
+                fontWeight: '700',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                cursor: !isFormValid ? 'not-allowed' : 'pointer',
+                boxShadow: !isFormValid 
+                  ? 'none' 
+                  : '0 6px 20px rgba(234, 88, 12, 0.3)',
+                opacity: !isFormValid ? 0.5 : 1,
+                minHeight: '48px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              Calcular Custos do Inventário
+            </button>
+          </FormStep>
         </form>
       </GlassCard>
     </div>
