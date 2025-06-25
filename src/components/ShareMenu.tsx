@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Share, Download, Mail, Linkedin, Copy, Check } from 'lucide-react';
 import { useShare } from '../hooks/useShare';
@@ -27,16 +26,9 @@ const ShareMenu = ({ data }: ShareMenuProps) => {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value);
-  };
-
   const shareData = {
     title: 'Cálculo de Inventário ITCMD',
-    text: `Calculei os custos do meu inventário:\n\n💰 Patrimônio: ${formatCurrency(data.patrimonio)}\n📊 Custo Total: ${formatCurrency(data.total)}\n📍 Estado: ${data.estado}\n⚖️ Processo: ${data.tipoProcesso}\n\nCalcule o seu também: ${window.location.origin}`,
+    text: `Calculei os custos do meu inventário:\n\n💰 Patrimônio: ${formatCurrencyWithDecimals(data.patrimonio)}\n📊 Custo Total: ${formatCurrencyWithDecimals(data.total)}\n📍 Estado: ${data.estado}\n⚖️ Processo: ${data.tipoProcesso}\n\nCalcule o seu também: ${window.location.origin}`,
     url: window.location.origin
   };
 
@@ -64,18 +56,27 @@ const ShareMenu = ({ data }: ShareMenuProps) => {
 
   const handleDownloadPDF = async () => {
     try {
-      await generatePDF('results-content', `inventario-itcmd-${Date.now()}.pdf`);
+      console.log('Iniciando download de PDF via ShareMenu');
+      await generatePDF('results-pdf-content', `inventario-itcmd-${Date.now()}.pdf`, data);
       toast({
         title: 'PDF Gerado!',
         description: 'Relatório baixado com sucesso'
       });
     } catch (error) {
+      console.error('Erro no ShareMenu PDF:', error);
       toast({
         title: 'Erro',
-        description: 'Não foi possível gerar o PDF. Tente novamente.',
+        description: error instanceof Error ? error.message : 'Não foi possível gerar o PDF. Tente novamente.',
         variant: 'destructive'
       });
     }
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
   };
 
   return (
@@ -143,5 +144,7 @@ const ShareMenu = ({ data }: ShareMenuProps) => {
     </div>
   );
 };
+
+import { formatCurrencyWithDecimals } from '../utils/formatters';
 
 export default ShareMenu;

@@ -16,7 +16,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
     : '0';
 
   return (
-    <div className="space-y-8">
+    <div id="results-pdf-content" className="space-y-8">
       {/* Card Principal - Custo Total */}
       <GlassCard className="text-center">
         <div className="mb-6">

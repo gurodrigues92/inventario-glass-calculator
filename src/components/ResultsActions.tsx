@@ -21,15 +21,26 @@ const ResultsActions = ({ shareData }: ResultsActionsProps) => {
 
   const handleDownloadPDF = async () => {
     try {
-      await generatePDF('results-content', `inventario-itcmd-${Date.now()}.pdf`, shareData);
+      // Aguardar um pouco para garantir que o conteúdo esteja renderizado
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      console.log('Iniciando geração de PDF com dados:', shareData);
+      
+      await generatePDF(
+        'results-pdf-content', // ID correto do container
+        `inventario-itcmd-${Date.now()}.pdf`, 
+        shareData
+      );
+      
       toast({
-        title: 'PDF Gerado!',
-        description: 'Relatório baixado com sucesso'
+        title: 'PDF Gerado com Sucesso!',
+        description: 'Relatório baixado e salvo na pasta de downloads'
       });
     } catch (error) {
+      console.error('Erro na geração de PDF:', error);
       toast({
-        title: 'Erro',
-        description: 'Não foi possível gerar o PDF. Tente novamente.',
+        title: 'Erro na Geração do PDF',
+        description: error instanceof Error ? error.message : 'Erro desconhecido. Tente novamente.',
         variant: 'destructive'
       });
     }
@@ -40,10 +51,15 @@ const ResultsActions = ({ shareData }: ResultsActionsProps) => {
       <button 
         onClick={handleDownloadPDF}
         disabled={isGenerating}
-        className="glass-button px-8 py-3 flex items-center space-x-2 disabled:opacity-50"
+        className="glass-button px-8 py-3 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        style={{
+          background: isGenerating ? 'rgba(209, 191, 163, 0.3)' : 'rgba(209, 191, 163, 0.1)',
+          border: '1px solid rgba(209, 191, 163, 0.5)',
+          color: '#0C2C45'
+        }}
       >
         <Download className="w-4 h-4" />
-        <span>{isGenerating ? 'Gerando...' : 'Baixar PDF'}</span>
+        <span>{isGenerating ? 'Gerando PDF...' : 'Baixar PDF'}</span>
       </button>
       
       <button 
