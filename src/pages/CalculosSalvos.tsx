@@ -101,7 +101,7 @@ const CalculosSalvos = () => {
         <main className="pt-24 pb-12 px-6">
           <div className="max-w-6xl mx-auto">
             <div className="text-center">
-              <div className="text-white">Carregando cálculos salvos...</div>
+              <div style={{ color: '#2C2C2C' }}>Carregando cálculos salvos...</div>
             </div>
           </div>
         </main>
@@ -120,13 +120,13 @@ const CalculosSalvos = () => {
             <div className="flex items-center space-x-4">
               <button 
                 onClick={() => navigate('/')}
-                className="flex items-center space-x-2 text-glass hover:text-white transition-colors"
+                className="flex items-center space-x-2 text-[#476D9E] hover:text-[#0C2C45] transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Voltar</span>
               </button>
               
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="text-3xl font-bold" style={{ color: '#2C2C2C' }}>
                 Cálculos Salvos
               </h1>
             </div>
@@ -135,13 +135,13 @@ const CalculosSalvos = () => {
           {/* Search */}
           <div className="mb-8">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-glass w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#476D9E] w-4 h-4" />
               <Input
                 type="text"
                 placeholder="Buscar por nome, email ou estado..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-glass/10 border-glass text-white placeholder:text-glass/60"
+                className="pl-10 bg-white/90 border-[#E8E2DD] text-[#2C2C2C] placeholder:text-[#476D9E]/60"
               />
             </div>
           </div>
@@ -149,7 +149,7 @@ const CalculosSalvos = () => {
           {/* Results */}
           {filteredCalculos.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-glass text-lg">
+              <p className="text-[#476D9E] text-lg">
                 {calculos.length === 0 
                   ? 'Nenhum cálculo salvo encontrado.'
                   : 'Nenhum resultado encontrado para sua busca.'
@@ -161,19 +161,19 @@ const CalculosSalvos = () => {
               {filteredCalculos.map((calculo) => (
                 <div
                   key={calculo.id}
-                  className="bg-glass/10 backdrop-blur-sm border border-glass/30 rounded-lg p-6 hover:bg-glass/20 transition-colors"
+                  className="bg-white/95 backdrop-blur-sm border border-[#E8E2DD] rounded-lg p-6 hover:bg-white transition-colors shadow-sm"
                 >
                   <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* Info do Cliente */}
                     <div>
-                      <h3 className="text-white font-semibold text-lg mb-2">
+                      <h3 className="font-semibold text-lg mb-2" style={{ color: '#2C2C2C' }}>
                         {calculo.profile.nome}
                       </h3>
                       {calculo.profile.email && (
-                        <p className="text-glass text-sm">{calculo.profile.email}</p>
+                        <p className="text-[#476D9E] text-sm">{calculo.profile.email}</p>
                       )}
                       {calculo.profile.telefone && (
-                        <p className="text-glass text-sm">{calculo.profile.telefone}</p>
+                        <p className="text-[#476D9E] text-sm">{calculo.profile.telefone}</p>
                       )}
                     </div>
 
@@ -181,25 +181,25 @@ const CalculosSalvos = () => {
                     <div>
                       <div className="flex items-center space-x-2 mb-2">
                         <DollarSign className="w-4 h-4 text-primary" />
-                        <span className="text-glass text-sm">Patrimônio</span>
+                        <span className="text-[#476D9E] text-sm">Patrimônio</span>
                       </div>
-                      <p className="text-white font-semibold">
+                      <p className="font-semibold" style={{ color: '#2C2C2C' }}>
                         {formatCurrency(calculo.patrimonio)}
                       </p>
                       <div className="flex items-center space-x-2 mt-2">
                         <MapPin className="w-4 h-4 text-secondary" />
-                        <span className="text-glass text-sm">{calculo.estado}</span>
+                        <span className="text-[#476D9E] text-sm">{calculo.estado}</span>
                       </div>
                     </div>
 
                     {/* Resultado */}
                     <div>
-                      <p className="text-glass text-sm mb-2">Custo Total</p>
-                      <p className="text-white font-semibold text-lg">
+                      <p className="text-[#476D9E] text-sm mb-2">Custo Total</p>
+                      <p className="font-semibold text-lg" style={{ color: '#2C2C2C' }}>
                         {formatCurrency(calculo.custo_total)}
                       </p>
                       {calculo.tempo_estimado && (
-                        <p className="text-glass text-sm mt-1">
+                        <p className="text-[#476D9E] text-sm mt-1">
                           {calculo.tempo_estimado}
                         </p>
                       )}
@@ -208,8 +208,8 @@ const CalculosSalvos = () => {
                     {/* Data e Ações */}
                     <div className="flex flex-col justify-between">
                       <div className="flex items-center space-x-2 mb-4">
-                        <Calendar className="w-4 h-4 text-glass" />
-                        <span className="text-glass text-sm">
+                        <Calendar className="w-4 h-4 text-[#476D9E]" />
+                        <span className="text-[#476D9E] text-sm">
                           {formatDate(calculo.created_at)}
                         </span>
                       </div>
@@ -221,7 +221,7 @@ const CalculosSalvos = () => {
                         }}
                         variant="outline"
                         size="sm"
-                        className="border-glass text-glass hover:bg-glass/10"
+                        className="border-[#476D9E] text-[#476D9E] hover:bg-[#F5EFEB]"
                       >
                         Ver Detalhes
                       </Button>
@@ -234,22 +234,22 @@ const CalculosSalvos = () => {
 
           {/* Summary */}
           {calculos.length > 0 && (
-            <div className="mt-8 bg-glass/10 backdrop-blur-sm border border-glass/30 rounded-lg p-6">
-              <h3 className="text-white font-semibold mb-4">Resumo</h3>
+            <div className="mt-8 bg-white/95 backdrop-blur-sm border border-[#E8E2DD] rounded-lg p-6 shadow-sm">
+              <h3 className="font-semibold mb-4" style={{ color: '#2C2C2C' }}>Resumo</h3>
               <div className="grid md:grid-cols-3 gap-6">
                 <div>
-                  <p className="text-glass text-sm">Total de Cálculos</p>
-                  <p className="text-white text-2xl font-bold">{calculos.length}</p>
+                  <p className="text-[#476D9E] text-sm">Total de Cálculos</p>
+                  <p className="text-2xl font-bold" style={{ color: '#2C2C2C' }}>{calculos.length}</p>
                 </div>
                 <div>
-                  <p className="text-glass text-sm">Patrimônio Total Calculado</p>
-                  <p className="text-white text-2xl font-bold">
+                  <p className="text-[#476D9E] text-sm">Patrimônio Total Calculado</p>
+                  <p className="text-2xl font-bold" style={{ color: '#2C2C2C' }}>
                     {formatCurrency(calculos.reduce((sum, calc) => sum + calc.patrimonio, 0))}
                   </p>
                 </div>
                 <div>
-                  <p className="text-glass text-sm">Custos Totais Calculados</p>
-                  <p className="text-white text-2xl font-bold">
+                  <p className="text-[#476D9E] text-sm">Custos Totais Calculados</p>
+                  <p className="text-2xl font-bold" style={{ color: '#2C2C2C' }}>
                     {formatCurrency(calculos.reduce((sum, calc) => sum + calc.custo_total, 0))}
                   </p>
                 </div>
