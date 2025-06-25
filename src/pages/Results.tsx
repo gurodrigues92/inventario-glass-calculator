@@ -1,13 +1,12 @@
 
 import React, { useState } from 'react';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import ResultsSimplified from '../components/ResultsSimplified';
 import ResultsActions from '../components/ResultsActions';
 import SalvarCalculoModal from '../components/SalvarCalculoModal';
 import ResultsLoadingState from '../components/ResultsLoadingState';
-import { Button } from '@/components/ui/button';
 import { useResultsData } from '../hooks/useResultsData';
 import { useResultsSave } from '../hooks/useResultsSave';
 import { useIsMobile } from '../hooks/use-mobile';
@@ -56,8 +55,8 @@ const Results = () => {
       
       <main className={`pb-12 ${isMobile ? 'pt-20 px-4' : 'pt-24 px-6'}`}>
         <div className={`mx-auto ${isMobile ? 'max-w-sm' : 'max-w-4xl'}`}>
-          {/* Back Button and Save Button - Responsivo */}
-          <div className={`results-header mb-6 md:mb-8 ${isMobile ? 'flex-col space-y-4' : 'flex justify-between items-center'}`}>
+          {/* Back Button - Só botão voltar agora */}
+          <div className={`results-header mb-6 md:mb-8 ${isMobile ? 'flex-col space-y-4' : 'flex justify-start items-center'}`}>
             <button 
               onClick={() => navigate('/')}
               className={`flex items-center space-x-2 text-glass hover:text-white transition-colors ${isMobile ? 'self-start' : ''}`}
@@ -65,15 +64,6 @@ const Results = () => {
               <ArrowLeft className="w-4 h-4" />
               <span>Voltar</span>
             </button>
-
-            <Button
-              onClick={() => setShowSalvarModal(true)}
-              disabled={isSaving}
-              className={`bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white ${isMobile ? 'w-full py-3' : 'px-6 py-2'}`}
-            >
-              <Save className="w-4 h-4 mr-2" />
-              {calculoSalvoId ? 'Cálculo Salvo' : 'Salvar Cálculo'}
-            </Button>
           </div>
 
           {/* Header - Responsivo */}
@@ -95,9 +85,14 @@ const Results = () => {
             />
           </div>
 
-          {/* Actions Section - Download PDF and New Consultation */}
+          {/* Actions Section - Agora com os 3 botões padronizados */}
           <div className={`fade-in-up ${isMobile ? 'mt-8' : 'mt-12'}`}>
-            <ResultsActions shareData={shareData} />
+            <ResultsActions 
+              shareData={shareData}
+              onSalvar={() => setShowSalvarModal(true)}
+              isSaving={isSaving}
+              calculoSalvoId={calculoSalvoId}
+            />
           </div>
         </div>
       </main>

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download } from 'lucide-react';
+import { Download, Save } from 'lucide-react';
 import { usePDF } from '../hooks/usePDF';
 import { useToast } from '../hooks/use-toast';
 
@@ -12,9 +12,12 @@ interface ResultsActionsProps {
     estado: string;
     tipoProcesso: string;
   };
+  onSalvar: () => void;
+  isSaving: boolean;
+  calculoSalvoId: string | null;
 }
 
-const ResultsActions = ({ shareData }: ResultsActionsProps) => {
+const ResultsActions = ({ shareData, onSalvar, isSaving, calculoSalvoId }: ResultsActionsProps) => {
   const navigate = useNavigate();
   const { generatePDF, isGenerating } = usePDF();
   const { toast } = useToast();
@@ -49,6 +52,17 @@ const ResultsActions = ({ shareData }: ResultsActionsProps) => {
 
   return (
     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+      {/* Botão Salvar Cálculo */}
+      <button 
+        onClick={onSalvar}
+        disabled={isSaving}
+        className="btn-standard px-8 py-3 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <Save className="w-4 h-4" />
+        <span>{calculoSalvoId ? 'Cálculo Salvo' : 'Salvar Cálculo'}</span>
+      </button>
+
+      {/* Botão Baixar PDF */}
       <button 
         onClick={handleDownloadPDF}
         disabled={isGenerating}
@@ -58,9 +72,10 @@ const ResultsActions = ({ shareData }: ResultsActionsProps) => {
         <span>{isGenerating ? 'Gerando PDF...' : 'Baixar PDF'}</span>
       </button>
       
+      {/* Botão Nova Consulta */}
       <button 
         onClick={() => navigate('/')}
-        className="btn-secondary px-8 py-3"
+        className="btn-standard px-8 py-3"
       >
         Nova Consulta
       </button>
