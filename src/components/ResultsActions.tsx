@@ -56,7 +56,7 @@ const ResultsActions = ({ shareData, onSalvar, isSaving, calculoSalvoId }: Resul
       <button 
         onClick={onSalvar}
         disabled={isSaving}
-        className="btn-standard px-8 py-3 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="btn-primary px-8 py-3 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <Save className="w-4 h-4" />
         <span>{calculoSalvoId ? 'Cálculo Salvo' : 'Salvar Cálculo'}</span>
@@ -66,7 +66,7 @@ const ResultsActions = ({ shareData, onSalvar, isSaving, calculoSalvoId }: Resul
       <button 
         onClick={handleDownloadPDF}
         disabled={isGenerating}
-        className="btn-standard px-8 py-3 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="btn-primary px-8 py-3 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <Download className="w-4 h-4" />
         <span>{isGenerating ? 'Gerando PDF...' : 'Baixar PDF'}</span>
@@ -75,7 +75,7 @@ const ResultsActions = ({ shareData, onSalvar, isSaving, calculoSalvoId }: Resul
       {/* Botão Nova Consulta */}
       <button 
         onClick={() => navigate('/')}
-        className="btn-standard px-8 py-3"
+        className="btn-primary px-8 py-3"
       >
         Nova Consulta
       </button>

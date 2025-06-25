@@ -90,7 +90,7 @@ const CalculosSalvos = () => {
     return (
       <div className="min-h-screen bg-animated">
         <Header />
-        <main className="pt-24 pb-12 px-6">
+        <main className="pt-36 pb-12 px-6">
           <div className="max-w-6xl mx-auto">
             <div className="text-center">
               <div style={{ color: '#2C2C2C' }}>Carregando cálculos salvos...</div>
@@ -105,7 +105,7 @@ const CalculosSalvos = () => {
     <div className="min-h-screen bg-animated">
       <Header />
       
-      <main className="pt-24 pb-12 px-6">
+      <main className="pt-36 pb-12 px-6">
         <div className="max-w-6xl mx-auto">
           <CalculosHeader />
           

@@ -53,7 +53,7 @@ const Results = () => {
     <div className="min-h-screen bg-animated">
       <Header />
       
-      <main className={`pb-12 ${isMobile ? 'pt-20 px-4' : 'pt-24 px-6'}`}>
+      <main className={`pb-12 ${isMobile ? 'pt-28 px-4' : 'pt-36 px-6'}`}>
         <div className={`mx-auto ${isMobile ? 'max-w-sm' : 'max-w-4xl'}`}>
           {/* Back Button - Só botão voltar agora */}
           <div className={`results-header mb-6 md:mb-8 ${isMobile ? 'flex-col space-y-4' : 'flex justify-start items-center'}`}>

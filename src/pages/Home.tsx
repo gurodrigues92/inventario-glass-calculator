@@ -11,7 +11,7 @@ const Home = () => {
     <div className="min-h-screen bg-animated">
       <Header />
       
-      <main className="pt-24 pb-12 px-6">
+      <main className="pt-36 pb-12 px-6">
         <div className="max-w-3xl mx-auto">
           <HeroSection />
           <PatrimonioForm />
