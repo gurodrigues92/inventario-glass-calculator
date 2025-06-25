@@ -4,11 +4,25 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { calcularCustosInventario, DadosCalculoInventario } from '../utils/itcmdCalculator';
 import { parseCurrencyValue } from '../utils/formatters';
 
+interface LoadingStep {
+  message: string;
+  progress: number;
+}
+
+const LOADING_STEPS: LoadingStep[] = [
+  { message: 'Analisando patrimônio...', progress: 25 },
+  { message: 'Calculando ITCMD...', progress: 50 },
+  { message: 'Computando honorários advocatícios...', progress: 75 },
+  { message: 'Finalizando relatório...', progress: 100 }
+];
+
 export const useResultsData = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [hasValidData, setHasValidData] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   
   const { formData, calculationType } = location.state || {};
 
@@ -22,7 +36,29 @@ export const useResultsData = () => {
     }
     
     setHasValidData(true);
-    setIsLoading(false);
+    
+    // Simular loading com etapas
+    let currentStep = 0;
+    const stepDuration = 750; // 750ms por etapa = 3 segundos total
+    
+    const simulateLoading = () => {
+      const interval = setInterval(() => {
+        if (currentStep < LOADING_STEPS.length) {
+          setLoadingStep(currentStep);
+          setLoadingProgress(LOADING_STEPS[currentStep].progress);
+          currentStep++;
+        } else {
+          clearInterval(interval);
+          setIsLoading(false);
+        }
+      }, stepDuration);
+      
+      return interval;
+    };
+    
+    const loadingInterval = simulateLoading();
+    
+    return () => clearInterval(loadingInterval);
   }, [formData, navigate]);
 
   const dadosCalculo: DadosCalculoInventario = formData ? {
@@ -40,7 +76,14 @@ export const useResultsData = () => {
     dividasEspolio: formData.dividasEspolio ? parseCurrencyValue(formData.dividasEspolio) : 0
   } : {} as DadosCalculoInventario;
 
-  const resultado = hasValidData ? calcularCustosInventario(dadosCalculo) : null;
+  const resultado = hasValidData && !isLoading ? calcularCustosInventario(dadosCalculo) : null;
+
+  const getCurrentLoadingMessage = () => {
+    if (loadingStep < LOADING_STEPS.length) {
+      return LOADING_STEPS[loadingStep].message;
+    }
+    return 'Finalizando...';
+  };
 
   return {
     isLoading,
@@ -48,6 +91,8 @@ export const useResultsData = () => {
     formData,
     calculationType,
     dadosCalculo,
-    resultado
+    resultado,
+    loadingProgress,
+    loadingMessage: getCurrentLoadingMessage()
   };
 };

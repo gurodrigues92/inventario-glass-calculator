@@ -15,7 +15,16 @@ const Results = () => {
   const navigate = useNavigate();
   const [showSalvarModal, setShowSalvarModal] = useState(false);
   
-  const { isLoading, hasValidData, formData, dadosCalculo, resultado } = useResultsData();
+  const { 
+    isLoading, 
+    hasValidData, 
+    formData, 
+    dadosCalculo, 
+    resultado,
+    loadingProgress,
+    loadingMessage
+  } = useResultsData();
+  
   const { calculoSalvoId, isSaving, handleSalvarCalculo } = useResultsSave(
     resultado, 
     formData, 
@@ -23,7 +32,12 @@ const Results = () => {
   );
 
   if (isLoading || !hasValidData) {
-    return <ResultsLoadingState />;
+    return (
+      <ResultsLoadingState 
+        progress={loadingProgress} 
+        message={loadingMessage} 
+      />
+    );
   }
 
   // Preparar dados para o componente ResultsActions

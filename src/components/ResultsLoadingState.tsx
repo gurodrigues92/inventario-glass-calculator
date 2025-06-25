@@ -1,13 +1,20 @@
 
 import React from 'react';
 import ResultsPageLayout from './ResultsPageLayout';
+import LoadingCalculator from './LoadingCalculator';
 
-const ResultsLoadingState = () => {
+interface ResultsLoadingStateProps {
+  progress?: number;
+  message?: string;
+}
+
+const ResultsLoadingState = ({ 
+  progress = 0, 
+  message = 'Carregando resultados...' 
+}: ResultsLoadingStateProps) => {
   return (
     <ResultsPageLayout>
-      <div className="text-center">
-        <div className="text-white">Carregando resultados...</div>
-      </div>
+      <LoadingCalculator progress={progress} message={message} />
     </ResultsPageLayout>
   );
 };
