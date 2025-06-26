@@ -3,6 +3,7 @@ import React from 'react';
 import { formatCurrencyWithDecimals, numeroParaExtenso } from '../utils/formatters';
 import GlassCard from './GlassCard';
 import { DadosCalculoInventario } from '../utils/itcmdCalculator';
+import { useIsMobile } from '../hooks/use-mobile';
 
 interface ResultsSimplifiedProps {
   resultado: any;
@@ -11,37 +12,47 @@ interface ResultsSimplifiedProps {
 }
 
 const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplifiedProps) => {
+  const isMobile = useIsMobile();
+  
   const economiaPercentual = resultado.resumo.economiaHolding && resultado.resumo.custoTotal > 0 
     ? ((resultado.resumo.economiaHolding / resultado.resumo.custoTotal) * 100).toFixed(0)
     : '0';
 
   return (
-    <div className="space-y-8">
+    <div className={`space-y-8 ${isMobile ? 'mobile-results-content' : ''}`} id="results-content">
       {/* PÁGINA 1 - CUSTOS E DETALHAMENTO */}
       <div id="results-page-1" className="space-y-8" style={{ pageBreakAfter: 'always', minHeight: '100vh' }}>
         {/* Card Principal - Custo Total */}
         <GlassCard className="text-center">
           <div className="mb-6">
             <h2 
-              className="text-2xl font-semibold mb-2"
+              className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold mb-2`}
               style={{ color: '#0C2C45' }}
             >
               Custos Estimados do Inventário
             </h2>
             <div 
-              className="text-5xl font-bold mb-2"
-              style={{ color: '#D1BFA3' }}
+              className={`${isMobile ? 'text-3xl' : 'text-5xl'} font-bold mb-2`}
+              style={{ 
+                color: '#D1BFA3',
+                wordBreak: 'break-word',
+                lineHeight: '1.1'
+              }}
             >
               {formatCurrencyWithDecimals(resultado.resumo.custoTotal)}
             </div>
             <div 
-              className="text-lg italic mb-4"
-              style={{ color: '#476D9E' }}
+              className={`${isMobile ? 'text-sm' : 'text-lg'} italic mb-4`}
+              style={{ 
+                color: '#476D9E',
+                fontSize: isMobile ? '12px' : undefined,
+                lineHeight: '1.3'
+              }}
             >
               "{numeroParaExtenso(resultado.resumo.custoTotal)}"
             </div>
             <span 
-              className="text-xl"
+              className={`${isMobile ? 'text-lg' : 'text-xl'}`}
               style={{ color: '#476D9E' }}
             >
               {resultado.resumo.percentualSobrePatrimonio}% do patrimônio
@@ -49,17 +60,22 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
           </div>
 
           <div 
-            className="inline-block px-4 py-2 rounded-full text-sm font-semibold"
+            className={`inline-block px-4 py-2 rounded-full ${isMobile ? 'text-xs' : 'text-sm'} font-semibold`}
             style={{
               background: 'rgba(209, 191, 163, 0.1)',
               border: '1px solid rgba(209, 191, 163, 0.3)',
-              color: '#0C2C45'
+              color: '#0C2C45',
+              maxWidth: '100%',
+              wordBreak: 'break-word'
             }}
           >
             <div>💰 Patrimônio: {formatCurrencyWithDecimals(dadosCalculo.patrimonio)}</div>
             <div 
-              className="text-xs italic mt-1"
-              style={{ color: '#476D9E' }}
+              className={`${isMobile ? 'text-xs' : 'text-xs'} italic mt-1`}
+              style={{ 
+                color: '#476D9E',
+                fontSize: isMobile ? '10px' : undefined
+              }}
             >
               "{numeroParaExtenso(dadosCalculo.patrimonio)}"
             </div>
@@ -69,7 +85,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
         {/* Detalhamento dos Custos */}
         <GlassCard>
           <h3 
-            className="text-xl font-semibold mb-6 text-center"
+            className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold mb-6 text-center`}
             style={{ color: '#0C2C45' }}
           >
             Detalhamento dos Custos
@@ -77,18 +93,18 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
           
           <div className="space-y-4">
             <div 
-              className="flex justify-between items-center p-4 rounded-lg" 
+              className={`flex justify-between items-center ${isMobile ? 'p-3' : 'p-4'} rounded-lg`} 
               style={{ background: 'rgba(209, 191, 163, 0.05)' }}
             >
-              <div>
+              <div className="flex-1">
                 <span 
-                  className="font-medium"
+                  className={`${isMobile ? 'text-sm' : ''} font-medium`}
                   style={{ color: '#0C2C45' }}
                 >
                   ITCMD ({formData.estado})
                 </span>
                 <div 
-                  className="text-sm"
+                  className={`${isMobile ? 'text-xs' : 'text-sm'}`}
                   style={{ color: '#476D9E' }}
                 >
                   Imposto estadual sobre herança
@@ -96,19 +112,22 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
               </div>
               <div className="text-right">
                 <div 
-                  className="font-semibold"
+                  className={`${isMobile ? 'text-sm' : ''} font-semibold`}
                   style={{ color: '#0C2C45' }}
                 >
                   {formatCurrencyWithDecimals(resultado.detalhamento.itcmd.valor)}
                 </div>
                 <div 
-                  className="text-xs italic"
-                  style={{ color: '#476D9E' }}
+                  className={`${isMobile ? 'text-xs' : 'text-xs'} italic`}
+                  style={{ 
+                    color: '#476D9E',
+                    fontSize: isMobile ? '10px' : undefined
+                  }}
                 >
                   "{numeroParaExtenso(resultado.detalhamento.itcmd.valor)}"
                 </div>
                 <div 
-                  className="text-sm" 
+                  className={`${isMobile ? 'text-xs' : 'text-sm'}`} 
                   style={{ color: '#D1BFA3' }}
                 >
                   {resultado.detalhamento.itcmd.percentual.toFixed(1)}%
@@ -117,58 +136,69 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
             </div>
 
             <div 
-              className="flex justify-between items-center p-4 rounded-lg" 
+              className={`flex justify-between items-center ${isMobile ? 'p-3' : 'p-4'} rounded-lg`} 
               style={{ background: 'rgba(209, 191, 163, 0.05)' }}
             >
-              <div>
+              <div className="flex-1">
                 <span 
-                  className="font-medium"
+                  className={`${isMobile ? 'text-sm' : ''} font-medium`}
                   style={{ color: '#0C2C45' }}
                 >
                   Honorários Advocatícios
                 </span>
                 <div 
-                  className="text-sm"
+                  className={`${isMobile ? 'text-xs' : 'text-sm'}`}
                   style={{ color: '#476D9E' }}
                 >
-                  {resultado.detalhamento.honorarios.percentual}% do patrimônio
+                  10% a 20% do patrimônio (média 15%)
                 </div>
+                {resultado.detalhamento.honorarios.isRange && (
+                  <div 
+                    className={`${isMobile ? 'text-xs' : 'text-sm'} mt-1`}
+                    style={{ color: '#D1BFA3' }}
+                  >
+                    Faixa: {formatCurrencyWithDecimals(resultado.detalhamento.honorarios.valorMinimo)} - {formatCurrencyWithDecimals(resultado.detalhamento.honorarios.valorMaximo)}
+                  </div>
+                )}
               </div>
               <div className="text-right">
                 <div 
-                  className="font-semibold"
+                  className={`${isMobile ? 'text-sm' : ''} font-semibold`}
                   style={{ color: '#0C2C45' }}
                 >
                   {formatCurrencyWithDecimals(resultado.detalhamento.honorarios.valor)}
                 </div>
                 <div 
-                  className="text-xs italic"
-                  style={{ color: '#476D9E' }}
+                  className={`${isMobile ? 'text-xs' : 'text-xs'} italic`}
+                  style={{ 
+                    color: '#476D9E',
+                    fontSize: isMobile ? '10px' : undefined
+                  }}
                 >
                   "{numeroParaExtenso(resultado.detalhamento.honorarios.valor)}"
                 </div>
                 <div 
-                  className="text-sm" 
+                  className={`${isMobile ? 'text-xs' : 'text-sm'}`} 
                   style={{ color: '#D1BFA3' }}
                 >
-                  {resultado.detalhamento.honorarios.percentual}%
+                  {resultado.detalhamento.honorarios.percentual}% (média)
                 </div>
               </div>
             </div>
 
             <div 
-              className="flex justify-between items-center p-4 rounded-lg" 
+              className={`flex justify-between items-center ${isMobile ? 'p-3' : 'p-4'} rounded-lg`} 
               style={{ background: 'rgba(209, 191, 163, 0.05)' }}
             >
-              <div>
+              <div className="flex-1">
                 <span 
-                  className="font-medium"
+                  className={`${isMobile ? 'text-sm' : ''} font-medium`}
                   style={{ color: '#0C2C45' }}
                 >
                   Custas de Cartório
                 </span>
                 <div 
-                  className="text-sm"
+                  className={`${isMobile ? 'text-xs' : 'text-sm'}`}
                   style={{ color: '#476D9E' }}
                 >
                   Registro e documentação
@@ -176,19 +206,22 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
               </div>
               <div className="text-right">
                 <div 
-                  className="font-semibold"
+                  className={`${isMobile ? 'text-sm' : ''} font-semibold`}
                   style={{ color: '#0C2C45' }}
                 >
                   {formatCurrencyWithDecimals(resultado.detalhamento.custas.valor)}
                 </div>
                 <div 
-                  className="text-xs italic"
-                  style={{ color: '#476D9E' }}
+                  className={`${isMobile ? 'text-xs' : 'text-xs'} italic`}
+                  style={{ 
+                    color: '#476D9E',
+                    fontSize: isMobile ? '10px' : undefined
+                  }}
                 >
                   "{numeroParaExtenso(resultado.detalhamento.custas.valor)}"
                 </div>
                 <div 
-                  className="text-sm" 
+                  className={`${isMobile ? 'text-xs' : 'text-sm'}`} 
                   style={{ color: '#D1BFA3' }}
                 >
                   2%
@@ -201,12 +234,12 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
         {/* Informações adicionais na página 1 */}
         <GlassCard>
           <h4 
-            className="font-semibold mb-3 text-center"
+            className={`${isMobile ? 'text-sm' : ''} font-semibold mb-3 text-center`}
             style={{ color: '#0C2C45' }}
           >
             📋 Resumo do Processo
           </h4>
-          <div className="grid md:grid-cols-2 gap-4 text-sm">
+          <div className={`grid ${isMobile ? 'grid-cols-1 gap-2' : 'md:grid-cols-2 gap-4'} ${isMobile ? 'text-xs' : 'text-sm'}`}>
             <div>
               <span style={{ color: '#476D9E' }}>Estado:</span>
               <span className="ml-2 font-medium" style={{ color: '#0C2C45' }}>{formData.estado}</span>
@@ -225,11 +258,11 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
         <GlassCard premium={true}>
           <div className="text-center mb-6">
             <div 
-              className="inline-block px-6 py-2 rounded-full mb-4"
+              className={`inline-block ${isMobile ? 'px-4 py-1' : 'px-6 py-2'} rounded-full mb-4`}
               style={{
                 background: 'linear-gradient(135deg, #27AE60, #2ECC71)',
                 color: 'white',
-                fontSize: '14px',
+                fontSize: isMobile ? '12px' : '14px',
                 fontWeight: '700'
               }}
             >
@@ -237,14 +270,14 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
             </div>
             
             <h3 
-              className="text-2xl font-bold mb-4"
+              className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold mb-4`}
               style={{ color: '#D1BFA3' }}
             >
               Com Holding Familiar S/A
             </h3>
             
             <p 
-              className="mb-6 leading-relaxed"
+              className={`${isMobile ? 'text-sm' : ''} mb-6 leading-relaxed ${isMobile ? 'px-2' : ''}`}
               style={{ color: '#0C2C45' }}
             >
               Com a constituição de uma Holding Familiar S/A, você pode reduzir 
@@ -253,51 +286,57 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
             </p>
             
             <div 
-              className="text-3xl font-bold mb-2"
-              style={{ color: '#27AE60' }}
+              className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold mb-2`}
+              style={{ 
+                color: '#27AE60',
+                wordBreak: 'break-word'
+              }}
             >
               Economia estimada: {formatCurrencyWithDecimals(resultado.resumo.economiaHolding)}
             </div>
             <div 
-              className="text-lg italic mb-6"
-              style={{ color: '#476D9E' }}
+              className={`${isMobile ? 'text-sm' : 'text-lg'} italic mb-6`}
+              style={{ 
+                color: '#476D9E',
+                fontSize: isMobile ? '12px' : undefined
+              }}
             >
               "{numeroParaExtenso(resultado.resumo.economiaHolding)}"
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'md:grid-cols-2 gap-6'}`}>
             <div>
               <h4 
-                className="font-semibold mb-3"
+                className={`${isMobile ? 'text-sm' : ''} font-semibold mb-3`}
                 style={{ color: '#0C2C45' }}
               >
                 ✅ Benefícios da Holding S/A
               </h4>
               <ul className="space-y-2">
                 <li 
-                  className="flex items-center gap-2 text-sm"
+                  className={`flex items-center gap-2 ${isMobile ? 'text-xs' : 'text-sm'}`}
                   style={{ color: '#476D9E' }}
                 >
                   <span style={{ color: '#27AE60' }}>✓</span>
                   ITCMD: 0% sobre a diferença
                 </li>
                 <li 
-                  className="flex items-center gap-2 text-sm"
+                  className={`flex items-center gap-2 ${isMobile ? 'text-xs' : 'text-sm'}`}
                   style={{ color: '#476D9E' }}
                 >
                   <span style={{ color: '#27AE60' }}>✓</span>
                   Ganho de Capital: 0%
                 </li>
                 <li 
-                  className="flex items-center gap-2 text-sm"
+                  className={`flex items-center gap-2 ${isMobile ? 'text-xs' : 'text-sm'}`}
                   style={{ color: '#476D9E' }}
                 >
                   <span style={{ color: '#27AE60' }}>✓</span>
                   Constituição em 30 a 60 dias
                 </li>
                 <li 
-                  className="flex items-center gap-2 text-sm"
+                  className={`flex items-center gap-2 ${isMobile ? 'text-xs' : 'text-sm'}`}
                   style={{ color: '#476D9E' }}
                 >
                   <span style={{ color: '#27AE60' }}>✓</span>
@@ -308,13 +347,13 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
             
             <div>
               <h4 
-                className="font-semibold mb-3"
+                className={`${isMobile ? 'text-sm' : ''} font-semibold mb-3`}
                 style={{ color: '#0C2C45' }}
               >
                 💰 Custos da Holding S/A
               </h4>
               <div className="space-y-2">
-                <div className="flex justify-between text-sm">
+                <div className={`flex justify-between ${isMobile ? 'text-xs' : 'text-sm'}`}>
                   <span style={{ color: '#476D9E' }}>Honorários Constituição:</span>
                   <div className="text-right">
                     <span 
@@ -324,14 +363,17 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                       {formatCurrencyWithDecimals(150000)}
                     </span>
                     <div 
-                      className="text-xs italic"
-                      style={{ color: '#476D9E' }}
+                      className={`${isMobile ? 'text-xs' : 'text-xs'} italic`}
+                      style={{ 
+                        color: '#476D9E',
+                        fontSize: isMobile ? '10px' : undefined
+                      }}
                     >
                       "{numeroParaExtenso(150000)}"
                     </div>
                   </div>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className={`flex justify-between ${isMobile ? 'text-xs' : 'text-sm'}`}>
                   <span style={{ color: '#476D9E' }}>Custos Cartório:</span>
                   <div className="text-right">
                     <span 
@@ -341,8 +383,11 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                       {formatCurrencyWithDecimals(16000)}
                     </span>
                     <div 
-                      className="text-xs italic"
-                      style={{ color: '#476D9E' }}
+                      className={`${isMobile ? 'text-xs' : 'text-xs'} italic`}
+                      style={{ 
+                        color: '#476D9E',
+                        fontSize: isMobile ? '10px' : undefined
+                      }}
                     >
                       "{numeroParaExtenso(16000)}"
                     </div>
@@ -352,13 +397,16 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                   className="border-t pt-2 mt-2"
                   style={{ borderColor: '#E8E2DD' }}
                 >
-                  <div className="flex justify-between font-semibold">
+                  <div className={`flex justify-between font-semibold ${isMobile ? 'text-xs' : ''}`}>
                     <span style={{ color: '#0C2C45' }}>Total:</span>
                     <div className="text-right">
                       <span style={{ color: '#27AE60' }}>{formatCurrencyWithDecimals(166000)}</span>
                       <div 
-                        className="text-xs italic font-normal"
-                        style={{ color: '#476D9E' }}
+                        className={`${isMobile ? 'text-xs' : 'text-xs'} italic font-normal`}
+                        style={{ 
+                          color: '#476D9E',
+                          fontSize: isMobile ? '10px' : undefined
+                        }}
                       >
                         "{numeroParaExtenso(166000)}"
                       </div>
@@ -372,16 +420,19 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
 
         {/* Aviso Reforma Tributária */}
         <GlassCard className="border" style={{ borderColor: 'rgba(243, 156, 18, 0.3)' }}>
-          <div className="flex items-start gap-4">
-            <span className="text-3xl">⚠️</span>
+          <div className={`flex items-start gap-4 ${isMobile ? 'text-sm' : ''}`}>
+            <span className={`${isMobile ? 'text-2xl' : 'text-3xl'}`}>⚠️</span>
             <div>
               <h4 
-                className="font-semibold mb-2"
+                className={`${isMobile ? 'text-sm' : ''} font-semibold mb-2`}
                 style={{ color: '#0C2C45' }}
               >
                 Importante: Reforma Tributária 2025
               </h4>
-              <p style={{ color: '#476D9E' }}>
+              <p 
+                className={isMobile ? 'text-xs' : ''}
+                style={{ color: '#476D9E' }}
+              >
                 A partir de 2025, com a reforma tributária, estes custos podem 
                 chegar até o dobro do valor, a depender de cada estado. 
                 <strong style={{ color: '#0C2C45' }}> Planeje-se agora!</strong>
@@ -394,13 +445,13 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
         <GlassCard premium={true} className="text-center">
           <div className="mb-6">
             <h3 
-              className="text-3xl font-bold mb-2"
+              className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold mb-2`}
               style={{ color: '#D1BFA3' }}
             >
               ISENTE O PROCESSO DE INVENTÁRIO
             </h3>
             <p 
-              className="text-xl font-semibold"
+              className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold`}
               style={{ color: '#0C2C45' }}
             >
               FALE COM UM ESPECIALISTA
@@ -408,19 +459,22 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
           </div>
           
           <button
-            className="luxury-btn-primary px-8 py-4 text-lg font-semibold"
+            className={`luxury-btn-primary ${isMobile ? 'px-6 py-3 text-base' : 'px-8 py-4 text-lg'} font-semibold touchable`}
             style={{
               background: 'linear-gradient(135deg, #D1BFA3, #E5D4B1, #D1BFA3)',
               color: '#0C2C45',
               border: 'none',
               borderRadius: '12px',
-              fontSize: '18px',
+              fontSize: isMobile ? '16px' : '18px',
               fontWeight: '700',
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
-              boxShadow: '0 6px 20px rgba(209, 191, 163, 0.4)'
+              boxShadow: '0 6px 20px rgba(209, 191, 163, 0.4)',
+              minHeight: isMobile ? '48px' : 'auto',
+              width: isMobile ? '100%' : 'auto',
+              maxWidth: isMobile ? '100%' : 'none'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-2px)';
@@ -435,7 +489,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
           </button>
           
           <p 
-            className="text-sm mt-4"
+            className={`${isMobile ? 'text-xs' : 'text-sm'} mt-4`}
             style={{ color: '#476D9E' }}
           >
             Consultoria especializada em planejamento sucessório e holding familiar

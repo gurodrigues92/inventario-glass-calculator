@@ -21,10 +21,14 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
   // 1. Calcular ITCMD baseado na tabela real dos estados
   const itcmdResult = calcularITCMD(patrimonio, estado);
   
-  // 2. Honorários advocatícios baseados no PDF
-  // 8% sem litígio, 10% com litígio (conforme página 11 do PDF)
-  const percentualHonorarios = temLitigio ? 0.10 : 0.08;
-  const honorarios = patrimonio * percentualHonorarios;
+  // 2. Honorários advocatícios corrigidos - 10% a 20% (média 15%)
+  const percentualHonorariosMin = 0.10; // 10%
+  const percentualHonorariosMax = 0.20; // 20%
+  const percentualHonorariosMedio = 0.15; // 15% (média)
+  
+  const honorariosMin = patrimonio * percentualHonorariosMin;
+  const honorariosMax = patrimonio * percentualHonorariosMax;
+  const honorarios = patrimonio * percentualHonorariosMedio; // Usar média para cálculos
   
   // 3. Custas de cartório - 2% fixo (conforme PDF)
   const custasCartorio = patrimonio * 0.02;
@@ -62,11 +66,12 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
       },
       honorarios: {
         valor: honorarios,
-        percentual: percentualHonorarios * 100,
-        descricao: `Honorários advocatícios (${percentualHonorarios * 100}% ${temLitigio ? 'com litígio' : 'sem litígio'})`,
-        tooltip: temLitigio ? 
-          'Com possibilidade de litígio, os honorários aumentam para 10%' : 
-          'Honorários padrão para processo sem litígio'
+        valorMinimo: honorariosMin,
+        valorMaximo: honorariosMax,
+        percentual: percentualHonorariosMedio * 100,
+        descricao: `Honorários advocatícios (10% a 20% - média 15%)`,
+        isRange: true,
+        tooltip: 'Honorários advocatícios variam entre 10% e 20% do patrimônio, com média de 15%'
       },
       custas: {
         valor: custasCartorio,
