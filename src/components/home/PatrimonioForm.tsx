@@ -87,8 +87,6 @@ const PatrimonioForm = () => {
             title="Localização"
             subtitle="Informe seu estado para calcular o ITCMD correto"
             icon={<MapPin size={24} />}
-            accentColor="#2563EB"
-            borderColor="#DBEAFE"
           >
             <LuxurySelect
               label="Estado de Residência"
@@ -108,8 +106,6 @@ const PatrimonioForm = () => {
             title="Imóveis"
             subtitle="Casas, apartamentos, terrenos - valor real de mercado"
             icon={<Home size={24} />}
-            accentColor="#059669"
-            borderColor="#D1FAE5"
           >
             <LuxuryCurrencyInput
               label="Valor de Mercado dos Imóveis"
@@ -128,8 +124,6 @@ const PatrimonioForm = () => {
             title="Veículos"
             subtitle="Carros, motos, embarcações - conforme tabela FIPE"
             icon={<Car size={24} />}
-            accentColor="#DC2626"
-            borderColor="#FEE2E2"
           >
             <LuxuryCurrencyInput
               label="Valor de Mercado dos Veículos"
@@ -148,8 +142,6 @@ const PatrimonioForm = () => {
             title="Investimentos"
             subtitle="Ações, fundos, poupança, joias, obras de arte"
             icon={<Gem size={24} />}
-            accentColor="#7C3AED"
-            borderColor="#EDE9FE"
           >
             <LuxuryCurrencyInput
               label="Valor de Mercado dos Investimentos"
@@ -168,8 +160,6 @@ const PatrimonioForm = () => {
             title="Resumo do Patrimônio"
             subtitle="Total calculado automaticamente"
             icon={<Calculator size={24} />}
-            accentColor="#EA580C"
-            borderColor="#FED7AA"
           >
             {/* Total do Patrimônio - Otimizado para Mobile */}
             <div 
@@ -177,13 +167,13 @@ const PatrimonioForm = () => {
               style={{
                 background: isMobile ? 
                   'linear-gradient(135deg, #FFF7ED 0%, #FFFFFF 100%)' :
-                  'linear-gradient(135deg, rgba(234, 88, 12, 0.1), rgba(254, 215, 170, 0.5))',
+                  'linear-gradient(135deg, rgba(209, 191, 163, 0.1), rgba(245, 239, 235, 0.5))',
                 border: isMobile ? 
-                  '2px solid #FED7AA' :
-                  '1px solid rgba(234, 88, 12, 0.3)',
+                  '2px solid #D1BFA3' :
+                  '1px solid rgba(209, 191, 163, 0.3)',
                 boxShadow: isMobile ?
                   '0 2px 8px rgba(0, 0, 0, 0.06)' :
-                  '0 4px 16px rgba(234, 88, 12, 0.1)',
+                  '0 4px 16px rgba(209, 191, 163, 0.1)',
                 padding: isMobile ? '20px' : '28px',
                 borderRadius: '12px'
               }}
@@ -192,7 +182,7 @@ const PatrimonioForm = () => {
                 <span 
                   className={`${isMobile ? 'mobile-label section-title-mobile' : 'font-semibold text-lg'}`}
                   style={{ 
-                    color: '#EA580C',
+                    color: '#D1BFA3',
                     marginBottom: isMobile ? '12px' : '8px',
                     display: 'block',
                     textAlign: 'center'
@@ -203,7 +193,7 @@ const PatrimonioForm = () => {
                 <span 
                   className={`${isMobile ? 'total-value-mobile' : 'font-bold text-2xl'} total-value`}
                   style={{ 
-                    color: '#EA580C',
+                    color: '#D1BFA3',
                     display: 'block',
                     wordBreak: 'break-word',
                     textAlign: 'center'
@@ -260,7 +250,7 @@ const PatrimonioForm = () => {
               style={{
                 background: !isFormValid 
                   ? '#E8E2DD' 
-                  : 'linear-gradient(135deg, #EA580C, #FB923C)',
+                  : 'linear-gradient(135deg, #0C2C45, #476D9E)',
                 color: !isFormValid ? '#9FB7D4' : '#FFFFFF',
                 border: 'none',
                 borderRadius: '12px',
@@ -272,7 +262,7 @@ const PatrimonioForm = () => {
                 cursor: !isFormValid ? 'not-allowed' : 'pointer',
                 boxShadow: !isFormValid 
                   ? 'none' 
-                  : '0 6px 20px rgba(234, 88, 12, 0.3)',
+                  : '0 6px 20px rgba(12, 44, 69, 0.3)',
                 opacity: !isFormValid ? 0.5 : 1,
                 minHeight: '48px',
                 display: 'flex',
