@@ -21,14 +21,9 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
   // 1. Calcular ITCMD baseado na tabela real dos estados
   const itcmdResult = calcularITCMD(patrimonio, estado);
   
-  // 2. Honorários advocatícios corrigidos - 10% a 20% (média 15%)
-  const percentualHonorariosMin = 0.10; // 10%
-  const percentualHonorariosMax = 0.20; // 20%
-  const percentualHonorariosMedio = 0.15; // 15% (média)
-  
-  const honorariosMin = patrimonio * percentualHonorariosMin;
-  const honorariosMax = patrimonio * percentualHonorariosMax;
-  const honorarios = patrimonio * percentualHonorariosMedio; // Usar média para cálculos
+  // 2. Honorários advocatícios - 1,5% fixo do patrimônio
+  const percentualHonorarios = 0.015; // 1,5%
+  const honorarios = patrimonio * percentualHonorarios;
   
   // 3. Custas de cartório - 2% fixo (conforme PDF)
   const custasCartorio = patrimonio * 0.02;
@@ -36,13 +31,15 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
   // 4. Total Pessoa Física
   const custoTotalPF = itcmdResult.valor + honorarios + custasCartorio;
   
-  // 5. Custos Holding S/A (valores fixos conforme página 13 do PDF)
+  // 5. Custos Holding S/A (honorários agora 1,5% do patrimônio)
+  const honorariosConstituicaoHolding = patrimonio * 0.015; // 1,5% do patrimônio
+  const custosCartorioHolding = 16000; // R$ 16.000 fixo (0,16%)
   const custosHoldingSA = {
-    honorariosConstituicao: 150000, // R$ 150.000 fixo
-    custosCartorio: 16000, // R$ 16.000 fixo (0,16%)
+    honorariosConstituicao: honorariosConstituicaoHolding,
+    custosCartorio: custosCartorioHolding,
     itcmd: 0, // 0% conforme PDF
     ganhoCapital: 0, // 0% conforme PDF
-    total: 166000 // R$ 166.000 total
+    total: honorariosConstituicaoHolding + custosCartorioHolding
   };
   
   // 6. Economia com Holding
@@ -66,12 +63,9 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
       },
       honorarios: {
         valor: honorarios,
-        valorMinimo: honorariosMin,
-        valorMaximo: honorariosMax,
-        percentual: percentualHonorariosMedio * 100,
-        descricao: `Honorários advocatícios (10% a 20% - média 15%)`,
-        isRange: true,
-        tooltip: 'Honorários advocatícios variam entre 10% e 20% do patrimônio, com média de 15%'
+        percentual: percentualHonorarios * 100,
+        descricao: `Honorários advocatícios (1,5%)`,
+        tooltip: 'Honorários advocatícios de 1,5% do patrimônio'
       },
       custas: {
         valor: custasCartorio,

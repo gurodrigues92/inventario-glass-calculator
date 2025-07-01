@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { formatCurrencyWithDecimals, numeroParaExtenso } from '../utils/formatters';
 import GlassCard from './GlassCard';
@@ -17,6 +16,11 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
   const economiaPercentual = resultado.resumo.economiaHolding && resultado.resumo.custoTotal > 0 
     ? ((resultado.resumo.economiaHolding / resultado.resumo.custoTotal) * 100).toFixed(0)
     : '0';
+
+  // Calcular honorários da holding dinamicamente
+  const honorariosConstituicaoHolding = dadosCalculo.patrimonio * 0.015;
+  const custosCartorioHolding = 16000;
+  const totalHolding = honorariosConstituicaoHolding + custosCartorioHolding;
 
   return (
     <div className={`space-y-8 ${isMobile ? 'mobile-results-content' : ''}`} id="results-content">
@@ -150,16 +154,8 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                   className={`${isMobile ? 'text-xs' : 'text-sm'}`}
                   style={{ color: '#476D9E' }}
                 >
-                  10% a 20% do patrimônio (média 15%)
+                  1,5% do patrimônio
                 </div>
-                {resultado.detalhamento.honorarios.isRange && (
-                  <div 
-                    className={`${isMobile ? 'text-xs' : 'text-sm'} mt-1`}
-                    style={{ color: '#D1BFA3' }}
-                  >
-                    Faixa: {formatCurrencyWithDecimals(resultado.detalhamento.honorarios.valorMinimo)} - {formatCurrencyWithDecimals(resultado.detalhamento.honorarios.valorMaximo)}
-                  </div>
-                )}
               </div>
               <div className="text-right">
                 <div 
@@ -181,7 +177,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                   className={`${isMobile ? 'text-xs' : 'text-sm'}`} 
                   style={{ color: '#D1BFA3' }}
                 >
-                  {resultado.detalhamento.honorarios.percentual}% (média)
+                  1,5%
                 </div>
               </div>
             </div>
@@ -354,13 +350,13 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
               </h4>
               <div className="space-y-2">
                 <div className={`flex justify-between ${isMobile ? 'text-xs' : 'text-sm'}`}>
-                  <span style={{ color: '#476D9E' }}>Honorários Constituição:</span>
+                  <span style={{ color: '#476D9E' }}>Honorários Constituição (1,5%):</span>
                   <div className="text-right">
                     <span 
                       className="font-medium"
                       style={{ color: '#0C2C45' }}
                     >
-                      {formatCurrencyWithDecimals(150000)}
+                      {formatCurrencyWithDecimals(honorariosConstituicaoHolding)}
                     </span>
                     <div 
                       className={`${isMobile ? 'text-xs' : 'text-xs'} italic`}
@@ -369,7 +365,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                         fontSize: isMobile ? '10px' : undefined
                       }}
                     >
-                      "{numeroParaExtenso(150000)}"
+                      "{numeroParaExtenso(honorariosConstituicaoHolding)}"
                     </div>
                   </div>
                 </div>
@@ -380,7 +376,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                       className="font-medium"
                       style={{ color: '#0C2C45' }}
                     >
-                      {formatCurrencyWithDecimals(16000)}
+                      {formatCurrencyWithDecimals(custosCartorioHolding)}
                     </span>
                     <div 
                       className={`${isMobile ? 'text-xs' : 'text-xs'} italic`}
@@ -389,7 +385,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                         fontSize: isMobile ? '10px' : undefined
                       }}
                     >
-                      "{numeroParaExtenso(16000)}"
+                      "{numeroParaExtenso(custosCartorioHolding)}"
                     </div>
                   </div>
                 </div>
@@ -400,7 +396,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                   <div className={`flex justify-between font-semibold ${isMobile ? 'text-xs' : ''}`}>
                     <span style={{ color: '#0C2C45' }}>Total:</span>
                     <div className="text-right">
-                      <span style={{ color: '#27AE60' }}>{formatCurrencyWithDecimals(166000)}</span>
+                      <span style={{ color: '#27AE60' }}>{formatCurrencyWithDecimals(totalHolding)}</span>
                       <div 
                         className={`${isMobile ? 'text-xs' : 'text-xs'} italic font-normal`}
                         style={{ 
@@ -408,7 +404,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                           fontSize: isMobile ? '10px' : undefined
                         }}
                       >
-                        "{numeroParaExtenso(166000)}"
+                        "{numeroParaExtenso(totalHolding)}"
                       </div>
                     </div>
                   </div>
