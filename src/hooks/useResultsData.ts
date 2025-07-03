@@ -73,7 +73,8 @@ export const useResultsData = () => {
     valorVeiculos: formData.valorVeiculos ? parseCurrencyValue(formData.valorVeiculos) : 0,
     valorInvestimentos: formData.valorInvestimentos ? parseCurrencyValue(formData.valorInvestimentos) : 0,
     valorOutrosBens: formData.valorOutrosBens ? parseCurrencyValue(formData.valorOutrosBens) : 0,
-    dividasEspolio: formData.dividasEspolio ? parseCurrencyValue(formData.dividasEspolio) : 0
+    dividasEspolio: formData.dividasEspolio ? parseCurrencyValue(formData.dividasEspolio) : 0,
+    patrimonioHistoricoIR: formData.patrimonioHistoricoIR ? parseCurrencyValue(formData.patrimonioHistoricoIR) : undefined
   } : {} as DadosCalculoInventario;
 
   const resultado = hasValidData && !isLoading ? calcularCustosInventario(dadosCalculo) : null;

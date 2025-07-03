@@ -18,7 +18,8 @@ const PatrimonioForm = () => {
     estado: '',
     valorImoveis: '',
     valorVeiculos: '',
-    valorInvestimentos: ''
+    valorInvestimentos: '',
+    patrimonioHistoricoIR: ''
   });
 
   const [totalPatrimonio, setTotalPatrimonio] = useState(0);
@@ -42,6 +43,7 @@ const PatrimonioForm = () => {
     const dadosParaCalculo = {
       ...formData,
       patrimonio: formatCurrency(totalPatrimonio),
+      patrimonioHistoricoIR: formData.patrimonioHistoricoIR || '0',
       tipoProcesso: 'extrajudicial',
       herdeiros: '1',
       temTestamento: false,
@@ -154,9 +156,27 @@ const PatrimonioForm = () => {
             />
           </FormStep>
 
-          {/* Etapa 5: Resumo */}
+          {/* Etapa 5: Patrimônio Histórico IR */}
           <FormStep
             stepNumber={5}
+            title="Patrimônio Histórico (IR)"
+            subtitle="Valor declarado no Imposto de Renda - opcional"
+            icon={<Calculator size={24} />}
+          >
+            <LuxuryCurrencyInput
+              label="Valor do Patrimônio no IR (Opcional)"
+              icon={<IconWrapper icon={Calculator} size={16} />}
+              value={formData.patrimonioHistoricoIR}
+              onChange={(value) => handleInputChange('patrimonioHistoricoIR', value)}
+              placeholder="R$ 0,00"
+              allowDecimals={true}
+              hint="Se informado, será usado para calcular o Ganho de Capital (15%). Se não informado, não haverá cobrança de Ganho de Capital."
+            />
+          </FormStep>
+
+          {/* Etapa 6: Resumo */}
+          <FormStep
+            stepNumber={6}
             title="Resumo do Patrimônio"
             subtitle="Total calculado automaticamente"
             icon={<Calculator size={24} />}

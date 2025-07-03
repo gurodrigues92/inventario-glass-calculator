@@ -18,35 +18,43 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
     temLitigio = false
   } = dados;
   
-  // 1. Calcular ITCMD baseado na tabela real dos estados
-  const itcmdResult = calcularITCMD(patrimonio, estado);
+  // 1. Calcular ITCMD - 8% fixo conforme tabela
+  const itcmdResult = { 
+    valor: patrimonio * 0.08, 
+    descricao: `ITCMD - 8% (Alíquota padrão)` 
+  };
   
-  // 2. Honorários advocatícios - 1,5% fixo do patrimônio
-  const percentualHonorarios = 0.015; // 1,5%
+  // 2. Honorários advocatícios - 10% conforme tabela
+  const percentualHonorarios = 0.10; // 10%
   const honorarios = patrimonio * percentualHonorarios;
   
-  // 3. Custas de cartório - 2% fixo (conforme PDF)
+  // 3. Custas de cartório - 2% conforme tabela
   const custasCartorio = patrimonio * 0.02;
   
-  // 4. Total Pessoa Física
-  const custoTotalPF = itcmdResult.valor + honorarios + custasCartorio;
+  // 4. Ganho de Capital - 15% sobre a diferença (se aplicável)
+  const patrimonioHistorico = dados.patrimonioHistoricoIR || patrimonio;
+  const diferencaGanhoCapital = Math.max(0, patrimonio - patrimonioHistorico);
+  const ganhoCapital = diferencaGanhoCapital * 0.15; // 15%
   
-  // 5. Custos Holding S/A (honorários agora 1,5% do patrimônio)
+  // 5. Total Pessoa Física
+  const custoTotalPF = itcmdResult.valor + honorarios + custasCartorio + ganhoCapital;
+  
+  // 6. Custos Holding S/A (honorários 1,5% do patrimônio)
   const honorariosConstituicaoHolding = patrimonio * 0.015; // 1,5% do patrimônio
-  const custosCartorioHolding = 16000; // R$ 16.000 fixo (0,16%)
+  const custosCartorioHolding = 16000; // R$ 16.000 fixo
   const custosHoldingSA = {
     honorariosConstituicao: honorariosConstituicaoHolding,
     custosCartorio: custosCartorioHolding,
-    itcmd: 0, // 0% conforme PDF
-    ganhoCapital: 0, // 0% conforme PDF
+    itcmd: 0, // 0% conforme tabela
+    ganhoCapital: 0, // 0% conforme tabela
     total: honorariosConstituicaoHolding + custosCartorioHolding
   };
   
-  // 6. Economia com Holding
+  // 7. Economia com Holding
   const economiaHolding = Math.max(0, custoTotalPF - custosHoldingSA.total);
   const percentualEconomia = custoTotalPF > 0 ? (economiaHolding / custoTotalPF * 100) : 0;
   
-  // 7. Tempo estimado
+  // 8. Tempo estimado
   const tempoEstimado = tipoProcesso === 'judicial' 
     ? (temLitigio ? '5 a 8 anos' : '3 a 5 anos')
     : '60 a 120 dias';
@@ -58,14 +66,14 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
     detalhamento: {
       itcmd: {
         valor: itcmdResult.valor,
-        percentual: (itcmdResult.valor / patrimonio * 100),
-        descricao: `ITCMD ${estado} - ${itcmdResult.descricao.split(' - ')[1]}`
+        percentual: 8,
+        descricao: `ITCMD - 8% (Alíquota padrão)`
       },
       honorarios: {
         valor: honorarios,
         percentual: percentualHonorarios * 100,
-        descricao: `Honorários advocatícios (1,5%)`,
-        tooltip: 'Honorários advocatícios de 1,5% do patrimônio'
+        descricao: `Honorários advocatícios (10%)`,
+        tooltip: 'Honorários advocatícios de 10% do patrimônio'
       },
       custas: {
         valor: custasCartorio,
@@ -82,6 +90,12 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
         percentual: 0,
         descricao: 'Não aplicável',
         informativo: 'ITBI não incide sobre inventário'
+      },
+      ganhoCapital: {
+        valor: ganhoCapital,
+        percentual: 15,
+        descricao: 'Ganho de Capital (15%)',
+        tooltip: `15% sobre a diferença entre valor atual (${formatCurrency(patrimonio)}) e histórico IR (${formatCurrency(patrimonioHistorico)})`
       }
     },
     resumo: {

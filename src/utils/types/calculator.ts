@@ -12,11 +12,9 @@ export interface DadosCalculoInventario {
   valorInvestimentos?: number;
   valorOutrosBens?: number;
   dividasEspolio?: number;
-  // Novos campos para versão avançada
-  valorImoveisIR?: number;
-  valorImoveisMercado?: number;
-  valorBensIR?: number;
-  valorBensMercado?: number;
+  // Novos campos para ganho de capital
+  patrimonioHistoricoIR?: number;
+  patrimonioAtualMercado?: number;
 }
 
 export interface DetalhamentoCusto {
@@ -53,6 +51,7 @@ export interface ResultadoCalculo {
     custas: DetalhamentoCusto;
     cartorio: DetalhamentoCusto;
     itbi: DetalhamentoCusto;
+    ganhoCapital: DetalhamentoCusto;
   };
   resumo: {
     custoTotal: number;

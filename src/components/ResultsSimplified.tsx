@@ -144,7 +144,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
               style={{ background: 'rgba(209, 191, 163, 0.05)' }}
             >
               <div className="flex-1">
-                <span 
+                 <span 
                   className={`${isMobile ? 'text-sm' : ''} font-medium`}
                   style={{ color: '#0C2C45' }}
                 >
@@ -154,7 +154,7 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                   className={`${isMobile ? 'text-xs' : 'text-sm'}`}
                   style={{ color: '#476D9E' }}
                 >
-                  1,5% do patrimônio
+                  10% do patrimônio
                 </div>
               </div>
               <div className="text-right">
@@ -173,11 +173,11 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                 >
                   "{numeroParaExtenso(resultado.detalhamento.honorarios.valor)}"
                 </div>
-                <div 
+                 <div 
                   className={`${isMobile ? 'text-xs' : 'text-sm'}`} 
                   style={{ color: '#D1BFA3' }}
                 >
-                  1,5%
+                  10%
                 </div>
               </div>
             </div>
@@ -224,6 +224,52 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplif
                 </div>
               </div>
             </div>
+
+            {/* Ganho de Capital */}
+            {resultado.detalhamento.ganhoCapital.valor > 0 && (
+              <div 
+                className={`flex justify-between items-center ${isMobile ? 'p-3' : 'p-4'} rounded-lg`} 
+                style={{ background: 'rgba(209, 191, 163, 0.05)' }}
+              >
+                <div className="flex-1">
+                  <span 
+                    className={`${isMobile ? 'text-sm' : ''} font-medium`}
+                    style={{ color: '#0C2C45' }}
+                  >
+                    Ganho de Capital
+                  </span>
+                  <div 
+                    className={`${isMobile ? 'text-xs' : 'text-sm'}`}
+                    style={{ color: '#476D9E' }}
+                  >
+                    15% sobre valorização
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div 
+                    className={`${isMobile ? 'text-sm' : ''} font-semibold`}
+                    style={{ color: '#0C2C45' }}
+                  >
+                    {formatCurrencyWithDecimals(resultado.detalhamento.ganhoCapital.valor)}
+                  </div>
+                  <div 
+                    className={`${isMobile ? 'text-xs' : 'text-xs'} italic`}
+                    style={{ 
+                      color: '#476D9E',
+                      fontSize: isMobile ? '10px' : undefined
+                    }}
+                  >
+                    "{numeroParaExtenso(resultado.detalhamento.ganhoCapital.valor)}"
+                  </div>
+                  <div 
+                    className={`${isMobile ? 'text-xs' : 'text-sm'}`} 
+                    style={{ color: '#D1BFA3' }}
+                  >
+                    15%
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </GlassCard>
 
