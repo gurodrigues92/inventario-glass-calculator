@@ -14,7 +14,7 @@ const HoldingBenefitsCard = ({ resultado, dadosCalculo, economiaPercentual }: Ho
   const isMobile = useIsMobile();
 
   const honorariosConstituicaoHolding = dadosCalculo.patrimonio * 0.015;
-  const custosCartorioHolding = 16000;
+  const custosCartorioHolding = dadosCalculo.patrimonio * 0.02;
   const totalHolding = honorariosConstituicaoHolding + custosCartorioHolding;
 
   return (
@@ -137,7 +137,7 @@ const HoldingBenefitsCard = ({ resultado, dadosCalculo, economiaPercentual }: Ho
               </div>
             </div>
             <div className={`flex justify-between ${isMobile ? 'text-xs' : 'text-sm'}`}>
-              <span style={{ color: '#476D9E' }}>Custos Cartório:</span>
+              <span style={{ color: '#476D9E' }}>Custos Cartório (2%):</span>
               <div className="text-right">
                 <span 
                   className="font-medium"

@@ -41,7 +41,7 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
   
   // 6. Custos Holding S/A (honorários 1,5% do patrimônio)
   const honorariosConstituicaoHolding = patrimonio * 0.015; // 1,5% do patrimônio
-  const custosCartorioHolding = 16000; // R$ 16.000 fixo
+  const custosCartorioHolding = patrimonio * 0.02; // 2% do patrimônio
   const custosHoldingSA = {
     honorariosConstituicao: honorariosConstituicaoHolding,
     custosCartorio: custosCartorioHolding,
