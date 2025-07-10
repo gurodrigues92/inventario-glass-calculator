@@ -54,6 +54,45 @@ export const formatCurrencyInputWithoutDecimals = (value: string): string => {
 };
 
 // Nova função melhorada para input de moeda com decimais
+// Função para formatação em tempo real durante a digitação
+export const formatCurrencyAsTyping = (inputValue: string, allowDecimals: boolean = true): string => {
+  if (!inputValue) return '';
+  
+  // Remove tudo exceto números, vírgulas e pontos
+  let cleanValue = inputValue.replace(/[^\d,\.]/g, '');
+  
+  if (!cleanValue) return '';
+  
+  if (allowDecimals) {
+    // Se tem vírgula, trata como separador decimal
+    if (cleanValue.includes(',')) {
+      const parts = cleanValue.split(',');
+      const integerPart = parts[0].replace(/\./g, ''); // Remove pontos da parte inteira
+      const decimalPart = parts[1] ? parts[1].substring(0, 2) : ''; // Máximo 2 decimais
+      
+      if (/^\d+$/.test(integerPart)) {
+        // Formata a parte inteira com separadores de milhares
+        const formattedInteger = parseInt(integerPart).toLocaleString('pt-BR');
+        return decimalPart ? `R$ ${formattedInteger},${decimalPart}` : `R$ ${formattedInteger},`;
+      }
+    } else {
+      // Apenas números inteiros
+      const num = parseInt(cleanValue.replace(/\./g, ''));
+      if (!isNaN(num)) {
+        return `R$ ${num.toLocaleString('pt-BR')}`;
+      }
+    }
+  } else {
+    // Sem decimais
+    const num = parseInt(cleanValue.replace(/\./g, ''));
+    if (!isNaN(num)) {
+      return `R$ ${num.toLocaleString('pt-BR')}`;
+    }
+  }
+  
+  return '';
+};
+
 export const formatSmartCurrencyInput = (inputValue: string, allowDecimals: boolean = true): string => {
   if (!inputValue) return '';
   

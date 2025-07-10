@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import LuxuryField from './LuxuryField';
-import { formatCurrencyInput, formatCurrencyInputWithoutDecimals } from '../../utils/formatters';
+import { formatCurrencyAsTyping, formatSmartCurrencyInput } from '../../utils/formatters';
 import { useIsMobile } from '../../hooks/use-mobile';
 
 interface LuxuryCurrencyInputProps {
@@ -32,31 +32,27 @@ const LuxuryCurrencyInput = ({
   hint,
   allowDecimals = true
 }: LuxuryCurrencyInputProps) => {
-  const [rawInput, setRawInput] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const isMobile = useIsMobile();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    setRawInput(inputValue);
+    
+    // Formatação em tempo real durante a digitação
+    const formattedValue = formatCurrencyAsTyping(inputValue, allowDecimals);
+    onChange(formattedValue);
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     setIsFocused(false);
     
-    // Format the currency value
-    let formattedValue = '';
-    if (rawInput || value) {
-      const inputToFormat = rawInput || value;
-      if (allowDecimals) {
-        formattedValue = formatCurrencyInput(inputToFormat);
-      } else {
-        formattedValue = formatCurrencyInputWithoutDecimals(inputToFormat);
+    // Formatação final mais robusta no blur
+    if (value) {
+      const finalFormatted = formatSmartCurrencyInput(value, allowDecimals);
+      if (finalFormatted !== value) {
+        onChange(finalFormatted);
       }
     }
-    
-    onChange(formattedValue);
-    setRawInput('');
     
     // Reset border styling
     if (isMobile) {
@@ -70,12 +66,6 @@ const LuxuryCurrencyInput = ({
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     setIsFocused(true);
-    
-    // Show unformatted value for easier editing
-    if (value && !rawInput) {
-      const unformatted = value.replace(/R\$\s?/, '').replace(/\./g, '');
-      setRawInput(unformatted);
-    }
     
     // Apply focus styling - mobile optimized
     if (isMobile) {
@@ -103,8 +93,8 @@ const LuxuryCurrencyInput = ({
     }
   };
 
-  // Show rawInput during editing, formatted value when not editing
-  const displayValue = isFocused ? rawInput : value;
+  // O valor já está formatado em tempo real
+  const displayValue = value;
 
   return (
     <LuxuryField label={label} icon={icon} className={className}>
