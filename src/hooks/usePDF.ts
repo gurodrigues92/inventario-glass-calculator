@@ -34,7 +34,17 @@ export const usePDF = () => {
       // PÁGINA 1 - CUSTOS E DETALHAMENTO
       const page1Element = document.getElementById('results-page-1');
       if (!page1Element) {
-        throw new Error('Elemento da página 1 não foi encontrado');
+        console.error('Elemento results-page-1 não encontrado no DOM');
+        throw new Error('Conteúdo da página 1 não está disponível. Aguarde o carregamento completo.');
+      }
+
+      // Verificar se o elemento está visível
+      if (page1Element.offsetWidth === 0 || page1Element.offsetHeight === 0) {
+        console.error('Elemento results-page-1 não está visível:', {
+          width: page1Element.offsetWidth,
+          height: page1Element.offsetHeight
+        });
+        throw new Error('Conteúdo da página 1 não está visível. Aguarde o carregamento completo.');
       }
 
       console.log('Capturando página 1 (custos e detalhamento)');
@@ -44,11 +54,12 @@ export const usePDF = () => {
         allowTaint: true,
         backgroundColor: '#ffffff',
         removeContainer: true,
-        imageTimeout: 15000,
+        imageTimeout: 20000, // Aumentado timeout
         scrollX: 0,
         scrollY: 0,
         windowWidth: page1Element.scrollWidth,
         windowHeight: page1Element.scrollHeight,
+        logging: true, // Ativar logs para debug
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.getElementById('results-page-1');
           if (clonedElement) {
@@ -107,7 +118,17 @@ export const usePDF = () => {
       // PÁGINA 2 - HOLDING S/A E CTA
       const page2Element = document.getElementById('results-page-2');
       if (!page2Element) {
-        throw new Error('Elemento da página 2 não foi encontrado');
+        console.error('Elemento results-page-2 não encontrado no DOM');
+        throw new Error('Conteúdo da página 2 não está disponível. Aguarde o carregamento completo.');
+      }
+
+      // Verificar se o elemento está visível
+      if (page2Element.offsetWidth === 0 || page2Element.offsetHeight === 0) {
+        console.error('Elemento results-page-2 não está visível:', {
+          width: page2Element.offsetWidth,
+          height: page2Element.offsetHeight
+        });
+        throw new Error('Conteúdo da página 2 não está visível. Aguarde o carregamento completo.');
       }
 
       console.log('Capturando página 2 (holding e CTA)');
@@ -117,11 +138,12 @@ export const usePDF = () => {
         allowTaint: true,
         backgroundColor: '#ffffff',
         removeContainer: true,
-        imageTimeout: 15000,
+        imageTimeout: 20000, // Aumentado timeout
         scrollX: 0,
         scrollY: 0,
         windowWidth: page2Element.scrollWidth,
         windowHeight: page2Element.scrollHeight,
+        logging: true, // Ativar logs para debug
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.getElementById('results-page-2');
           if (clonedElement) {

@@ -33,7 +33,7 @@ export const useResultsSave = (resultado: any, formData: any, calculationType: s
         custoTotal: resultado.resumo.custoTotal,
         custoItcmd: resultado.detalhamento.itcmd.valor,
         custoHonorarios: resultado.detalhamento.honorarios.valor,
-        custoCustas: resultado.detalhamento.custas.valor,
+        custoCustas: resultado.detalhamento.custas?.valor || 0, // Proteção para campo que pode não existir
         tempoEstimado: resultado.resumo.tempoEstimado,
         percentualSobrePatrimonio: percentualNumerico,
         insights: resultado.insights,
