@@ -14,8 +14,7 @@ const HoldingBenefitsCard = ({ resultado, dadosCalculo, economiaPercentual }: Ho
   const isMobile = useIsMobile();
 
   const honorariosConstituicaoHolding = dadosCalculo.patrimonio * 0.015;
-  const custosCartorioHolding = dadosCalculo.patrimonio * 0.02;
-  const totalHolding = honorariosConstituicaoHolding + custosCartorioHolding;
+  const totalHolding = honorariosConstituicaoHolding;
 
   return (
     <GlassCard premium={true}>
@@ -133,26 +132,6 @@ const HoldingBenefitsCard = ({ resultado, dadosCalculo, economiaPercentual }: Ho
                   }}
                 >
                   "{numeroParaExtenso(honorariosConstituicaoHolding)}"
-                </div>
-              </div>
-            </div>
-            <div className={`flex justify-between ${isMobile ? 'text-xs' : 'text-sm'}`}>
-              <span style={{ color: '#476D9E' }}>Custos Cartório (2%):</span>
-              <div className="text-right">
-                <span 
-                  className="font-medium"
-                  style={{ color: '#0C2C45' }}
-                >
-                  {formatCurrencyWithDecimals(custosCartorioHolding)}
-                </span>
-                <div 
-                  className={`${isMobile ? 'text-xs' : 'text-xs'} italic`}
-                  style={{ 
-                    color: '#476D9E',
-                    fontSize: isMobile ? '10px' : undefined
-                  }}
-                >
-                  "{numeroParaExtenso(custosCartorioHolding)}"
                 </div>
               </div>
             </div>
