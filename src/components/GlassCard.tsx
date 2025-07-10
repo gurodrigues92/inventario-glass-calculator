@@ -69,9 +69,7 @@ const GlassCard = ({ children, className, style, hover = true, premium = false }
           }}
         />
       )}
-      <div style={{ position: 'relative', zIndex: 1 }}>
-        {children}
-      </div>
+      {children}
     </div>
   );
 };
