@@ -113,15 +113,16 @@ const LuxuryCurrencyInput = ({
         style={{
           background: '#FFFFFF',
           border: isMobile ? '2px solid #E0E0E0' : '1px solid #E8E2DD',
-          borderRadius: isMobile ? '8px' : '8px',
+          borderRadius: '8px',
           color: '#2C2C2C',
-          padding: isMobile ? '16px' : '16px',
-          fontSize: '16px',
+          padding: isMobile ? '16px' : '14px 16px',
+          fontSize: isMobile ? '16px' : '15px',
           fontWeight: '500',
-          minHeight: isMobile ? '48px' : 'auto',
+          minHeight: isMobile ? '48px' : '44px',
           transition: 'all 0.3s ease',
           boxShadow: isMobile ? '0 1px 3px rgba(0, 0, 0, 0.05)' : 'none',
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          touchAction: 'manipulation'
         }}
       />
       

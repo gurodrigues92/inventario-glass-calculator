@@ -23,41 +23,40 @@ const CostBreakdownCard = ({ resultado, formData }: CostBreakdownCardProps) => {
     percentage: number; 
   }) => (
     <div 
-      className={`flex justify-between items-center ${isMobile ? 'p-3' : 'p-4'} rounded-lg`} 
+      className={`${isMobile ? 'flex flex-col space-y-3 p-4' : 'flex justify-between items-center p-4'} rounded-lg`} 
       style={{ background: 'rgba(209, 191, 163, 0.05)' }}
     >
-      <div className="flex-1">
+      <div className={`${isMobile ? 'w-full' : 'flex-1'}`}>
         <span 
-          className={`${isMobile ? 'text-sm' : ''} font-medium`}
+          className={`${isMobile ? 'text-base' : 'text-base'} font-medium block`}
           style={{ color: '#0C2C45' }}
         >
           {title}
         </span>
         <div 
-          className={`${isMobile ? 'text-xs' : 'text-sm'}`}
+          className={`${isMobile ? 'text-sm' : 'text-sm'} mt-1`}
           style={{ color: '#476D9E' }}
         >
           {description}
         </div>
       </div>
-      <div className="text-right">
+      <div className={`${isMobile ? 'w-full' : 'text-right'} ${isMobile ? 'border-t border-gray-200 pt-3' : ''}`}>
         <div 
-          className={`${isMobile ? 'text-sm' : ''} font-semibold`}
+          className={`${isMobile ? 'text-lg text-center' : 'text-base'} font-semibold`}
           style={{ color: '#0C2C45' }}
         >
           {formatCurrencyWithDecimals(value)}
         </div>
         <div 
-          className={`${isMobile ? 'text-xs' : 'text-xs'} italic`}
+          className={`text-xs italic mt-1 ${isMobile ? 'text-center' : ''}`}
           style={{ 
-            color: '#476D9E',
-            fontSize: isMobile ? '10px' : undefined
+            color: '#476D9E'
           }}
         >
           "{numeroParaExtenso(value)}"
         </div>
         <div 
-          className={`${isMobile ? 'text-xs' : 'text-sm'}`} 
+          className={`${isMobile ? 'text-sm text-center' : 'text-sm'} mt-1 font-medium`} 
           style={{ color: '#D1BFA3' }}
         >
           {percentage.toFixed(1)}%
@@ -67,7 +66,7 @@ const CostBreakdownCard = ({ resultado, formData }: CostBreakdownCardProps) => {
   );
 
   return (
-    <GlassCard>
+    <GlassCard className={`${isMobile ? 'p-4' : 'p-6'}`}>
       <h3 
         className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold mb-6 text-center`}
         style={{ color: '#0C2C45' }}
@@ -75,7 +74,7 @@ const CostBreakdownCard = ({ resultado, formData }: CostBreakdownCardProps) => {
         Detalhamento dos Custos
       </h3>
       
-      <div className="space-y-4">
+      <div className={`${isMobile ? 'space-y-6' : 'space-y-4'}`}>
         <CostItem
           title={`ITCMD (${formData.estado})`}
           description="Imposto estadual sobre herança"
@@ -89,7 +88,6 @@ const CostBreakdownCard = ({ resultado, formData }: CostBreakdownCardProps) => {
           value={resultado.detalhamento.honorarios.valor}
           percentage={10}
         />
-
 
         {resultado.detalhamento.ganhoCapital.valor > 0 && (
           <CostItem

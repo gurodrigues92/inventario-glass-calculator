@@ -67,68 +67,69 @@ const HoldingBenefitsCard = ({ resultado, dadosCalculo, economiaPercentual }: Ho
         </div>
       </div>
 
-      <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'md:grid-cols-2 gap-6'}`}>
-        <div>
+      <div className={`${isMobile ? 'flex flex-col space-y-6' : 'grid md:grid-cols-2 gap-6'}`}>
+        <div className={`${isMobile ? 'order-1' : ''}`}>
           <h4 
-            className={`${isMobile ? 'text-sm' : ''} font-semibold mb-3`}
+            className={`${isMobile ? 'text-base' : 'text-base'} font-semibold mb-4`}
             style={{ color: '#0C2C45' }}
           >
             ✅ Benefícios da Holding S/A
           </h4>
-          <ul className="space-y-2">
+          <ul className={`${isMobile ? 'space-y-3' : 'space-y-2'}`}>
             <li 
-              className={`flex items-center gap-2 ${isMobile ? 'text-xs' : 'text-sm'}`}
+              className={`flex items-center gap-3 ${isMobile ? 'text-sm' : 'text-sm'} ${isMobile ? 'p-2 bg-green-50 rounded-lg' : ''}`}
               style={{ color: '#476D9E' }}
             >
-              <span style={{ color: '#27AE60' }}>✓</span>
-              ITCMD: 0% sobre a diferença
+              <span style={{ color: '#27AE60', fontSize: isMobile ? '16px' : '14px' }}>✓</span>
+              <span>ITCMD: 0% sobre a diferença</span>
             </li>
             <li 
-              className={`flex items-center gap-2 ${isMobile ? 'text-xs' : 'text-sm'}`}
+              className={`flex items-center gap-3 ${isMobile ? 'text-sm' : 'text-sm'} ${isMobile ? 'p-2 bg-green-50 rounded-lg' : ''}`}
               style={{ color: '#476D9E' }}
             >
-              <span style={{ color: '#27AE60' }}>✓</span>
-              Ganho de Capital: 0%
+              <span style={{ color: '#27AE60', fontSize: isMobile ? '16px' : '14px' }}>✓</span>
+              <span>Ganho de Capital: 0%</span>
             </li>
             <li 
-              className={`flex items-center gap-2 ${isMobile ? 'text-xs' : 'text-sm'}`}
+              className={`flex items-center gap-3 ${isMobile ? 'text-sm' : 'text-sm'} ${isMobile ? 'p-2 bg-green-50 rounded-lg' : ''}`}
               style={{ color: '#476D9E' }}
             >
-              <span style={{ color: '#27AE60' }}>✓</span>
-              Constituição em 30 a 60 dias
+              <span style={{ color: '#27AE60', fontSize: isMobile ? '16px' : '14px' }}>✓</span>
+              <span>Constituição em 30 a 60 dias</span>
             </li>
             <li 
-              className={`flex items-center gap-2 ${isMobile ? 'text-xs' : 'text-sm'}`}
+              className={`flex items-center gap-3 ${isMobile ? 'text-sm' : 'text-sm'} ${isMobile ? 'p-2 bg-green-50 rounded-lg' : ''}`}
               style={{ color: '#476D9E' }}
             >
-              <span style={{ color: '#27AE60' }}>✓</span>
-              Gestão profissional do patrimônio
+              <span style={{ color: '#27AE60', fontSize: isMobile ? '16px' : '14px' }}>✓</span>
+              <span>Gestão profissional do patrimônio</span>
             </li>
           </ul>
         </div>
         
-        <div>
+        <div className={`${isMobile ? 'order-2' : ''}`}>
           <h4 
-            className={`${isMobile ? 'text-sm' : ''} font-semibold mb-3`}
+            className={`${isMobile ? 'text-base' : 'text-base'} font-semibold mb-4`}
             style={{ color: '#0C2C45' }}
           >
             💰 Custos da Holding S/A
           </h4>
-          <div className="space-y-2">
-            <div className={`flex justify-between ${isMobile ? 'text-xs' : 'text-sm'}`}>
-              <span style={{ color: '#476D9E' }}>Honorários Constituição (1,5%):</span>
-              <div className="text-right">
+          <div className={`${isMobile ? 'space-y-4' : 'space-y-2'}`}>
+            <div className={`${isMobile ? 'flex flex-col space-y-2 p-3 bg-blue-50 rounded-lg' : 'flex justify-between text-sm'}`}>
+              <span className={`${isMobile ? 'text-sm font-medium' : ''}`} style={{ color: '#476D9E' }}>
+                Honorários Constituição (1,5%):
+              </span>
+              <div className={`${isMobile ? 'text-center' : 'text-right'}`}>
                 <span 
-                  className="font-medium"
+                  className={`font-medium ${isMobile ? 'text-lg' : ''}`}
                   style={{ color: '#0C2C45' }}
                 >
                   {formatCurrencyWithDecimals(honorariosConstituicaoHolding)}
                 </span>
                 <div 
-                  className={`${isMobile ? 'text-xs' : 'text-xs'} italic`}
+                  className={`text-xs italic mt-1 ${isMobile ? 'text-center' : ''}`}
                   style={{ 
-                    color: '#476D9E',
-                    fontSize: isMobile ? '10px' : undefined
+                    color: '#476D9E'
                   }}
                 >
                   "{numeroParaExtenso(honorariosConstituicaoHolding)}"
@@ -136,18 +137,21 @@ const HoldingBenefitsCard = ({ resultado, dadosCalculo, economiaPercentual }: Ho
               </div>
             </div>
             <div 
-              className="border-t pt-2 mt-2"
-              style={{ borderColor: '#E8E2DD' }}
+              className={`border-t pt-3 mt-3 ${isMobile ? 'border-gray-200' : ''}`}
+              style={{ borderColor: isMobile ? undefined : '#E8E2DD' }}
             >
-              <div className={`flex justify-between font-semibold ${isMobile ? 'text-xs' : ''}`}>
-                <span style={{ color: '#0C2C45' }}>Total:</span>
-                <div className="text-right">
-                  <span style={{ color: '#27AE60' }}>{formatCurrencyWithDecimals(totalHolding)}</span>
+              <div className={`${isMobile ? 'flex flex-col space-y-2 p-3 bg-green-50 rounded-lg' : 'flex justify-between font-semibold'}`}>
+                <span className={`${isMobile ? 'text-sm font-medium text-center' : ''}`} style={{ color: '#0C2C45' }}>
+                  Total:
+                </span>
+                <div className={`${isMobile ? 'text-center' : 'text-right'}`}>
+                  <span className={`${isMobile ? 'text-xl font-bold' : ''}`} style={{ color: '#27AE60' }}>
+                    {formatCurrencyWithDecimals(totalHolding)}
+                  </span>
                   <div 
-                    className={`${isMobile ? 'text-xs' : 'text-xs'} italic font-normal`}
+                    className={`text-xs italic font-normal mt-1 ${isMobile ? 'text-center' : ''}`}
                     style={{ 
-                      color: '#476D9E',
-                      fontSize: isMobile ? '10px' : undefined
+                      color: '#476D9E'
                     }}
                   >
                     "{numeroParaExtenso(totalHolding)}"

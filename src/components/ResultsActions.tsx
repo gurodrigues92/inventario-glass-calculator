@@ -104,10 +104,10 @@ const ResultsActions = ({ shareData, onSalvar, isSaving, calculoSalvoId }: Resul
   return (
     <div className={`results-actions ${isMobile ? 'mobile-results-actions' : ''}`}>
       <div 
-        className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-4 justify-center items-center`}
+        className={`flex ${isMobile ? 'flex-col' : 'flex-row'} ${isMobile ? 'gap-4' : 'gap-3'} justify-center items-center`}
         style={{
           width: '100%',
-          maxWidth: isMobile ? '100%' : '600px',
+          maxWidth: isMobile ? '100%' : '700px',
           margin: '0 auto',
           padding: isMobile ? '0' : '0 16px'
         }}

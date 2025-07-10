@@ -79,46 +79,60 @@ const FormStep = ({
         }}
       />
       
-      {/* Step Header */}
-      <div className={`step-header ${isMobile ? 'mobile-step-header' : 'flex items-center gap-4'} mb-6`}>
-        <div 
-          className="step-number"
-          style={{
-            background: colors.accent,
-            color: '#FFFFFF',
-            width: isMobile ? '40px' : '48px',
-            height: isMobile ? '40px' : '48px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: isMobile ? '16px' : '18px',
-            fontWeight: '600',
-            boxShadow: `0 2px 8px ${colors.accent}20`
-          }}
-        >
-          {stepNumber}
-        </div>
-        
-        <div className={`step-icon ${isMobile ? 'mobile-step-icon' : ''}`} style={{ color: colors.accent, fontSize: '24px' }}>
-          {icon}
-        </div>
-        
-        <div className="step-text flex-1">
-          <h3 
-            className={`step-title ${isMobile ? 'text-lg' : 'text-xl'} font-bold mb-1`}
-            style={{ color: colors.accent }}
+      {/* Step Header - Redesigned Layout */}
+      <div className={`step-header ${isMobile ? 'flex flex-col space-y-3' : 'flex items-start gap-4'} mb-6`}>
+        {/* Main Header Row */}
+        <div className={`flex items-center gap-3 ${isMobile ? 'w-full' : ''}`}>
+          {/* Badge Number - Small and Clean */}
+          <div 
+            className="step-badge"
+            style={{
+              background: colors.accent,
+              color: '#FFFFFF',
+              width: '24px',
+              height: '24px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '12px',
+              fontWeight: 'bold',
+              boxShadow: `0 2px 6px ${colors.accent}30`,
+              flexShrink: 0
+            }}
           >
-            {title}
-          </h3>
-          {subtitle && (
-            <p 
-              className={`step-subtitle ${isMobile ? 'text-sm' : 'text-base'}`}
-              style={{ color: '#476D9E', opacity: 0.8 }}
+            {stepNumber}
+          </div>
+          
+          {/* Icon */}
+          <div 
+            className="step-icon"
+            style={{ 
+              color: colors.accent, 
+              fontSize: '20px',
+              flexShrink: 0
+            }}
+          >
+            {icon}
+          </div>
+          
+          {/* Title and Subtitle */}
+          <div className="step-text flex-1 min-w-0">
+            <h3 
+              className={`step-title ${isMobile ? 'text-lg' : 'text-xl'} font-bold mb-1 leading-tight`}
+              style={{ color: colors.accent }}
             >
-              {subtitle}
-            </p>
-          )}
+              {title}
+            </h3>
+            {subtitle && (
+              <p 
+                className={`step-subtitle ${isMobile ? 'text-sm' : 'text-base'} leading-relaxed`}
+                style={{ color: '#476D9E', opacity: 0.8 }}
+              >
+                {subtitle}
+              </p>
+            )}
+          </div>
         </div>
       </div>
       
