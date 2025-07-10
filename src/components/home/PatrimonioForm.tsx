@@ -79,8 +79,8 @@ const PatrimonioForm = () => {
   };
 
   return (
-    <div className={isMobile ? 'mobile-container' : ''}>
-      <GlassCard className={`fade-in-up ${isMobile ? 'section-mobile' : ''}`}>
+    <div className={`${isMobile ? 'px-4 py-2' : 'px-0'}`}>
+      <GlassCard className={`fade-in-up ${isMobile ? 'p-4' : 'p-8'}`}>
         <form onSubmit={handleSubmit} className="space-y-0">
           
           {/* Etapa 1: Localização */}
