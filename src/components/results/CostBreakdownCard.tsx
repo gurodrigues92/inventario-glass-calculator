@@ -90,12 +90,6 @@ const CostBreakdownCard = ({ resultado, formData }: CostBreakdownCardProps) => {
           percentage={10}
         />
 
-        <CostItem
-          title="Custas de Cartório"
-          description="Registro e documentação"
-          value={resultado.detalhamento.custas.valor}
-          percentage={2}
-        />
 
         {resultado.detalhamento.ganhoCapital.valor > 0 && (
           <CostItem
