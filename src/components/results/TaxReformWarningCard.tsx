@@ -20,8 +20,10 @@ const TaxReformWarningCard = () => {
             className={isMobile ? 'text-xs' : ''}
             style={{ color: '#476D9E' }}
           >
-            A partir de 2025, com a reforma tributária, estes custos podem 
-            chegar até o dobro do valor, a depender de cada estado. 
+            <span style={{ color: '#DC2626' }}>
+              A partir de 2025, com a reforma tributária, estes custos podem 
+              chegar até o dobro do valor, a depender de cada estado.
+            </span>
             <strong style={{ color: '#0C2C45' }}> Planeje-se agora!</strong>
           </p>
         </div>

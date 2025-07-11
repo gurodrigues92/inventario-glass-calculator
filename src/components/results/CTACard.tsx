@@ -10,7 +10,7 @@ const CTACard = () => {
       <div className="mb-6">
         <h3 
           className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold mb-2`}
-          style={{ color: '#D1BFA3' }}
+          style={{ color: '#10B981' }}
         >
           ISENTE O PROCESSO DE INVENTÁRIO
         </h3>
@@ -53,8 +53,8 @@ const CTACard = () => {
       </button>
       
       <p 
-        className={`${isMobile ? 'text-xs' : 'text-sm'} mt-4`}
-        style={{ color: '#476D9E' }}
+        className={`${isMobile ? 'text-xs' : 'text-sm'} mt-4 font-semibold`}
+        style={{ color: '#0C2C45' }}
       >
         Consultoria especializada em planejamento sucessório e holding familiar
       </p>
