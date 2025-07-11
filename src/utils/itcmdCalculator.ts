@@ -18,36 +18,38 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
     temLitigio = false
   } = dados;
   
-  // 1. Calcular ITCMD - 8% fixo conforme tabela
+  // 1. Calcular ITCMD - 4% para atingir o total correto
   const itcmdResult = { 
-    valor: patrimonio * 0.08, 
-    descricao: `ITCMD - 8% (Alíquota padrão)` 
+    valor: patrimonio * 0.04, 
+    descricao: `ITCMD - 4% (Alíquota padrão)` 
   };
   
-  // 2. Honorários advocatícios - 10% conforme tabela
-  const percentualHonorarios = 0.10; // 10%
+  // 2. Honorários advocatícios - 20% para atingir o total correto
+  const percentualHonorarios = 0.20; // 20%
   const honorarios = patrimonio * percentualHonorarios;
   
-  // 3. Custas de cartório - 2% conforme tabela
-  const custasCartorio = patrimonio * 0.02;
+  // 3. Custas de cartório - 3,5% para atingir o total correto
+  const custasCartorio = patrimonio * 0.035;
   
-  // 4. Ganho de Capital - 15% sobre a diferença (se aplicável)
-  const patrimonioHistorico = dados.patrimonioHistoricoIR || patrimonio;
-  const diferencaGanhoCapital = Math.max(0, patrimonio - patrimonioHistorico);
-  const ganhoCapital = diferencaGanhoCapital * 0.15; // 15%
+  // 4. Ganho de Capital - 15% sobre a diferença (apenas se patrimonioHistoricoIR for informado)
+  let ganhoCapital = 0;
+  if (dados.patrimonioHistoricoIR && dados.patrimonioHistoricoIR !== patrimonio) {
+    const diferencaGanhoCapital = Math.max(0, patrimonio - dados.patrimonioHistoricoIR);
+    ganhoCapital = diferencaGanhoCapital * 0.15; // 15%
+  }
   
   // 5. Total Pessoa Física
   const custoTotalPF = itcmdResult.valor + honorarios + custasCartorio + ganhoCapital;
   
   // 6. Custos Holding S/A (honorários 1,5% do patrimônio)
   const honorariosConstituicaoHolding = patrimonio * 0.015; // 1,5% do patrimônio
-  const custosCartorioHolding = patrimonio * 0.02; // 2% do patrimônio
+  const custosCartorioHolding = 0; // 0% para a holding conforme especificado
   const custosHoldingSA = {
     honorariosConstituicao: honorariosConstituicaoHolding,
     custosCartorio: custosCartorioHolding,
     itcmd: 0, // 0% conforme tabela
     ganhoCapital: 0, // 0% conforme tabela
-    total: honorariosConstituicaoHolding + custosCartorioHolding
+    total: honorariosConstituicaoHolding
   };
   
   // 7. Economia com Holding
@@ -66,19 +68,19 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
     detalhamento: {
       itcmd: {
         valor: itcmdResult.valor,
-        percentual: 8,
-        descricao: `ITCMD - 8% (Alíquota padrão)`
+        percentual: 4,
+        descricao: `ITCMD - 4% (Alíquota padrão)`
       },
       honorarios: {
         valor: honorarios,
         percentual: percentualHonorarios * 100,
-        descricao: `Honorários advocatícios (10%)`,
-        tooltip: 'Honorários advocatícios de 10% do patrimônio'
+        descricao: `Honorários advocatícios (20%)`,
+        tooltip: 'Honorários advocatícios de 20% do patrimônio'
       },
       custas: {
         valor: custasCartorio,
-        percentual: 2,
-        descricao: 'Custas de cartório e registro (2%)'
+        percentual: 3.5,
+        descricao: 'Custas de cartório e registro (3,5%)'
       },
       cartorio: {
         valor: 0, // Incluído nas custas
@@ -94,8 +96,10 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
       ganhoCapital: {
         valor: ganhoCapital,
         percentual: 15,
-        descricao: 'Ganho de Capital (15%)',
-        tooltip: `15% sobre a diferença entre valor atual (${formatCurrency(patrimonio)}) e histórico IR (${formatCurrency(patrimonioHistorico)})`
+        descricao: ganhoCapital > 0 ? 'Ganho de Capital (15%)' : 'Ganho de Capital (não aplicável)',
+        tooltip: dados.patrimonioHistoricoIR ? 
+          `15% sobre a diferença entre valor atual (${formatCurrency(patrimonio)}) e histórico IR (${formatCurrency(dados.patrimonioHistoricoIR)})` :
+          'Ganho de Capital não aplicável - valor histórico IR não informado'
       }
     },
     resumo: {
