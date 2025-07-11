@@ -31,12 +31,9 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
   // 3. Custas de cartório - 3,5% para atingir o total correto
   const custasCartorio = patrimonio * 0.035;
   
-  // 4. Ganho de Capital - 15% sobre a diferença (apenas se patrimonioHistoricoIR for informado)
-  let ganhoCapital = 0;
-  if (dados.patrimonioHistoricoIR && dados.patrimonioHistoricoIR !== patrimonio) {
-    const diferencaGanhoCapital = Math.max(0, patrimonio - dados.patrimonioHistoricoIR);
-    ganhoCapital = diferencaGanhoCapital * 0.15; // 15%
-  }
+  // 4. Ganho de Capital - diferença entre custos inventário (sem honorários) e holding
+  const custosInventarioSemHonorarios = itcmdResult.valor + custasCartorio;
+  const ganhoCapital = custosInventarioSemHonorarios; // Valor dos custos menos honorários
   
   // 5. Total Pessoa Física
   const custoTotalPF = itcmdResult.valor + honorarios + custasCartorio + ganhoCapital;
