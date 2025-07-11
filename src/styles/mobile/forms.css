@@ -1,0 +1,63 @@
+/* ===== MOBILE FORMS ===== */
+
+@media (max-width: 768px) {
+  /* INPUTS COM MELHOR DESTAQUE */
+  .input-field-mobile, 
+  .glass-input,
+  .luxury-input {
+    background: #FFFFFF !important;
+    border: 2px solid #E0E0E0 !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    font-size: 16px !important;
+    width: 100% !important;
+    min-height: 48px !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    box-sizing: border-box !important;
+  }
+
+  .input-field-mobile:focus,
+  .glass-input:focus,
+  .luxury-input:focus {
+    border-color: #2196F3 !important;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1) !important;
+    outline: none !important;
+    background: #FFFFFF !important;
+  }
+
+  /* LABELS E CAMPOS */
+  .input-group-mobile {
+    margin-bottom: 20px !important;
+    position: relative !important;
+  }
+
+  .input-label-mobile {
+    display: block !important;
+    margin-bottom: 8px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: #555 !important;
+  }
+
+  /* TOTAL DO PATRIMÔNIO RESPONSIVO */
+  .total-patrimonio {
+    padding: 16px !important;
+    border-radius: 12px !important;
+    margin: 16px 0 !important;
+    background: rgba(209, 191, 163, 0.1) !important;
+    border: 1px solid rgba(209, 191, 163, 0.3) !important;
+  }
+
+  .total-patrimonio .flex {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+
+  .total-patrimonio span {
+    font-size: 16px !important;
+    line-height: 1.4 !important;
+    word-break: break-word !important;
+  }
+}

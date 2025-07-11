@@ -15,4 +15,10 @@
 @import './styles/animations.css';
 @import './styles/sections.css';
 @import './styles/responsive.css';
-@import './styles/mobile-optimizations.css';
+@import './styles/mobile/typography.css';
+@import './styles/mobile/layout.css';
+@import './styles/mobile/forms.css';
+@import './styles/mobile/cards.css';
+@import './styles/mobile/touch.css';
+@import './styles/mobile/breakpoints.css';
+@import './styles/mobile/device-specific.css';

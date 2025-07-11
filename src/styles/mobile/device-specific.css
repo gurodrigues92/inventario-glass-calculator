@@ -1,0 +1,19 @@
+/* ===== DEVICE SPECIFIC OPTIMIZATIONS ===== */
+
+/* HIGH DPI SCREENS */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .glass-card,
+  .luxury-card {
+    border-width: 0.5px !important;
+  }
+}
+
+/* SAFE AREAS PARA DEVICES COM NOTCH */
+@supports (padding: max(0px)) {
+  .mobile-container {
+    padding-top: max(16px, env(safe-area-inset-top)) !important;
+    padding-left: max(16px, env(safe-area-inset-left)) !important;
+    padding-right: max(16px, env(safe-area-inset-right)) !important;
+    padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+  }
+}

@@ -1,0 +1,30 @@
+/* ===== MOBILE BREAKPOINTS ===== */
+
+/* BREAKPOINTS ESPECÍFICOS */
+@media (max-width: 375px) {
+  .mobile-container {
+    padding: 12px !important;
+  }
+  
+  .total-patrimonio {
+    padding: 12px !important;
+  }
+  
+  .button-mobile,
+  .luxury-btn-primary {
+    padding: 14px 20px !important;
+    font-size: 15px !important;
+  }
+}
+
+@media (min-width: 376px) and (max-width: 414px) {
+  .mobile-container {
+    padding: 16px !important;
+  }
+}
+
+@media (min-width: 415px) and (max-width: 768px) {
+  .results-grid-mobile {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+  }
+}

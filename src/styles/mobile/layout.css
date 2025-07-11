@@ -1,0 +1,38 @@
+/* ===== MOBILE LAYOUT ===== */
+
+@media (max-width: 768px) {
+  /* CORREÇÃO DE OVERFLOW */
+  .value-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 0 16px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* CONTAINER PRINCIPAL MOBILE */
+  .mobile-container {
+    width: 100% !important;
+    max-width: 100vw !important;
+    padding: 16px !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+
+  /* GRID RESPONSIVO */
+  .results-grid-mobile {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* FORMULÁRIOS OTIMIZADOS */
+  form {
+    padding: 0 !important;
+  }
+
+  .space-y-6 > * + * {
+    margin-top: 20px !important;
+  }
+}

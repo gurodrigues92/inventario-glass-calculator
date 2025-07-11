@@ -1,0 +1,38 @@
+/* ===== MOBILE TYPOGRAPHY ===== */
+
+@media (max-width: 768px) {
+  /* Tamanhos mínimos mobile */
+  .mobile-text {
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+  }
+
+  .mobile-label {
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: #333 !important;
+  }
+
+  .mobile-value {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+  }
+
+  .total-value-mobile {
+    font-size: clamp(22px, 6vw, 28px) !important;
+    font-weight: 800 !important;
+    word-break: break-word !important;
+    text-align: center !important;
+    max-width: 100% !important;
+    line-height: 1.2 !important;
+  }
+
+  .total-value {
+    font-size: clamp(24px, 6vw, 36px) !important;
+    word-break: break-word !important;
+    text-align: center !important;
+    max-width: 100% !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+  }
+}
