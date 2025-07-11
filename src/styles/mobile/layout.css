@@ -33,11 +33,11 @@
   }
 
   .space-y-6 > * + * {
-    margin-top: 16px !important; /* reduzido de 20px */
+    margin-top: 20px !important; /* aumentado para dar mais respiro */
   }
   
   .space-y-8 > * + * {
-    margin-top: 20px !important; /* reduzido de 32px */
+    margin-top: 24px !important; /* aumentado para dar mais respiro */
   }
   
   /* Melhor aproveitamento do espaço vertical */

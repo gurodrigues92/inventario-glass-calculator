@@ -10,7 +10,7 @@ interface LuxuryFieldProps {
 
 const LuxuryField = ({ label, icon, children, className = '' }: LuxuryFieldProps) => {
   return (
-    <div className={`space-y-2 ${className}`}>
+    <div className={`space-y-3 ${className}`}>
       <label 
         className="label-luxury"
         style={{

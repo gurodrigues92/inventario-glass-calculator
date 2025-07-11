@@ -32,8 +32,8 @@
   /* CARDS DE RESULTADO */
   .glass-card,
   .luxury-card {
-    padding: 12px !important;
-    margin: 8px 0 !important;
+    padding: 16px !important;
+    margin: 12px 0 !important;
     border-radius: 12px !important;
     background: #FFFFFF !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
