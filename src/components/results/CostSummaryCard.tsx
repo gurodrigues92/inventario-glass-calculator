@@ -15,21 +15,16 @@ const CostSummaryCard = ({ resultado, dadosCalculo }: CostSummaryCardProps) => {
   return (
     <GlassCard className={`text-center ${isMobile ? 'p-4' : 'p-6'}`}>
       <div className={`mb-6 ${isMobile ? 'space-y-4' : 'space-y-3'}`}>
-        <h2 
-          className={`${isMobile ? 'text-lg' : 'text-2xl'} font-semibold mb-2`}
-          style={{ color: '#0C2C45' }}
-        >
+        <h2 className={`${isMobile ? 'title-mobile-sm' : 'text-2xl'} font-semibold mb-2`}
+            style={{ color: '#0C2C45' }}>
           Custos Estimados do Inventário
         </h2>
-        <div 
-          className={`${isMobile ? 'text-2xl' : 'text-5xl'} font-bold mb-2 px-2`}
-          style={{ 
-            color: '#D1BFA3',
-            wordBreak: 'break-word',
-            lineHeight: isMobile ? '1.2' : '1.1',
-            fontSize: isMobile ? 'clamp(1.5rem, 5vw, 2.5rem)' : undefined
-          }}
-        >
+        <div className={`${isMobile ? 'value-responsive' : 'text-5xl'} font-bold mb-2 px-2`}
+             style={{ 
+               color: '#D1BFA3',
+               wordBreak: 'break-word',
+               lineHeight: isMobile ? '1.2' : '1.1'
+             }}>
           {formatCurrencyWithDecimals(resultado.resumo.custoTotal)}
         </div>
         <div 

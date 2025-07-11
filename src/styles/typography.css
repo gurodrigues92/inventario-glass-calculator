@@ -99,22 +99,40 @@
 /* Mobile Typography Adjustments */
 @media (max-width: 768px) {
   .heading-xl {
-    font-size: 2.5rem !important;
+    font-size: 1.75rem !important; /* 28px - reduzido de 40px */
   }
   
   .heading-lg {
-    font-size: 2rem !important;
+    font-size: 1.5rem !important; /* 24px - reduzido de 32px */
   }
   
   .text-luxury-title {
-    font-size: 24px;
+    font-size: 20px; /* reduzido de 24px */
   }
   
   .text-card-title {
-    font-size: 20px;
+    font-size: 18px; /* reduzido de 20px */
   }
   
   .text-result-total {
-    font-size: 36px;
+    font-size: 28px; /* reduzido de 36px */
+  }
+}
+
+/* Responsive Typography Classes */
+@layer components {
+  .title-responsive {
+    font-size: clamp(1.25rem, 4vw, 2.5rem) !important;
+    line-height: 1.2 !important;
+  }
+  
+  .subtitle-responsive {
+    font-size: clamp(1rem, 3vw, 1.5rem) !important;
+    line-height: 1.4 !important;
+  }
+  
+  .value-responsive {
+    font-size: clamp(1.5rem, 5vw, 3rem) !important;
+    line-height: 1.1 !important;
   }
 }

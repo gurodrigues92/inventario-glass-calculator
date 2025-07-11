@@ -5,24 +5,11 @@ import { Check, Lightbulb } from 'lucide-react';
 const HeroSection = () => {
   return (
     <div className="text-center mb-12 fade-in-up">
-      <h1 
-        className="heading-xl mb-6"
-        style={{
-          fontSize: '3.5rem',
-          fontWeight: '800',
-          lineHeight: '1.1',
-          background: 'linear-gradient(135deg, #0C2C45, #476D9E)',
-          WebkitBackgroundClip: 'text',
-          backgroundClip: 'text',
-          WebkitTextFillColor: 'transparent'
-        }}
-      >
+      <h1 className="title-responsive heading-responsive mb-4 sm:mb-6 max-w-4xl mx-auto text-center">
         Reduza Legalmente o Imposto de Herança e Proteja seu Patrimônio
       </h1>
-      <p 
-        className="text-xl max-w-2xl mx-auto leading-relaxed mb-8"
-        style={{ color: '#476D9E' }}
-      >
+      <p className="subtitle-responsive max-w-2xl mx-auto leading-relaxed mb-6 sm:mb-8 text-center" 
+         style={{ color: '#476D9E' }}>
         Descubra agora quanto você pode economizar com nosso cálculo inteligente – 
         <strong style={{ color: '#0C2C45' }}> rápido e preciso!</strong>
       </p>

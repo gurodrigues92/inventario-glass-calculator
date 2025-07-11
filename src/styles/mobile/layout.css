@@ -33,6 +33,15 @@
   }
 
   .space-y-6 > * + * {
-    margin-top: 20px !important;
+    margin-top: 16px !important; /* reduzido de 20px */
+  }
+  
+  .space-y-8 > * + * {
+    margin-top: 20px !important; /* reduzido de 32px */
+  }
+  
+  /* Melhor aproveitamento do espaço vertical */
+  .mobile-section {
+    padding: 16px 0 !important;
   }
 }
