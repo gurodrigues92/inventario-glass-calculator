@@ -212,6 +212,45 @@ export type Database = {
         }
         Relationships: []
       }
+      usuarios: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          data_ativacao: string | null
+          email: string
+          id: string
+          nome: string
+          produto: string | null
+          senha_hash: string | null
+          token_definicao_senha: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          data_ativacao?: string | null
+          email: string
+          id?: string
+          nome: string
+          produto?: string | null
+          senha_hash?: string | null
+          token_definicao_senha?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          data_ativacao?: string | null
+          email?: string
+          id?: string
+          nome?: string
+          produto?: string | null
+          senha_hash?: string | null
+          token_definicao_senha?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
