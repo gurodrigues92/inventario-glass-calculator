@@ -24,19 +24,22 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
     descricao: `ITCMD - 4% (Alíquota padrão)` 
   };
   
-  // 2. Honorários advocatícios - 20% para atingir o total correto
-  const percentualHonorarios = 0.20; // 20%
+  // 2. Honorários advocatícios - 10% sem litígio, 20% com litígio
+  const percentualHonorarios = temLitigio ? 0.20 : 0.10;
   const honorarios = patrimonio * percentualHonorarios;
   
-  // 3. Custas de cartório - 3,5% para atingir o total correto
-  const custasCartorio = patrimonio * 0.035;
+  // 3. Custas de cartório - 2%
+  const custasCartorio = patrimonio * 0.02;
   
-  // 4. Ganho de Capital - diferença entre custos inventário (sem honorários) e holding
-  const custosInventarioSemHonorarios = itcmdResult.valor + custasCartorio;
-  const ganhoCapital = custosInventarioSemHonorarios; // Valor dos custos menos honorários
+  // 4. Ganho de Capital - só após reforma tributária 2025
+  // Por enquanto, calculamos para mostrar o impacto futuro mas não incluímos no total atual
+  const diferencaPatrimonio = dados.patrimonioAtualMercado && dados.patrimonioHistoricoIR 
+    ? Math.max(0, dados.patrimonioAtualMercado - dados.patrimonioHistoricoIR)
+    : 0;
+  const ganhoCapital = diferencaPatrimonio * 0.15; // 15% sobre a diferença
   
-  // 5. Total Pessoa Física
-  const custoTotalPF = itcmdResult.valor + honorarios + custasCartorio + ganhoCapital;
+  // 5. Total Pessoa Física (SEM ganho de capital antes da reforma)
+  const custoTotalPF = itcmdResult.valor + honorarios + custasCartorio;
   
   // 6. Custos Holding S/A (honorários 1,5% do patrimônio)
   const honorariosConstituicaoHolding = patrimonio * 0.015; // 1,5% do patrimônio
@@ -71,13 +74,15 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
       honorarios: {
         valor: honorarios,
         percentual: percentualHonorarios * 100,
-        descricao: `Honorários advocatícios (20%)`,
-        tooltip: 'Honorários advocatícios de 20% do patrimônio'
+        descricao: `Honorários advocatícios (${percentualHonorarios * 100}%)`,
+        tooltip: temLitigio 
+          ? 'Honorários advocatícios de 20% do patrimônio em casos com litígio'
+          : 'Honorários advocatícios de 10% do patrimônio sem litígio'
       },
       custas: {
         valor: custasCartorio,
-        percentual: 3.5,
-        descricao: 'Custas de cartório e registro (3,5%)'
+        percentual: 2,
+        descricao: 'Custas de cartório e registro (2%)'
       },
       cartorio: {
         valor: 0, // Incluído nas custas
@@ -131,7 +136,9 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
       {
         tipo: 'informacao',
         titulo: 'Reforma Tributária 2025',
-        descricao: 'A partir de 2025, com a reforma tributária, estes custos podem chegar até o dobro do valor, a depender de cada estado.'
+        descricao: ganhoCapital > 0 
+          ? `A partir de 2025, será incluído Ganho de Capital de ${formatCurrency(ganhoCapital)} (15% sobre diferença de valor), aumentando o custo total.`
+          : 'A partir de 2025, com a reforma tributária, será incluído o Ganho de Capital sobre a diferença entre valor de mercado e valor declarado no IR.'
       },
       {
         tipo: 'estrategia',
