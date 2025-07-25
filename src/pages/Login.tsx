@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Eye, EyeOff, Gem } from 'lucide-react';
 
 export default function Login() {
   const { login, isAuthenticated } = useAuth();
@@ -41,15 +41,61 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-animated flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+        <Card 
+          className="shadow-xl border-0 backdrop-blur-sm"
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            border: '1px solid #E8E2DD',
+            boxShadow: '0 8px 24px rgba(12, 44, 69, 0.16)'
+          }}
+        >
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center transform rotate-45">
-              <div className="w-8 h-8 bg-white rounded transform -rotate-45"></div>
+            <div className="flex flex-col items-center space-y-4">
+              <div 
+                className="logo-diamond"
+                style={{
+                  width: '56px',
+                  height: '56px',
+                  background: '#0C2C45',
+                  borderRadius: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '28px',
+                  boxShadow: '0 4px 16px rgba(12, 44, 69, 0.2)',
+                  transform: 'rotate(45deg)',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <div style={{ transform: 'rotate(-45deg)' }}>
+                  <Gem size={28} color="#FFFFFF" strokeWidth={1.5} />
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <h1 
+                  className="text-2xl font-bold tracking-wide"
+                  style={{ color: '#0C2C45' }}
+                >
+                  Inventário
+                </h1>
+                <span 
+                  className="text-sm font-bold tracking-widest"
+                  style={{
+                    background: 'linear-gradient(135deg, #D1BFA3, #E5D4B1)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em'
+                  }}
+                >
+                  DESCOMPLICADO
+                </span>
+              </div>
             </div>
-            <CardTitle className="text-2xl font-bold text-gray-900">
-              Entrar na Calculadora
-            </CardTitle>
-            <CardDescription className="text-gray-600">
+            <CardDescription 
+              className="mt-4"
+              style={{ color: '#476D9E' }}
+            >
               Acesse sua conta para usar a calculadora de inventário
             </CardDescription>
           </CardHeader>
@@ -63,7 +109,12 @@ export default function Login() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="email">E-mail</Label>
+                <Label 
+                  htmlFor="email"
+                  style={{ color: '#0C2C45', fontWeight: '600' }}
+                >
+                  E-mail
+                </Label>
                 <Input
                   id="email"
                   type="email"
@@ -72,12 +123,22 @@ export default function Login() {
                   placeholder="Digite seu e-mail"
                   required
                   disabled={isLoading}
-                  className="bg-white"
+                  style={{
+                    background: '#FFFFFF',
+                    border: '1px solid #E8E2DD',
+                    color: '#0C2C45'
+                  }}
+                  className="focus:border-[#9FB7D4] transition-colors"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Senha</Label>
+                <Label 
+                  htmlFor="password"
+                  style={{ color: '#0C2C45', fontWeight: '600' }}
+                >
+                  Senha
+                </Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -87,45 +148,85 @@ export default function Login() {
                     placeholder="Digite sua senha"
                     required
                     disabled={isLoading}
-                    className="bg-white pr-10"
+                    style={{
+                      background: '#FFFFFF',
+                      border: '1px solid #E8E2DD',
+                      color: '#0C2C45',
+                      paddingRight: '40px'
+                    }}
+                    className="focus:border-[#9FB7D4] transition-colors"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors"
+                    style={{ color: '#476D9E' }}
+                    onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#0C2C45'}
+                    onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#476D9E'}
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
               </div>
 
-              <Button
+              <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg transform transition hover:scale-105"
                 disabled={isLoading}
+                className="w-full font-semibold py-3 px-4 rounded-lg transition-all duration-300"
+                style={{
+                  background: 'linear-gradient(135deg, #0C2C45, #476D9E)',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  boxShadow: '0 4px 16px rgba(12, 44, 69, 0.2)',
+                  cursor: isLoading ? 'not-allowed' : 'pointer'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isLoading) {
+                    (e.target as HTMLElement).style.transform = 'translateY(-2px)';
+                    (e.target as HTMLElement).style.boxShadow = '0 8px 24px rgba(12, 44, 69, 0.3)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isLoading) {
+                    (e.target as HTMLElement).style.transform = 'translateY(0)';
+                    (e.target as HTMLElement).style.boxShadow = '0 4px 16px rgba(12, 44, 69, 0.2)';
+                  }
+                }}
               >
                 {isLoading ? (
-                  <>
+                  <div className="flex items-center justify-center">
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Entrando...
-                  </>
+                  </div>
                 ) : (
                   'Entrar'
                 )}
-              </Button>
+              </button>
             </form>
 
             <div className="mt-6 text-center space-y-3">
-              <p className="text-sm text-gray-600">
+              <p style={{ color: '#476D9E', fontSize: '14px' }}>
                 Ainda não tem acesso?{' '}
-                <Link to="/acesso-negado" className="text-amber-600 hover:text-amber-700 font-medium">
+                <Link 
+                  to="/acesso-negado" 
+                  className="font-medium transition-colors"
+                  style={{ color: '#476D9E' }}
+                  onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#0C2C45'}
+                  onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#476D9E'}
+                >
                   Saiba como adquirir
                 </Link>
               </p>
               
-              <p className="text-xs text-gray-500">
+              <p style={{ color: '#476D9E', fontSize: '12px' }}>
                 Recebeu um link de ativação?{' '}
-                <Link to="/definir-senha" className="text-amber-600 hover:text-amber-700 font-medium">
+                <Link 
+                  to="/definir-senha" 
+                  className="font-medium transition-colors"
+                  style={{ color: '#476D9E' }}
+                  onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#0C2C45'}
+                  onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#476D9E'}
+                >
                   Definir senha
                 </Link>
               </p>
