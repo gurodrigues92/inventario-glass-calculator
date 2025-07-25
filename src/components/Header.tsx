@@ -2,12 +2,23 @@
 import React from 'react';
 import { useIsMobile } from '../hooks/use-mobile';
 import MobileHeader from './MobileHeader';
-import { Gem } from 'lucide-react';
+import { Gem, User, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { Button } from './ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 const Header = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { user, logout } = useAuth();
 
   if (isMobile) {
     return <MobileHeader />;
@@ -124,6 +135,33 @@ const Header = () => {
           >
             Falar com especialista
           </button>
+
+          {/* Menu do usuário */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex items-center space-x-2 border-2 hover:bg-gray-50">
+                <User size={18} />
+                <span className="hidden lg:inline font-medium">{user?.nome || 'Usuário'}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium">{user?.nome}</p>
+                  <p className="text-xs text-muted-foreground">{user?.email}</p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate('/calculos-salvos')}>
+                <span>Meus Cálculos</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={logout} className="text-red-600">
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Sair</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </nav>
       </div>
     </header>
