@@ -56,17 +56,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!data.success) {
         return { success: false, error: data.error };
       }
-
-      // Verificar se o usuário ainda está ativo no servidor
-      const { data: userCheck, error: checkError } = await supabase
-        .from('usuarios')
-        .select('ativo')
-        .eq('id', data.user.id)
-        .single();
-        
-      if (checkError || !userCheck?.ativo) {
-        return { success: false, error: 'Conta desativada' };
-      }
       
       // Salvar usuário no estado e localStorage
       setUser(data.user);
