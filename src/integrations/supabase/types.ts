@@ -223,6 +223,7 @@ export type Database = {
           produto: string | null
           senha_hash: string | null
           token_definicao_senha: string | null
+          token_gerado_em: string | null
           updated_at: string
         }
         Insert: {
@@ -235,6 +236,7 @@ export type Database = {
           produto?: string | null
           senha_hash?: string | null
           token_definicao_senha?: string | null
+          token_gerado_em?: string | null
           updated_at?: string
         }
         Update: {
@@ -247,6 +249,7 @@ export type Database = {
           produto?: string | null
           senha_hash?: string | null
           token_definicao_senha?: string | null
+          token_gerado_em?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -256,7 +259,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      gerar_token_seguro: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
