@@ -51,9 +51,21 @@ async function verifyPassword(password: string, hash: string): Promise<boolean> 
       return false;
     }
     
+    // Validar entrada
+    if (!password || !hash) {
+      console.log('Password ou hash vazio');
+      return false;
+    }
+    
     const [saltHex, hashHex] = hash.split(':');
     if (!saltHex || !hashHex) {
       console.log('Formato de hash inválido');
+      return false;
+    }
+    
+    // Validar formato hexadecimal
+    if (!/^[a-f0-9]+$/i.test(saltHex) || !/^[a-f0-9]+$/i.test(hashHex)) {
+      console.log('Hash contém caracteres inválidos');
       return false;
     }
     

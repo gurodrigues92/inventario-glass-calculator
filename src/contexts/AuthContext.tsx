@@ -50,21 +50,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (error) {
         console.error('Erro na função de login:', error);
-        return { success: false, error: 'Erro de conexão. Tente novamente.' };
+        return { success: false, error: 'Erro de conexão' };
       }
 
       if (!data.success) {
         return { success: false, error: data.error };
       }
 
+      // Verificar se o usuário ainda está ativo no servidor
+      const { data: userCheck, error: checkError } = await supabase
+        .from('usuarios')
+        .select('ativo')
+        .eq('id', data.user.id)
+        .single();
+        
+      if (checkError || !userCheck?.ativo) {
+        return { success: false, error: 'Conta desativada' };
+      }
+      
       // Salvar usuário no estado e localStorage
       setUser(data.user);
       localStorage.setItem('inventario_user', JSON.stringify(data.user));
+      localStorage.setItem('lastLoginCheck', Date.now().toString());
       
       return { success: true };
     } catch (error) {
       console.error('Erro no login:', error);
-      return { success: false, error: 'Erro inesperado. Tente novamente.' };
+      return { success: false, error: 'Erro inesperado' };
     } finally {
       setIsLoading(false);
     }

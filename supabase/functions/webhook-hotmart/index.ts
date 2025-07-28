@@ -185,9 +185,6 @@ serve(async (req) => {
       })
     }
 
-    // Gerar token único para definição de senha
-    const tokenDefinicaoSenha = crypto.randomUUID()
-
     console.log('Processando usuário no banco de dados...')
 
     // Verificar se usuário já existe (com retry)
@@ -201,6 +198,18 @@ serve(async (req) => {
     })
 
     let isNewUser = false
+    let tokenDefinicaoSenha: string
+
+    // Gerar token seguro usando a função do banco
+    const { data: tokenData, error: tokenError } = await supabase
+      .rpc('gerar_token_seguro')
+    
+    if (tokenError || !tokenData) {
+      console.error('Erro ao gerar token:', tokenError)
+      throw new Error('Falha ao gerar token de segurança')
+    }
+    
+    tokenDefinicaoSenha = tokenData
 
     if (usuarioExistente) {
       console.log('Atualizando usuário existente...')
@@ -212,7 +221,8 @@ serve(async (req) => {
             ativo: true,
             data_ativacao: new Date().toISOString(),
             produto: produto,
-            token_definicao_senha: tokenDefinicaoSenha
+            token_definicao_senha: tokenDefinicaoSenha,
+            token_gerado_em: new Date().toISOString()
           })
           .eq('email', email)
 
@@ -237,7 +247,8 @@ serve(async (req) => {
             ativo: true,
             data_ativacao: new Date().toISOString(),
             produto: produto,
-            token_definicao_senha: tokenDefinicaoSenha
+            token_definicao_senha: tokenDefinicaoSenha,
+            token_gerado_em: new Date().toISOString()
           })
 
         if (insertError) {

@@ -118,6 +118,7 @@ serve(async (req) => {
       .update({
         senha_hash: senhaHash,
         token_definicao_senha: null,
+        token_gerado_em: null,
         ativo: true,
         data_ativacao: new Date().toISOString()
       })
