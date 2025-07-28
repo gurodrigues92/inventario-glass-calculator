@@ -211,13 +211,13 @@ export default function AcessoNegado() {
                 Teve problemas com a compra ou não recebeu o e-mail de ativação?
                 Entre em contato conosco através do e-mail:{' '}
                 <a
-                  href="mailto:suporte@calculadorainventario.com"
+                  href="mailto:contato@patrimonioseminventario.com.br"
                   className="font-medium transition-colors"
                   style={{ color: '#476D9E' }}
                   onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#0C2C45'}
                   onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#476D9E'}
                 >
-                  suporte@calculadorainventario.com
+                  contato@patrimonioseminventario.com.br
                 </a>
               </p>
             </div>
