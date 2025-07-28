@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -10,6 +9,37 @@ const corsHeaders = {
 interface DefinirSenhaRequest {
   token: string;
   password: string;
+}
+
+// Função para hash da senha usando Web Crypto API
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  
+  const key = await crypto.subtle.importKey(
+    'raw',
+    data,
+    { name: 'PBKDF2' },
+    false,
+    ['deriveBits']
+  );
+  
+  const bits = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: salt,
+      iterations: 100000,
+      hash: 'SHA-256'
+    },
+    key,
+    256
+  );
+  
+  const hash = Array.from(new Uint8Array(bits));
+  const saltArray = Array.from(salt);
+  
+  return `${saltArray.map(b => b.toString(16).padStart(2, '0')).join('')}:${hash.map(b => b.toString(16).padStart(2, '0')).join('')}`;
 }
 
 serve(async (req) => {
@@ -78,8 +108,9 @@ serve(async (req) => {
       })
     }
 
-    // Gerar hash da senha
-    const senhaHash = await bcrypt.hash(password)
+    // Gerar hash da senha usando Web Crypto API
+    console.log('Gerando hash da senha para usuário:', usuario.email);
+    const senhaHash = await hashPassword(password);
 
     // Atualizar usuário com a nova senha e remover o token
     const { error: updateError } = await supabase

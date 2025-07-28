@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import * as bcrypt from "https://deno.land/x/bcrypt@v0.3.0/mod.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -10,6 +9,86 @@ const corsHeaders = {
 interface LoginRequest {
   email: string;
   password: string;
+}
+
+// Função para hash da senha usando Web Crypto API
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  
+  const key = await crypto.subtle.importKey(
+    'raw',
+    data,
+    { name: 'PBKDF2' },
+    false,
+    ['deriveBits']
+  );
+  
+  const bits = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: salt,
+      iterations: 100000,
+      hash: 'SHA-256'
+    },
+    key,
+    256
+  );
+  
+  const hash = Array.from(new Uint8Array(bits));
+  const saltArray = Array.from(salt);
+  
+  return `${saltArray.map(b => b.toString(16).padStart(2, '0')).join('')}:${hash.map(b => b.toString(16).padStart(2, '0')).join('')}`;
+}
+
+// Função para verificar senha usando Web Crypto API
+async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  try {
+    // Se o hash parece ser do bcrypt (começa com $2), falha para forçar reset
+    if (hash.startsWith('$2')) {
+      console.log('Hash bcrypt detectado, usuário precisa redefinir senha');
+      return false;
+    }
+    
+    const [saltHex, hashHex] = hash.split(':');
+    if (!saltHex || !hashHex) {
+      console.log('Formato de hash inválido');
+      return false;
+    }
+    
+    const salt = new Uint8Array(saltHex.match(/.{2}/g)!.map(byte => parseInt(byte, 16)));
+    const expectedHash = hashHex.match(/.{2}/g)!.map(byte => parseInt(byte, 16));
+    
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    
+    const key = await crypto.subtle.importKey(
+      'raw',
+      data,
+      { name: 'PBKDF2' },
+      false,
+      ['deriveBits']
+    );
+    
+    const bits = await crypto.subtle.deriveBits(
+      {
+        name: 'PBKDF2',
+        salt: salt,
+        iterations: 100000,
+        hash: 'SHA-256'
+      },
+      key,
+      256
+    );
+    
+    const actualHash = Array.from(new Uint8Array(bits));
+    
+    return actualHash.every((byte, index) => byte === expectedHash[index]);
+  } catch (error) {
+    console.error('Erro na verificação da senha:', error);
+    return false;
+  }
 }
 
 serve(async (req) => {
@@ -76,7 +155,8 @@ serve(async (req) => {
     }
 
     // Verificar senha
-    const senhaValida = await bcrypt.compare(password, usuario.senha_hash)
+    console.log('Verificando senha para usuário:', email);
+    const senhaValida = await verifyPassword(password, usuario.senha_hash);
     
     if (!senhaValida) {
       console.log('Senha incorreta para:', email)
