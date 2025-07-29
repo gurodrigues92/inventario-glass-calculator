@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <style>
+    @media (prefers-color-scheme: dark) {
+      .diamond-fill { fill: #476D9E; }
+      .diamond-accent { fill: #D1BFA3; }
+    }
+    @media (prefers-color-scheme: light) {
+      .diamond-fill { fill: #0C2C45; }
+      .diamond-accent { fill: #476D9E; }
+    }
+  </style>
+  <defs>
+    <linearGradient id="diamond-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" class="diamond-fill"/>
+      <stop offset="100%" class="diamond-accent"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(16,16) rotate(45)">
+    <path d="M-8,-6 L8,-6 L10,0 L8,6 L-8,6 L-10,0 Z" fill="url(#diamond-gradient)" stroke="currentColor" stroke-width="0.5" opacity="0.9"/>
+    <path d="M-8,-6 L0,-10 L8,-6" fill="url(#diamond-gradient)" opacity="0.8"/>
+    <path d="M-8,6 L0,10 L8,6" fill="url(#diamond-gradient)" opacity="0.8"/>
+    <path d="M-4,-6 L0,-2 L4,-6" fill="rgba(255,255,255,0.3)"/>
+  </g>
+</svg>

@@ -1,0 +1,34 @@
+# Calculadora de ITCMD - Inventário Inteligente
+
+## Sobre
+Calculadora profissional de ITCMD (Imposto sobre Transmissão Causa Mortis e Doação) que permite reduzir até 90% do imposto de herança através de estratégias jurídicas avançadas.
+
+## Funcionalidades Principais
+- Cálculo preciso de ITCMD por estado brasileiro
+- Simulação de inventário judicial vs extrajudicial
+- Análise de viabilidade para holding patrimonial
+- Cálculo de honorários advocatícios
+- Geração de relatórios em PDF
+- Sistema de salvamento de cálculos
+
+## Público-Alvo
+- Advogados especialistas em direito sucessório
+- Contadores e consultores tributários
+- Famílias com patrimônio elevado
+- Profissionais de planejamento patrimonial
+
+## Diferenciais
+- Algoritmos jurídicos avançados
+- Interface intuitiva e profissional
+- Cálculos baseados na legislação atual
+- Estratégias de otimização tributária
+- Suporte a todos os estados brasileiros
+
+## Palavras-chave Principais
+calculadora ITCMD, imposto herança, inventário judicial, inventário extrajudicial, holding patrimonial, planejamento sucessório, direito sucessório, otimização tributária, transmissão patrimônio
+
+## Contato
+Para mais informações sobre estratégias de planejamento sucessório e redução de ITCMD, consulte um especialista em direito tributário.
+
+## Tecnologia
+Aplicação web moderna desenvolvida com React, TypeScript e Tailwind CSS, garantindo performance e segurança na manipulação de dados financeiros sensíveis.
