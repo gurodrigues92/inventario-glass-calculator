@@ -32,7 +32,24 @@ export default function Login() {
     if (result.success) {
       navigate('/');
     } else {
-      setError(result.error || 'Erro no login');
+      // Verificar se precisa definir senha
+      if (result.needsPasswordDefinition && result.token) {
+        console.log('Redirecionando para definir senha com token:', result.token);
+        navigate(`/definir-senha?token=${result.token}`);
+        return;
+      }
+      
+      // Mostrar mensagem específica ou genérica
+      if (result.error === 'SENHA_NAO_DEFINIDA') {
+        setError('Você precisa definir sua senha primeiro. Redirecionando...');
+        setTimeout(() => {
+          navigate('/definir-senha');
+        }, 2000);
+      } else if (result.error === 'CONTA_INATIVA') {
+        setError('Sua conta não está ativa. Você precisa definir sua senha primeiro.');
+      } else {
+        setError(result.message || result.error || 'Erro no login');
+      }
     }
     
     setIsLoading(false);

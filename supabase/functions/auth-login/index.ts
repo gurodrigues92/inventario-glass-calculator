@@ -144,22 +144,30 @@ serve(async (req) => {
       })
     }
 
-    // Verificar se o usuário está ativo
-    if (!usuario.ativo) {
+    // Verificar se a senha foi definida
+    if (!usuario.senha_hash) {
+      console.log('Usuário sem senha definida:', email, 'Token:', usuario.token_definicao_senha);
       return new Response(JSON.stringify({ 
         success: false, 
-        error: 'Conta não ativada. Verifique seu email.' 
+        error: 'SENHA_NAO_DEFINIDA',
+        message: 'Você precisa definir sua senha primeiro.',
+        token: usuario.token_definicao_senha,
+        hasToken: !!usuario.token_definicao_senha
       }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
 
-    // Verificar se a senha foi definida
-    if (!usuario.senha_hash) {
+    // Verificar se o usuário está ativo
+    if (!usuario.ativo) {
+      console.log('Usuário inativo:', email);
       return new Response(JSON.stringify({ 
         success: false, 
-        error: 'Senha não foi definida. Verifique seu email para o link de ativação.' 
+        error: 'CONTA_INATIVA',
+        message: 'Sua conta não está ativa. Defina sua senha primeiro.',
+        token: usuario.token_definicao_senha,
+        hasToken: !!usuario.token_definicao_senha
       }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

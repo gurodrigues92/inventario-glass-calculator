@@ -15,7 +15,13 @@ interface Usuario {
 interface AuthContextType {
   user: Usuario | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ 
+    success: boolean; 
+    error?: string; 
+    message?: string;
+    token?: string;
+    needsPasswordDefinition?: boolean;
+  }>;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -40,7 +46,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+  const login = async (email: string, password: string): Promise<{ 
+    success: boolean; 
+    error?: string; 
+    message?: string;
+    token?: string;
+    needsPasswordDefinition?: boolean;
+  }> => {
     try {
       setIsLoading(true);
       
@@ -54,7 +66,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (!data.success) {
-        return { success: false, error: data.error };
+        // Verificar se é erro específico que precisa de redirecionamento
+        if (data.error === 'SENHA_NAO_DEFINIDA' || data.error === 'CONTA_INATIVA') {
+          console.log('Usuário precisa definir senha:', data);
+          return { 
+            success: false, 
+            error: data.error,
+            message: data.message,
+            token: data.token,
+            needsPasswordDefinition: true
+          };
+        }
+        return { success: false, error: data.message || data.error };
       }
       
       // Salvar usuário no estado e localStorage
