@@ -34,6 +34,7 @@ const SpecialistSelectionDialog = ({ open, onOpenChange }: SpecialistSelectionDi
   ];
 
   const handleContactSpecialist = (whatsappUrl: string) => {
+    console.log('handleContactSpecialist called with:', whatsappUrl);
     window.open(whatsappUrl, '_blank');
     onOpenChange(false);
   };
@@ -125,7 +126,10 @@ const SpecialistSelectionDialog = ({ open, onOpenChange }: SpecialistSelectionDi
 
                 {/* Contact Button */}
                 <Button
-                  onClick={() => handleContactSpecialist(specialist.whatsapp)}
+                  onClick={() => {
+                    console.log('Button clicked for specialist:', specialist.name);
+                    handleContactSpecialist(specialist.whatsapp);
+                  }}
                   className="w-full hover:scale-105 hover:-translate-y-1 transition-all duration-300"
                   style={{
                     background: 'linear-gradient(135deg, #D1BFA3, #E5D4B1)',

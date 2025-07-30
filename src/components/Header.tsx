@@ -109,7 +109,10 @@ const Header = () => {
             ></span>
           </button>
           <button 
-            onClick={() => setIsSpecialistDialogOpen(true)}
+            onClick={() => {
+              console.log('Header specialist button clicked');
+              setIsSpecialistDialogOpen(true);
+            }}
             className="btn-luxury-cta hover:scale-105 hover:-translate-y-1 transition-all duration-300"
             style={{
               background: 'linear-gradient(135deg, #0C2C45, #476D9E)',
