@@ -263,6 +263,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      hash_password_pbkdf2: {
+        Args: { password: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
