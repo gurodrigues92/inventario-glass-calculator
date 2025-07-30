@@ -110,7 +110,7 @@ const Header = () => {
           </button>
           <button 
             onClick={() => setIsSpecialistDialogOpen(true)}
-            className="btn-luxury-cta"
+            className="btn-luxury-cta hover:scale-105 hover:-translate-y-1 transition-all duration-300"
             style={{
               background: 'linear-gradient(135deg, #0C2C45, #476D9E)',
               border: 'none',
@@ -119,23 +119,16 @@ const Header = () => {
               fontWeight: '600',
               textTransform: 'uppercase',
               letterSpacing: '0.02em',
-              padding: '12px 32px',
-              fontSize: '14px',
+              padding: '12px 40px',
+              fontSize: '13px',
               position: 'relative',
               overflow: 'hidden',
               whiteSpace: 'nowrap',
               textOverflow: 'ellipsis',
               transition: 'all 0.3s ease',
               boxShadow: '0 4px 16px rgba(12, 44, 69, 0.2)',
-              cursor: 'pointer'
-            }}
-            onMouseEnter={(e) => {
-              (e.target as HTMLElement).style.transform = 'translateY(-2px)';
-              (e.target as HTMLElement).style.boxShadow = '0 8px 24px rgba(12, 44, 69, 0.3)';
-            }}
-            onMouseLeave={(e) => {
-              (e.target as HTMLElement).style.transform = 'translateY(0)';
-              (e.target as HTMLElement).style.boxShadow = '0 4px 16px rgba(12, 44, 69, 0.2)';
+              cursor: 'pointer',
+              zIndex: 10
             }}
           >
             Falar com especialista

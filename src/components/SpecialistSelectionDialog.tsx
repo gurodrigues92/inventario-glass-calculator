@@ -126,7 +126,7 @@ const SpecialistSelectionDialog = ({ open, onOpenChange }: SpecialistSelectionDi
                 {/* Contact Button */}
                 <Button
                   onClick={() => handleContactSpecialist(specialist.whatsapp)}
-                  className="w-full group transition-all duration-300"
+                  className="w-full hover:scale-105 hover:-translate-y-1 transition-all duration-300"
                   style={{
                     background: 'linear-gradient(135deg, #D1BFA3, #E5D4B1)',
                     color: '#0C2C45',
@@ -134,22 +134,16 @@ const SpecialistSelectionDialog = ({ open, onOpenChange }: SpecialistSelectionDi
                     borderRadius: '12px',
                     fontWeight: '600',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    padding: '12px 20px',
-                    fontSize: '14px',
-                    boxShadow: '0 4px 16px rgba(209, 191, 163, 0.3)'
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.target as HTMLElement).style.transform = 'translateY(-2px)';
-                    (e.target as HTMLElement).style.boxShadow = '0 8px 24px rgba(209, 191, 163, 0.4)';
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.target as HTMLElement).style.transform = 'translateY(0)';
-                    (e.target as HTMLElement).style.boxShadow = '0 4px 16px rgba(209, 191, 163, 0.3)';
+                    letterSpacing: '0.02em',
+                    padding: '14px 24px',
+                    fontSize: '13px',
+                    boxShadow: '0 4px 16px rgba(209, 191, 163, 0.3)',
+                    pointerEvents: 'auto',
+                    zIndex: 10
                   }}
                 >
-                  <MessageCircle size={18} className="mr-2" />
-                  Conversar no WhatsApp
+                  <MessageCircle size={16} className="mr-2" />
+                  WhatsApp
                 </Button>
               </div>
 
