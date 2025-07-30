@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useIsMobile } from '../hooks/use-mobile';
 import MobileHeader from './MobileHeader';
 import { Gem, User, LogOut } from 'lucide-react';
@@ -14,11 +14,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import SpecialistSelectionDialog from './SpecialistSelectionDialog';
 
 const Header = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { user, logout } = useAuth();
+  const [isSpecialistDialogOpen, setIsSpecialistDialogOpen] = useState(false);
 
   if (isMobile) {
     return <MobileHeader />;
@@ -107,6 +109,7 @@ const Header = () => {
             ></span>
           </button>
           <button 
+            onClick={() => setIsSpecialistDialogOpen(true)}
             className="btn-luxury-cta"
             style={{
               background: 'linear-gradient(135deg, #0C2C45, #476D9E)',
@@ -164,6 +167,11 @@ const Header = () => {
           </DropdownMenu>
         </nav>
       </div>
+
+      <SpecialistSelectionDialog 
+        open={isSpecialistDialogOpen}
+        onOpenChange={setIsSpecialistDialogOpen}
+      />
     </header>
   );
 };

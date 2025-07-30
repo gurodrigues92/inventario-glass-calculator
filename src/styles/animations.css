@@ -155,3 +155,13 @@
   transform: translateY(-2px);
   filter: brightness(1.1);
 }
+
+/* Specialist Card Shimmer Animation */
+@keyframes specialist-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.specialist-shimmer {
+  animation: specialist-shimmer 2s infinite;
+}

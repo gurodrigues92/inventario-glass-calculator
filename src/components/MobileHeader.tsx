@@ -2,10 +2,12 @@
 import React, { useState } from 'react';
 import { Gem, Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import SpecialistSelectionDialog from './SpecialistSelectionDialog';
 
 const MobileHeader = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSpecialistDialogOpen, setIsSpecialistDialogOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -94,6 +96,7 @@ const MobileHeader = () => {
               ></span>
             </button>
             <button 
+              onClick={() => setIsSpecialistDialogOpen(true)}
               className="btn-luxury-cta"
               style={{
                 background: 'linear-gradient(135deg, #0C2C45, #476D9E)',
@@ -171,13 +174,21 @@ const MobileHeader = () => {
                 letterSpacing: '0.05em',
                 boxShadow: '0 4px 16px rgba(209, 191, 163, 0.3)'
               }}
-              onClick={toggleMenu}
+              onClick={() => {
+                setIsSpecialistDialogOpen(true);
+                toggleMenu();
+              }}
             >
               Falar com especialista
             </button>
           </nav>
         </div>
       )}
+
+      <SpecialistSelectionDialog 
+        open={isSpecialistDialogOpen}
+        onOpenChange={setIsSpecialistDialogOpen}
+      />
     </>
   );
 };
