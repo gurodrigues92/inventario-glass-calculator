@@ -73,12 +73,13 @@ const SpecialistSelectionDialog = ({ open, onOpenChange }: SpecialistSelectionDi
           {specialists.map((specialist) => (
             <div
               key={specialist.name}
-              className="group relative overflow-hidden rounded-2xl transition-all duration-300 hover:scale-105"
+              className="relative overflow-hidden rounded-2xl transition-all duration-300"
               style={{
                 background: 'rgba(255, 255, 255, 0.1)',
                 backdropFilter: 'blur(10px)',
                 border: '1px solid rgba(255, 255, 255, 0.2)',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                pointerEvents: 'auto'
               }}
             >
               {/* Card Content */}
@@ -151,13 +152,6 @@ const SpecialistSelectionDialog = ({ open, onOpenChange }: SpecialistSelectionDi
                 </Button>
               </div>
 
-              {/* Hover Shimmer Effect */}
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 specialist-shimmer"
-                style={{
-                  background: 'linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%)'
-                }}
-              />
             </div>
           ))}
         </div>
