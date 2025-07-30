@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from './ui/dialog';
 import { Button } from './ui/button';
-import { MessageCircle, Star } from 'lucide-react';
+import { MessageCircle, Star, X } from 'lucide-react';
 import stefanyImage from '../assets/stefany-herzog.png';
 import ketlenImage from '../assets/ketlen-marin.png';
 
@@ -51,6 +51,15 @@ const SpecialistSelectionDialog = ({ open, onOpenChange }: SpecialistSelectionDi
           boxShadow: '0 20px 40px rgba(12, 44, 69, 0.3)'
         }}
       >
+        {/* Close Button */}
+        <button
+          onClick={() => onOpenChange(false)}
+          className="absolute top-4 right-4 p-2 rounded-full transition-all duration-200 hover:bg-white/20 z-50"
+          style={{ color: '#D1BFA3' }}
+        >
+          <X size={20} />
+        </button>
+
         <DialogHeader className="p-8 pb-4">
           <DialogTitle 
             className="text-center text-3xl font-bold"
