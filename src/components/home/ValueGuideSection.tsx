@@ -7,9 +7,9 @@ const ValueGuideSection = () => {
   return (
     <div className="mt-16 fade-in-up">
       <GlassCard>
-        <div className="text-center mb-8">
+        <div className="text-center !mb-12">
           <h3 
-            className="text-xl font-semibold mb-6 flex items-center justify-center gap-2"
+            className="text-xl font-semibold !mb-8 flex items-center justify-center gap-2"
             style={{ color: '#0C2C45' }}
           >
             <Target size={24} color="#0C2C45" strokeWidth={1.5} />
@@ -17,10 +17,10 @@ const ValueGuideSection = () => {
           </h3>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 !gap-10 !mb-10">
           <div>
             <h4 
-              className="font-semibold mb-4 flex items-center gap-2"
+              className="font-semibold !mb-6 flex items-center gap-2"
               style={{ color: '#0C2C45' }}
             >
               <Check size={20} color="#27AE60" strokeWidth={2} />
@@ -34,7 +34,7 @@ const ValueGuideSection = () => {
           
           <div>
             <h4 
-              className="font-semibold mb-4 flex items-center gap-2"
+              className="font-semibold !mb-6 flex items-center gap-2"
               style={{ color: '#0C2C45' }}
             >
               <Check size={20} color="#27AE60" strokeWidth={2} />
@@ -48,7 +48,7 @@ const ValueGuideSection = () => {
         </div>
         
         <div 
-          className="p-6 rounded-lg" 
+          className="!p-8 rounded-lg"
           style={{ 
             background: 'rgba(209, 191, 163, 0.1)',
             border: '1px solid rgba(209, 191, 163, 0.2)'
