@@ -3,11 +3,13 @@ import React, { useState } from 'react';
 import { Gem, Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SpecialistSelectionDialog from './SpecialistSelectionDialog';
+import HowItWorksDialog from './HowItWorksDialog';
 
 const MobileHeader = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSpecialistDialogOpen, setIsSpecialistDialogOpen] = useState(false);
+  const [isHowItWorksDialogOpen, setIsHowItWorksDialogOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -69,8 +71,8 @@ const MobileHeader = () => {
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a 
-              href="#" 
+            <button 
+              onClick={() => setIsHowItWorksDialogOpen(true)}
               className="font-medium relative group transition-all duration-300"
               style={{ color: '#476D9E' }}
               onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#0C2C45'}
@@ -81,7 +83,7 @@ const MobileHeader = () => {
                 className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full"
                 style={{ background: 'linear-gradient(135deg, #D1BFA3, #E5D4B1)' }}
               ></span>
-            </a>
+            </button>
             <button 
               onClick={() => navigate('/calculos-salvos')}
               className="font-medium relative group transition-all duration-300"
@@ -149,13 +151,15 @@ const MobileHeader = () => {
           }}
         >
           <nav className="flex flex-col items-center justify-start pt-12 space-y-8">
-            <a 
-              href="#" 
+            <button 
+              onClick={() => {
+                setIsHowItWorksDialogOpen(true);
+                toggleMenu();
+              }}
               className="text-2xl font-medium text-white hover:text-opacity-80 transition-colors"
-              onClick={toggleMenu}
             >
               Como funciona
-            </a>
+            </button>
             <button 
               onClick={() => {
                 navigate('/calculos-salvos');
@@ -188,6 +192,11 @@ const MobileHeader = () => {
       <SpecialistSelectionDialog 
         open={isSpecialistDialogOpen}
         onOpenChange={setIsSpecialistDialogOpen}
+      />
+      
+      <HowItWorksDialog 
+        open={isHowItWorksDialogOpen}
+        onOpenChange={setIsHowItWorksDialogOpen}
       />
     </>
   );

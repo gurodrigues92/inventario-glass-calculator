@@ -15,12 +15,14 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import SpecialistSelectionDialog from './SpecialistSelectionDialog';
+import HowItWorksDialog from './HowItWorksDialog';
 
 const Header = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { user, logout } = useAuth();
   const [isSpecialistDialogOpen, setIsSpecialistDialogOpen] = useState(false);
+  const [isHowItWorksDialogOpen, setIsHowItWorksDialogOpen] = useState(false);
 
   if (isMobile) {
     return <MobileHeader />;
@@ -82,8 +84,8 @@ const Header = () => {
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">
-          <a 
-            href="#" 
+          <button 
+            onClick={() => setIsHowItWorksDialogOpen(true)}
             className="font-medium relative group transition-all duration-300"
             style={{ color: '#476D9E' }}
             onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#0C2C45'}
@@ -94,7 +96,7 @@ const Header = () => {
               className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full"
               style={{ background: 'linear-gradient(135deg, #D1BFA3, #E5D4B1)' }}
             ></span>
-          </a>
+          </button>
           <button 
             onClick={() => navigate('/calculos-salvos')}
             className="font-medium relative group transition-all duration-300"
@@ -169,6 +171,11 @@ const Header = () => {
       <SpecialistSelectionDialog 
         open={isSpecialistDialogOpen}
         onOpenChange={setIsSpecialistDialogOpen}
+      />
+      
+      <HowItWorksDialog 
+        open={isHowItWorksDialogOpen}
+        onOpenChange={setIsHowItWorksDialogOpen}
       />
     </header>
   );
