@@ -6,11 +6,11 @@ import GlassCard from '../GlassCard';
 const ValueGuideSection = () => {
   return (
     <div className="mt-16 fade-in-up">
-      <GlassCard 
-        className="value-guide-card"
+      <div 
+        className="bg-white/80 backdrop-blur-sm border border-purple-200/30 rounded-xl shadow-lg"
         style={{
-          padding: '2rem !important',
-          margin: '0 !important'
+          padding: '2rem',
+          margin: '0'
         }}
       >
         <div 
@@ -84,7 +84,7 @@ const ValueGuideSection = () => {
             Para veículos, use a tabela FIPE. Para investimentos, considere o valor atual da carteira.
           </p>
         </div>
-      </GlassCard>
+      </div>
     </div>
   );
 };
