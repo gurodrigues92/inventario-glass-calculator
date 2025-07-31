@@ -18,10 +18,11 @@ const ValueGuideSection = () => {
           style={{ marginBottom: '3rem !important' }}
         >
           <h3 
-            className="text-xl font-semibold flex items-center justify-center gap-2"
+            className="text-xl font-semibold flex items-center justify-center gap-4"
             style={{ 
               color: '#0C2C45',
-              marginBottom: '2rem !important'
+              marginBottom: '2.5rem !important',
+              lineHeight: '1.4'
             }}
           >
             <Target size={24} color="#0C2C45" strokeWidth={1.5} />
@@ -38,16 +39,21 @@ const ValueGuideSection = () => {
         >
           <div>
             <h4 
-              className="font-semibold flex items-center gap-2"
+              className="font-semibold flex items-center gap-3"
               style={{ 
                 color: '#0C2C45',
-                marginBottom: '1.5rem !important'
+                marginBottom: '1.75rem !important',
+                lineHeight: '1.3'
               }}
             >
               <Check size={20} color="#27AE60" strokeWidth={2} />
               Precisão Legal
             </h4>
-            <p className="text-sm leading-relaxed" style={{ color: '#476D9E' }}>
+            <p className="text-sm leading-relaxed" style={{ 
+              color: '#476D9E',
+              lineHeight: '1.6',
+              marginBottom: '0.5rem'
+            }}>
               A Receita Federal exige a declaração pelo valor real de mercado. 
               Valores subdeclarados podem gerar multas e problemas futuros.
             </p>
@@ -55,16 +61,21 @@ const ValueGuideSection = () => {
           
           <div>
             <h4 
-              className="font-semibold flex items-center gap-2"
+              className="font-semibold flex items-center gap-3"
               style={{ 
                 color: '#0C2C45',
-                marginBottom: '1.5rem !important'
+                marginBottom: '1.75rem !important',
+                lineHeight: '1.3'
               }}
             >
               <Check size={20} color="#27AE60" strokeWidth={2} />
               Cálculo Correto
             </h4>
-            <p className="text-sm leading-relaxed" style={{ color: '#476D9E' }}>
+            <p className="text-sm leading-relaxed" style={{ 
+              color: '#476D9E',
+              lineHeight: '1.6',
+              marginBottom: '0.5rem'
+            }}>
               O ITCMD é calculado sobre o valor real dos bens. 
               Nossa calculadora usa os valores que você informar para dar uma estimativa precisa.
             </p>
