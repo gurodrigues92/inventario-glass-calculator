@@ -6,22 +6,43 @@ import GlassCard from '../GlassCard';
 const ValueGuideSection = () => {
   return (
     <div className="mt-16 fade-in-up">
-      <GlassCard>
-        <div className="text-center !mb-12">
+      <GlassCard 
+        className="value-guide-card"
+        style={{
+          padding: '2rem !important',
+          margin: '0 !important'
+        }}
+      >
+        <div 
+          className="text-center"
+          style={{ marginBottom: '3rem !important' }}
+        >
           <h3 
-            className="text-xl font-semibold !mb-8 flex items-center justify-center gap-2"
-            style={{ color: '#0C2C45' }}
+            className="text-xl font-semibold flex items-center justify-center gap-2"
+            style={{ 
+              color: '#0C2C45',
+              marginBottom: '2rem !important'
+            }}
           >
             <Target size={24} color="#0C2C45" strokeWidth={1.5} />
             Por que usar Valor de Mercado?
           </h3>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 !gap-10 !mb-10">
+        <div 
+          className="grid grid-cols-1 md:grid-cols-2"
+          style={{ 
+            gap: '2.5rem !important',
+            marginBottom: '2.5rem !important' 
+          }}
+        >
           <div>
             <h4 
-              className="font-semibold !mb-6 flex items-center gap-2"
-              style={{ color: '#0C2C45' }}
+              className="font-semibold flex items-center gap-2"
+              style={{ 
+                color: '#0C2C45',
+                marginBottom: '1.5rem !important'
+              }}
             >
               <Check size={20} color="#27AE60" strokeWidth={2} />
               Precisão Legal
@@ -34,8 +55,11 @@ const ValueGuideSection = () => {
           
           <div>
             <h4 
-              className="font-semibold !mb-6 flex items-center gap-2"
-              style={{ color: '#0C2C45' }}
+              className="font-semibold flex items-center gap-2"
+              style={{ 
+                color: '#0C2C45',
+                marginBottom: '1.5rem !important'
+              }}
             >
               <Check size={20} color="#27AE60" strokeWidth={2} />
               Cálculo Correto
@@ -48,10 +72,11 @@ const ValueGuideSection = () => {
         </div>
         
         <div 
-          className="!p-8 rounded-lg"
+          className="rounded-lg"
           style={{ 
             background: 'rgba(209, 191, 163, 0.1)',
-            border: '1px solid rgba(209, 191, 163, 0.2)'
+            border: '1px solid rgba(209, 191, 163, 0.2)',
+            padding: '2rem !important'
           }}
         >
           <p className="text-sm text-center leading-relaxed" style={{ color: '#476D9E' }}>
