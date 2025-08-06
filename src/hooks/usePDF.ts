@@ -4,6 +4,37 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { formatCurrencyWithDecimals } from '../utils/formatters';
 
+// Função para validar e criar dados padrão
+const validateAndCreateDefaultData = (data: any) => {
+  return {
+    total: data?.total || 0,
+    patrimonio: data?.patrimonio || 0,
+    estado: data?.estado || 'Não informado',
+    tipoProcesso: data?.tipoProcesso || 'judicial'
+  };
+};
+
+// Função para aguardar elemento estar pronto com retry
+const waitForElement = async (elementId: string, maxRetries: number = 10): Promise<HTMLElement> => {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    const element = document.getElementById(elementId);
+    
+    if (element && element.offsetWidth > 0 && element.offsetHeight > 0) {
+      // Verificar se o elemento tem conteúdo
+      const hasContent = element.children.length > 0 || element.textContent?.trim();
+      if (hasContent) {
+        console.log(`Elemento ${elementId} encontrado e pronto (tentativa ${attempt})`);
+        return element;
+      }
+    }
+    
+    console.log(`Aguardando elemento ${elementId} (tentativa ${attempt}/${maxRetries})`);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+  
+  throw new Error(`Elemento ${elementId} não foi encontrado ou não carregou corretamente após ${maxRetries} tentativas`);
+};
+
 export const usePDF = () => {
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -19,9 +50,14 @@ export const usePDF = () => {
   ) => {
     setIsGenerating(true);
     
+    // Validar e garantir dados padrão (fora do try para uso no catch)
+    const validatedData = validateAndCreateDefaultData(data);
+    console.log('Dados validados para PDF:', validatedData);
+    
     try {
-      // Aguardar um pouco para garantir que o elemento esteja totalmente renderizado
-      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Aguardar renderização inicial
+      await new Promise(resolve => setTimeout(resolve, 800));
 
       console.log('Iniciando geração de PDF com duas páginas separadas');
 
@@ -31,21 +67,8 @@ export const usePDF = () => {
       const margin = 15;
       const contentWidth = pageWidth - (margin * 2);
 
-      // PÁGINA 1 - CUSTOS E DETALHAMENTO
-      const page1Element = document.getElementById('results-page-1');
-      if (!page1Element) {
-        console.error('Elemento results-page-1 não encontrado no DOM');
-        throw new Error('Conteúdo da página 1 não está disponível. Aguarde o carregamento completo.');
-      }
-
-      // Verificar se o elemento está visível
-      if (page1Element.offsetWidth === 0 || page1Element.offsetHeight === 0) {
-        console.error('Elemento results-page-1 não está visível:', {
-          width: page1Element.offsetWidth,
-          height: page1Element.offsetHeight
-        });
-        throw new Error('Conteúdo da página 1 não está visível. Aguarde o carregamento completo.');
-      }
+      // PÁGINA 1 - CUSTOS E DETALHAMENTO com retry robusto
+      const page1Element = await waitForElement('results-page-1');
 
       console.log('Capturando página 1 (custos e detalhamento)');
       const canvas1 = await html2canvas(page1Element, {
@@ -54,12 +77,20 @@ export const usePDF = () => {
         allowTaint: true,
         backgroundColor: '#ffffff',
         removeContainer: true,
-        imageTimeout: 20000, // Aumentado timeout
+        imageTimeout: 30000, // Aumentado timeout para 30s
         scrollX: 0,
         scrollY: 0,
         windowWidth: page1Element.scrollWidth,
         windowHeight: page1Element.scrollHeight,
-        logging: true, // Ativar logs para debug
+        logging: false, // Reduzir logs para melhor performance
+        foreignObjectRendering: true, // Melhor renderização de elementos complexos
+        ignoreElements: (element) => {
+          // Ignorar elementos que podem causar problemas
+          const htmlElement = element as HTMLElement;
+          return element.classList?.contains('loading') || 
+                 element.classList?.contains('skeleton') ||
+                 htmlElement.style?.display === 'none';
+        },
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.getElementById('results-page-1');
           if (clonedElement) {
@@ -88,48 +119,33 @@ export const usePDF = () => {
       pdf.setTextColor(100, 100, 100);
       pdf.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, margin, 28);
 
-      // Dados do relatório na página 1
-      if (data) {
-        pdf.setFontSize(10);
-        pdf.setTextColor(60, 60, 60);
-        
-        let yPos = 40;
-        pdf.text(`Estado: ${data.estado}`, margin, yPos);
-        yPos += 6;
-        pdf.text(`Tipo de Processo: ${data.tipoProcesso}`, margin, yPos);
-        yPos += 6;
-        pdf.text(`Patrimônio: ${formatCurrencyWithDecimals(data.patrimonio)}`, margin, yPos);
-        yPos += 6;
-        pdf.text(`Custo Total: ${formatCurrencyWithDecimals(data.total)}`, margin, yPos);
-        yPos += 6;
-        
-        pdf.setFontSize(8);
-        pdf.setTextColor(150, 150, 150);
-        pdf.text('────────────────────────────────────────────────────────────────────────', margin, yPos + 3);
-      }
+      // Dados do relatório na página 1 (sempre incluir com dados validados)
+      pdf.setFontSize(10);
+      pdf.setTextColor(60, 60, 60);
+      
+      let yPos = 40;
+      pdf.text(`Estado: ${validatedData.estado}`, margin, yPos);
+      yPos += 6;
+      pdf.text(`Tipo de Processo: ${validatedData.tipoProcesso}`, margin, yPos);
+      yPos += 6;
+      pdf.text(`Patrimônio: ${formatCurrencyWithDecimals(validatedData.patrimonio)}`, margin, yPos);
+      yPos += 6;
+      pdf.text(`Custo Total: ${formatCurrencyWithDecimals(validatedData.total)}`, margin, yPos);
+      yPos += 6;
+      
+      pdf.setFontSize(8);
+      pdf.setTextColor(150, 150, 150);
+      pdf.text('────────────────────────────────────────────────────────────────────────', margin, yPos + 3);
 
       // Adicionar imagem da página 1
       const imgWidth1 = contentWidth;
       const imgHeight1 = (canvas1.height * imgWidth1) / canvas1.width;
-      const startY1 = data ? 55 : 35;
+      const startY1 = 55; // Sempre usar posição com dados
       
       pdf.addImage(imgData1, 'PNG', margin, startY1, imgWidth1, imgHeight1, undefined, 'FAST');
 
-      // PÁGINA 2 - HOLDING S/A E CTA
-      const page2Element = document.getElementById('results-page-2');
-      if (!page2Element) {
-        console.error('Elemento results-page-2 não encontrado no DOM');
-        throw new Error('Conteúdo da página 2 não está disponível. Aguarde o carregamento completo.');
-      }
-
-      // Verificar se o elemento está visível
-      if (page2Element.offsetWidth === 0 || page2Element.offsetHeight === 0) {
-        console.error('Elemento results-page-2 não está visível:', {
-          width: page2Element.offsetWidth,
-          height: page2Element.offsetHeight
-        });
-        throw new Error('Conteúdo da página 2 não está visível. Aguarde o carregamento completo.');
-      }
+      // PÁGINA 2 - HOLDING S/A E CTA com retry robusto
+      const page2Element = await waitForElement('results-page-2');
 
       console.log('Capturando página 2 (holding e CTA)');
       const canvas2 = await html2canvas(page2Element, {
@@ -138,12 +154,20 @@ export const usePDF = () => {
         allowTaint: true,
         backgroundColor: '#ffffff',
         removeContainer: true,
-        imageTimeout: 20000, // Aumentado timeout
+        imageTimeout: 30000, // Aumentado timeout para 30s
         scrollX: 0,
         scrollY: 0,
         windowWidth: page2Element.scrollWidth,
         windowHeight: page2Element.scrollHeight,
-        logging: true, // Ativar logs para debug
+        logging: false, // Reduzir logs para melhor performance
+        foreignObjectRendering: true, // Melhor renderização de elementos complexos
+        ignoreElements: (element) => {
+          // Ignorar elementos que podem causar problemas
+          const htmlElement = element as HTMLElement;
+          return element.classList?.contains('loading') || 
+                 element.classList?.contains('skeleton') ||
+                 htmlElement.style?.display === 'none';
+        },
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.getElementById('results-page-2');
           if (clonedElement) {
@@ -208,20 +232,32 @@ export const usePDF = () => {
       pdf.save(fileName);
       return true;
     } catch (error) {
-      console.error('Erro detalhado ao gerar PDF:', error);
+      console.error('Erro detalhado ao gerar PDF:', {
+        error,
+        message: error instanceof Error ? error.message : 'Erro desconhecido',
+        stack: error instanceof Error ? error.stack : undefined,
+        validatedData
+      });
       
       if (error instanceof Error) {
-        if (error.message.includes('não foi encontrado')) {
-          throw new Error('Conteúdo não encontrado. Aguarde o carregamento completo da página.');
-        } else if (error.message.includes('não está visível')) {
-          throw new Error('Conteúdo não está visível. Verifique se a página foi carregada corretamente.');
-        } else if (error.message.includes('timeout')) {
-          throw new Error('Tempo limite excedido. Verifique sua conexão e tente novamente.');
-        } else {
-          throw new Error(`Erro na geração do PDF: ${error.message}`);
+        // Erros específicos de elementos DOM
+        if (error.message.includes('não foi encontrado') || error.message.includes('não carregou')) {
+          throw new Error(`Conteúdo da página não foi carregado. Aguarde alguns segundos e tente novamente. Se o problema persistir, recarregue a página.`);
+        } 
+        // Erros do html2canvas
+        else if (error.message.includes('timeout') || error.message.includes('canvas')) {
+          throw new Error('Falha na captura da página. Verifique sua conexão de internet e tente novamente.');
+        } 
+        // Erros do jsPDF
+        else if (error.message.includes('jsPDF') || error.message.includes('PDF')) {
+          throw new Error('Erro interno na geração do PDF. Tente novamente em alguns segundos.');
+        }
+        // Erro genérico
+        else {
+          throw new Error(`Erro na geração do PDF: ${error.message}. Dados usados: Estado: ${validatedData.estado}, Processo: ${validatedData.tipoProcesso}`);
         }
       } else {
-        throw new Error('Erro desconhecido ao gerar PDF. Tente novamente.');
+        throw new Error('Erro desconhecido ao gerar PDF. Verifique se a página está totalmente carregada e tente novamente.');
       }
     } finally {
       setIsGenerating(false);
