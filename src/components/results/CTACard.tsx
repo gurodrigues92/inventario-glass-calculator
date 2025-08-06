@@ -26,7 +26,7 @@ const CTACard = () => {
       
       <button
         onClick={() => setIsSpecialistDialogOpen(true)}
-        className={`luxury-btn-primary ${isMobile ? 'px-6 py-3 text-base' : 'px-8 py-4 text-lg'} font-semibold touchable`}
+        className={`luxury-btn-primary ${isMobile ? 'px-6 py-3 text-base' : 'px-8 py-4 text-lg'} font-semibold touchable relative z-10`}
         style={{
           background: 'linear-gradient(135deg, #D1BFA3, #E5D4B1, #D1BFA3)',
           color: '#0C2C45',
