@@ -19,8 +19,8 @@
     line-height: 1.4;
   }
   
-  /* Cards e Containers */
-  .glass-card, .luxury-card {
+  /* Cards e Containers - removed glass-card override to avoid conflicts */
+  .luxury-card {
     border-radius: 12px !important;
     padding: 16px !important;
     margin: 12px 0 !important;
@@ -71,7 +71,7 @@
     font-size: 2.25rem;
   }
   
-  .glass-card, .luxury-card {
+  .luxury-card {
     border-radius: 14px;
     padding: 20px;
   }

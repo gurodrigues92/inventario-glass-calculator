@@ -29,8 +29,7 @@
     border: 2px solid #4caf50 !important;
   }
 
-  /* CARDS DE RESULTADO */
-  .glass-card,
+  /* CARDS DE RESULTADO - removed glass-card override to avoid conflicts */
   .luxury-card {
     padding: 20px !important;
     margin: 16px 0 !important;
