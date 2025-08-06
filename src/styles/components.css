@@ -487,7 +487,6 @@
   /* Mobile Responsiveness */
   @media (max-width: 768px) {
     .luxury-card,
-    .glass-card,
     .form-card {
       padding: 24px;
       margin: 16px;

@@ -204,9 +204,6 @@
 
 /* High DPI screens */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .glass-card {
-    border-width: 0.5px !important;
-  }
   
   .logo-diamond {
     box-shadow: 0 2px 8px rgba(12, 44, 69, 0.15) !important;

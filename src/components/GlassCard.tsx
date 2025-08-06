@@ -34,7 +34,7 @@ const GlassCard = ({ children, className, style, hover = true, premium = false }
   return (
     <div 
       className={cn(
-        'glass-card',
+        'glass-card p-6',
         hover && 'hover-lift',
         premium && 'premium-card',
         className
