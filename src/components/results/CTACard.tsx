@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import GlassCard from '../GlassCard';
 import { useIsMobile } from '../../hooks/use-mobile';
+import SpecialistSelectionDialog from '../SpecialistSelectionDialog';
 
 const CTACard = () => {
   const isMobile = useIsMobile();
+  const [isSpecialistDialogOpen, setIsSpecialistDialogOpen] = useState(false);
 
   return (
     <GlassCard premium={true} className="text-center">
@@ -23,6 +25,7 @@ const CTACard = () => {
       </div>
       
       <button
+        onClick={() => setIsSpecialistDialogOpen(true)}
         className={`luxury-btn-primary ${isMobile ? 'px-6 py-3 text-base' : 'px-8 py-4 text-lg'} font-semibold touchable`}
         style={{
           background: 'linear-gradient(135deg, #D1BFA3, #E5D4B1, #D1BFA3)',
@@ -58,6 +61,11 @@ const CTACard = () => {
       >
         Consultoria especializada em planejamento sucessório e holding familiar
       </p>
+
+      <SpecialistSelectionDialog 
+        open={isSpecialistDialogOpen}
+        onOpenChange={setIsSpecialistDialogOpen}
+      />
     </GlassCard>
   );
 };
