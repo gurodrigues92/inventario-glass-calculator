@@ -43,7 +43,8 @@ const PatrimonioForm = () => {
     const dadosParaCalculo = {
       ...formData,
       patrimonio: formatCurrency(totalPatrimonio),
-      patrimonioHistoricoIR: formData.patrimonioHistoricoIR || '0',
+      patrimonioAtualMercado: formatCurrency(totalPatrimonio), // Valor atual de mercado
+      patrimonioHistoricoIR: formData.patrimonioHistoricoIR || '0', // Valor histórico IR
       tipoProcesso: 'extrajudicial',
       herdeiros: '1',
       temTestamento: false,

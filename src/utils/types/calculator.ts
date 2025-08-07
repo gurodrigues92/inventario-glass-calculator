@@ -43,6 +43,7 @@ export interface InsightPersonalizado {
 
 export interface ResultadoCalculo {
   patrimonio: number;
+  baseCalculo: number;
   estado: string;
   tipoProcesso: string;
   detalhamento: {

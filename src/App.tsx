@@ -14,6 +14,7 @@ import Login from "./pages/Login";
 import DefinirSenha from "./pages/DefinirSenha";
 import AcessoNegado from "./pages/AcessoNegado";
 import NotFound from "./pages/NotFound";
+import ValidationPanel from "./components/dev/ValidationPanel";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
+          <ValidationPanel />
         </div>
         </AuthProvider>
       </TooltipProvider>

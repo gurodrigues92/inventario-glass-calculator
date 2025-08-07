@@ -10,6 +10,9 @@ interface CostBreakdownCardProps {
 
 const CostBreakdownCard = ({ resultado, formData }: CostBreakdownCardProps) => {
   const isMobile = useIsMobile();
+  
+  // Verificar se base de cálculo é diferente do patrimônio total
+  const mostraBaseCalculo = resultado.baseCalculo && resultado.baseCalculo !== resultado.patrimonio;
 
   const CostItem = ({ 
     title, 
@@ -74,28 +77,67 @@ const CostBreakdownCard = ({ resultado, formData }: CostBreakdownCardProps) => {
         Detalhamento dos Custos
       </h3>
       
+      {/* Base de Cálculo - mostrar quando diferente do patrimônio total */}
+      {mostraBaseCalculo && (
+        <div 
+          className="mb-6 p-4 rounded-lg border-l-4"
+          style={{ 
+            background: 'rgba(255, 215, 0, 0.1)',
+            borderLeftColor: '#FFD700'
+          }}
+        >
+          <div className="text-sm font-medium" style={{ color: '#0C2C45' }}>
+            Base de Cálculo ITCMD
+          </div>
+          <div className="text-xs mt-1" style={{ color: '#476D9E' }}>
+            Valor Atual - Valor Histórico IR: {formatCurrencyWithDecimals(resultado.baseCalculo)}
+          </div>
+          <div className="text-xs italic mt-1" style={{ color: '#D1BFA3' }}>
+            ⚠️ ITCMD calculado sobre ganho de capital, não sobre valor total
+          </div>
+        </div>
+      )}
+
       <div className={`${isMobile ? 'space-y-6' : 'space-y-4'}`}>
         <CostItem
           title={`ITCMD (${formData.estado})`}
-          description="Imposto estadual sobre herança"
+          description={resultado.detalhamento.itcmd.descricao}
           value={resultado.detalhamento.itcmd.valor}
           percentage={resultado.detalhamento.itcmd.percentual}
         />
 
         <CostItem
           title="Honorários Advocatícios"
-          description="10% do patrimônio"
+          description={resultado.detalhamento.honorarios.descricao}
           value={resultado.detalhamento.honorarios.valor}
-          percentage={10}
+          percentage={resultado.detalhamento.honorarios.percentual}
+        />
+
+        <CostItem
+          title="Custas e Cartório"
+          description={resultado.detalhamento.custas.descricao}
+          value={resultado.detalhamento.custas.valor}
+          percentage={resultado.detalhamento.custas.percentual}
         />
 
         {resultado.detalhamento.ganhoCapital.valor > 0 && (
-          <CostItem
-            title="Ganho de Capital"
-            description="15% sobre valorização"
-            value={resultado.detalhamento.ganhoCapital.valor}
-            percentage={15}
-          />
+          <div 
+            className="p-4 rounded-lg border-l-4"
+            style={{ 
+              background: 'rgba(255, 99, 71, 0.1)',
+              borderLeftColor: '#FF6347'
+            }}
+          >
+            <CostItem
+              title="Imposto de Renda - Ganho de Capital"
+              description="15% sobre valorização (vigência 2025+)"
+              value={resultado.detalhamento.ganhoCapital.valor}
+              percentage={15}
+            />
+            <div className="text-xs italic mt-2" style={{ color: '#FF6347' }}>
+              ⚠️ Custo adicional com a reforma tributária a partir de 2025
+            </div>
+          </div>
         )}
       </div>
     </GlassCard>

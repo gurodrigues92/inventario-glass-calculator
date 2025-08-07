@@ -18,30 +18,28 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
     temLitigio = false
   } = dados;
   
-  // 1. Calcular ITCMD - 4% para atingir o total correto
-  const itcmdResult = { 
-    valor: patrimonio * 0.04, 
-    descricao: `ITCMD - 4% (Alíquota padrão)` 
-  };
+  // 1. Calcular base de cálculo correta
+  const baseCalculo = dados.patrimonioAtualMercado && dados.patrimonioHistoricoIR 
+    ? Math.max(0, dados.patrimonioAtualMercado - dados.patrimonioHistoricoIR)
+    : patrimonio;
   
-  // 2. Honorários advocatícios - 10% sem litígio, 20% com litígio
+  // 2. Calcular ITCMD usando função correta com alíquotas reais dos estados
+  const itcmdResult = calcularITCMD(baseCalculo, estado);
+  
+  // 3. Honorários advocatícios - 10% sem litígio, 20% com litígio
   const percentualHonorarios = temLitigio ? 0.20 : 0.10;
   const honorarios = patrimonio * percentualHonorarios;
   
-  // 3. Custas de cartório - 2%
+  // 4. Custas de cartório - 2%
   const custasCartorio = patrimonio * 0.02;
   
-  // 4. Ganho de Capital - só após reforma tributária 2025
-  // Por enquanto, calculamos para mostrar o impacto futuro mas não incluímos no total atual
-  const diferencaPatrimonio = dados.patrimonioAtualMercado && dados.patrimonioHistoricoIR 
-    ? Math.max(0, dados.patrimonioAtualMercado - dados.patrimonioHistoricoIR)
-    : 0;
-  const ganhoCapital = diferencaPatrimonio * 0.15; // 15% sobre a diferença
+  // 5. Imposto de Renda sobre ganho de capital (15% - reforma tributária 2025+)
+  const ganhoCapital = baseCalculo !== patrimonio ? baseCalculo * 0.15 : 0;
   
-  // 5. Total Pessoa Física (SEM ganho de capital antes da reforma)
+  // 6. Total Pessoa Física (SEM ganho de capital antes da reforma)
   const custoTotalPF = itcmdResult.valor + honorarios + custasCartorio;
   
-  // 6. Custos Holding S/A (honorários 1,5% do patrimônio)
+  // 7. Custos Holding S/A (honorários 1,5% do patrimônio)
   const honorariosConstituicaoHolding = patrimonio * 0.015; // 1,5% do patrimônio
   const custosCartorioHolding = 0; // 0% para a holding conforme especificado
   const custosHoldingSA = {
@@ -52,24 +50,25 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
     total: honorariosConstituicaoHolding
   };
   
-  // 7. Economia com Holding
+  // 8. Economia com Holding
   const economiaHolding = Math.max(0, custoTotalPF - custosHoldingSA.total);
   const percentualEconomia = custoTotalPF > 0 ? (economiaHolding / custoTotalPF * 100) : 0;
   
-  // 8. Tempo estimado
+  // 9. Tempo estimado
   const tempoEstimado = tipoProcesso === 'judicial' 
     ? (temLitigio ? '5 a 8 anos' : '3 a 5 anos')
     : '60 a 120 dias';
   
   return {
     patrimonio,
+    baseCalculo, // Adicionar base de cálculo transparente
     estado,
     tipoProcesso,
     detalhamento: {
       itcmd: {
         valor: itcmdResult.valor,
-        percentual: 4,
-        descricao: `ITCMD - 4% (Alíquota padrão)`
+        percentual: baseCalculo > 0 ? (itcmdResult.valor / baseCalculo * 100) : 0,
+        descricao: itcmdResult.descricao
       },
       honorarios: {
         valor: honorarios,
@@ -98,10 +97,11 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
       ganhoCapital: {
         valor: ganhoCapital,
         percentual: 15,
-        descricao: ganhoCapital > 0 ? 'Ganho de Capital (15%)' : 'Ganho de Capital (não aplicável)',
+        descricao: ganhoCapital > 0 ? 'Imposto de Renda - Ganho de Capital (15%)' : 'Imposto de Renda (não aplicável)',
         tooltip: dados.patrimonioHistoricoIR ? 
-          `15% sobre a diferença entre valor atual (${formatCurrency(patrimonio)}) e histórico IR (${formatCurrency(dados.patrimonioHistoricoIR)})` :
-          'Ganho de Capital não aplicável - valor histórico IR não informado'
+          `15% sobre o ganho de capital: diferença entre valor atual (${formatCurrency(dados.patrimonioAtualMercado || patrimonio)}) e histórico IR (${formatCurrency(dados.patrimonioHistoricoIR)})` :
+          'Imposto de Renda não aplicável - valor histórico IR não informado',
+        informativo: 'Vigência a partir de 2025 com a reforma tributária'
       }
     },
     resumo: {
@@ -137,8 +137,8 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
         tipo: 'informacao',
         titulo: 'Reforma Tributária 2025',
         descricao: ganhoCapital > 0 
-          ? `A partir de 2025, será incluído Ganho de Capital de ${formatCurrency(ganhoCapital)} (15% sobre diferença de valor), aumentando o custo total.`
-          : 'A partir de 2025, com a reforma tributária, será incluído o Ganho de Capital sobre a diferença entre valor de mercado e valor declarado no IR.'
+          ? `A partir de 2025, será incluído Imposto de Renda sobre ganho de capital de ${formatCurrency(ganhoCapital)} (15% sobre diferença de valor), aumentando o custo total.`
+          : 'A partir de 2025, com a reforma tributária, será incluído o Imposto de Renda sobre ganho de capital (diferença entre valor de mercado e valor declarado no IR).'
       },
       {
         tipo: 'estrategia',
