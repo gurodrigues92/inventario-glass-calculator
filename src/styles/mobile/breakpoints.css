@@ -18,11 +18,11 @@
   
   /* Títulos extra pequenos para phones pequenos */
   .heading-responsive {
-    font-size: 1.25rem !important; /* 20px */
+    font-size: 1.25rem; /* 20px */
   }
   
   .value-responsive {
-    font-size: 1.375rem !important; /* 22px */
+    font-size: 1.375rem; /* 22px */
   }
 }
 
@@ -33,11 +33,11 @@
   
   /* Títulos para phones médios */
   .heading-responsive {
-    font-size: 1.5rem !important; /* 24px */
+    font-size: 1.5rem; /* 24px */
   }
   
   .value-responsive {
-    font-size: 1.75rem !important; /* 28px */
+    font-size: 1.75rem; /* 28px */
   }
 }
 
@@ -48,10 +48,10 @@
   
   /* Títulos para tablets pequenos */
   .heading-responsive {
-    font-size: 1.875rem !important; /* 30px */
+    font-size: 1.875rem; /* 30px */
   }
   
   .value-responsive {
-    font-size: 2.25rem !important; /* 36px */
+    font-size: 2.25rem; /* 36px */
   }
 }

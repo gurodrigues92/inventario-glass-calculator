@@ -10,29 +10,29 @@
 
   /* Typography Clean */
   .heading-xl {
-    font-size: 3.5rem !important;
-    font-weight: 800 !important;
-    line-height: 1.1 !important;
-    background: linear-gradient(135deg, #0C2C45, #476D9E) !important;
-    -webkit-background-clip: text !important;
-    background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #0C2C45, #476D9E);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   .heading-lg {
-    font-size: 2.5rem !important;
-    font-weight: 700 !important;
-    color: #0C2C45 !important;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #0C2C45;
   }
 
   .heading-md {
-    font-size: 1.875rem !important;
-    font-weight: 600 !important;
-    color: #0C2C45 !important;
+    font-size: 1.875rem;
+    font-weight: 600;
+    color: #0C2C45;
   }
 
   .text-glass {
-    color: #476D9E !important;
+    color: #476D9E;
   }
 
   /* Typography Classes Atualizadas */
@@ -99,11 +99,11 @@
 /* Mobile Typography Adjustments */
 @media (max-width: 768px) {
   .heading-xl {
-    font-size: 1.75rem !important; /* 28px - reduzido de 40px */
+    font-size: 1.75rem; /* 28px - reduzido de 40px */
   }
   
   .heading-lg {
-    font-size: 1.5rem !important; /* 24px - reduzido de 32px */
+    font-size: 1.5rem; /* 24px - reduzido de 32px */
   }
   
   .text-luxury-title {
@@ -119,20 +119,20 @@
   }
 }
 
-/* Responsive Typography Classes */
-@layer components {
+/* Responsive Typography Classes - Using utilities layer for higher specificity */
+@layer utilities {
   .title-responsive {
-    font-size: clamp(1.25rem, 4vw, 2.5rem) !important;
-    line-height: 1.2 !important;
+    font-size: clamp(1.25rem, 4vw, 2.5rem);
+    line-height: 1.2;
   }
   
   .subtitle-responsive {
-    font-size: clamp(1rem, 3vw, 1.5rem) !important;
-    line-height: 1.4 !important;
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    line-height: 1.4;
   }
   
   .value-responsive {
-    font-size: clamp(1.5rem, 5vw, 3rem) !important;
-    line-height: 1.1 !important;
+    font-size: clamp(1.5rem, 5vw, 3rem);
+    line-height: 1.1;
   }
 }
