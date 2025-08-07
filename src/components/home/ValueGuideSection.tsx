@@ -15,7 +15,7 @@ const ValueGuideSection = () => {
       >
         <div 
           className="text-center"
-          style={{ marginBottom: '4rem !important' }}
+          style={{ marginBottom: '5rem !important' }}
         >
           <h3 
             className="text-xl font-semibold flex items-center justify-center gap-4"
@@ -33,8 +33,8 @@ const ValueGuideSection = () => {
         <div 
           className="grid grid-cols-1 md:grid-cols-2"
           style={{ 
-            gap: '3.5rem !important',
-            marginBottom: '3.5rem !important' 
+            gap: '4.5rem !important',
+            marginBottom: '4.5rem !important' 
           }}
         >
           <div>
@@ -42,7 +42,7 @@ const ValueGuideSection = () => {
               className="font-semibold flex items-center gap-3"
               style={{ 
                 color: '#0C2C45',
-                marginBottom: '2.25rem !important',
+                marginBottom: '1.5rem !important',
                 lineHeight: '1.3'
               }}
             >
@@ -51,7 +51,7 @@ const ValueGuideSection = () => {
             </h4>
             <p className="text-sm leading-relaxed" style={{ 
               color: '#476D9E',
-              lineHeight: '1.7',
+              lineHeight: '1.8',
               marginBottom: '0'
             }}>
               A Receita Federal exige a declaração pelo valor real de mercado. 
@@ -64,7 +64,7 @@ const ValueGuideSection = () => {
               className="font-semibold flex items-center gap-3"
               style={{ 
                 color: '#0C2C45',
-                marginBottom: '2.25rem !important',
+                marginBottom: '1.5rem !important',
                 lineHeight: '1.3'
               }}
             >
@@ -73,7 +73,7 @@ const ValueGuideSection = () => {
             </h4>
             <p className="text-sm leading-relaxed" style={{ 
               color: '#476D9E',
-              lineHeight: '1.7',
+              lineHeight: '1.8',
               marginBottom: '0'
             }}>
               O ITCMD é calculado sobre o valor real dos bens. 
@@ -87,7 +87,8 @@ const ValueGuideSection = () => {
           style={{ 
             background: 'rgba(209, 191, 163, 0.1)',
             border: '1px solid rgba(209, 191, 163, 0.2)',
-            padding: '2rem !important'
+            padding: '2.5rem !important',
+            marginTop: '1rem !important'
           }}
         >
           <p className="text-sm text-center leading-relaxed" style={{ 
