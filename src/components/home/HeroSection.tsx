@@ -1,7 +1,7 @@
 import React from 'react';
 import { Check, Lightbulb } from 'lucide-react';
 const HeroSection = () => {
-  return <div className="text-center mb-16 sm:mb-12 fade-in-up">
+  return <div className="text-center mb-16 sm:mb-12 pt-8 sm:pt-4 fade-in-up">
       <h1 className="title-responsive heading-responsive mb-6 sm:mb-4 max-w-4xl mx-auto text-center">
         Reduza Legalmente o Imposto de Herança e Proteja seu Patrimônio
       </h1>
