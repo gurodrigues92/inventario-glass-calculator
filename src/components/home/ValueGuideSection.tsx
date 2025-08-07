@@ -9,7 +9,7 @@ const ValueGuideSection = () => {
       <div className="value-guide-container">
         <div className="title-section">
           <h3 className="title-text">
-            <Target size={24} color="#0C2C45" strokeWidth={1.5} />
+            <Target size={24} color="#e1e5ea" strokeWidth={1.5} />
             Por que usar Valor de Mercado?
           </h3>
         </div>
@@ -17,7 +17,7 @@ const ValueGuideSection = () => {
         <div className="benefits-grid">
           <div className="benefit-item">
             <h4 className="benefit-title">
-              <Check size={20} color="#27AE60" strokeWidth={2} />
+              <Check size={20} color="#FFD700" strokeWidth={2} />
               Precisão Legal
             </h4>
             <p className="benefit-description">
@@ -28,7 +28,7 @@ const ValueGuideSection = () => {
           
           <div className="benefit-item">
             <h4 className="benefit-title">
-              <Check size={20} color="#27AE60" strokeWidth={2} />
+              <Check size={20} color="#FFD700" strokeWidth={2} />
               Cálculo Correto
             </h4>
             <p className="benefit-description">

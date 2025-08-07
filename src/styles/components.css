@@ -490,13 +490,14 @@
   }
 
   .value-guide-section .value-guide-container {
-    background: rgba(255, 255, 255, 0.8) !important;
-    backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(209, 191, 163, 0.3) !important;
-    border-radius: 0.75rem !important;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+    background: linear-gradient(135deg, rgba(133, 149, 171, 0.1) 0%, rgba(26, 26, 26, 0.95) 100%) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(133, 149, 171, 0.2) !important;
+    border-radius: 1.5rem !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
     padding: 3rem !important;
     margin: 0 !important;
+    color: #e1e5ea !important;
   }
 
   .value-guide-section .title-section {
@@ -507,7 +508,7 @@
   .value-guide-section .title-text {
     font-size: 1.25rem !important;
     font-weight: 600 !important;
-    color: #0C2C45 !important;
+    color: #e1e5ea !important;
     margin-bottom: 0 !important;
     line-height: 1.4 !important;
     display: flex !important;
@@ -535,7 +536,7 @@
 
   .value-guide-section .benefit-title {
     font-weight: 600 !important;
-    color: #0C2C45 !important;
+    color: #c2cad5 !important;
     margin-bottom: 1.5rem !important;
     line-height: 1.3 !important;
     display: flex !important;
@@ -546,14 +547,14 @@
   .value-guide-section .benefit-description {
     font-size: 0.875rem !important;
     line-height: 1.8 !important;
-    color: #476D9E !important;
+    color: #8595ab !important;
     margin-bottom: 0 !important;
   }
 
   .value-guide-section .tip-box {
     border-radius: 0.5rem !important;
-    background: rgba(209, 191, 163, 0.1) !important;
-    border: 1px solid rgba(209, 191, 163, 0.2) !important;
+    background: rgba(255, 215, 0, 0.1) !important;
+    border: 1px solid rgba(255, 215, 0, 0.3) !important;
     padding: 2.5rem !important;
     margin-top: 2.5rem !important;
   }
@@ -562,11 +563,11 @@
     font-size: 0.875rem !important;
     text-align: center !important;
     line-height: 1.7 !important;
-    color: #476D9E !important;
+    color: #c2cad5 !important;
   }
 
   .value-guide-section .tip-highlight {
-    color: #0C2C45 !important;
+    color: #FFD700 !important;
     font-weight: 600 !important;
   }
 
