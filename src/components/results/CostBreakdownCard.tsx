@@ -51,9 +51,12 @@ const CostBreakdownCard = ({ resultado, formData }: CostBreakdownCardProps) => {
           {formatCurrencyWithDecimals(value)}
         </div>
         <div 
-          className={`text-xs italic mt-1 ${isMobile ? 'text-center' : ''}`}
+          className={`text-xs italic mt-1 ${isMobile ? 'text-center' : ''} leading-tight break-words max-w-full`}
           style={{ 
-            color: '#476D9E'
+            color: '#476D9E',
+            wordWrap: 'break-word',
+            overflowWrap: 'break-word',
+            hyphens: 'auto'
           }}
         >
           "{numeroParaExtenso(value)}"
