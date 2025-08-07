@@ -9,19 +9,19 @@ const ValueGuideSection = () => {
       <div 
         className="bg-white/80 backdrop-blur-sm border border-purple-200/30 rounded-xl shadow-lg"
         style={{
-          padding: '2rem',
+          padding: '2.5rem',
           margin: '0'
         }}
       >
         <div 
           className="text-center"
-          style={{ marginBottom: '3rem !important' }}
+          style={{ marginBottom: '4rem !important' }}
         >
           <h3 
             className="text-xl font-semibold flex items-center justify-center gap-4"
             style={{ 
               color: '#0C2C45',
-              marginBottom: '2.5rem !important',
+              marginBottom: '0 !important',
               lineHeight: '1.4'
             }}
           >
@@ -33,8 +33,8 @@ const ValueGuideSection = () => {
         <div 
           className="grid grid-cols-1 md:grid-cols-2"
           style={{ 
-            gap: '2.5rem !important',
-            marginBottom: '2.5rem !important' 
+            gap: '3.5rem !important',
+            marginBottom: '3.5rem !important' 
           }}
         >
           <div>
@@ -42,7 +42,7 @@ const ValueGuideSection = () => {
               className="font-semibold flex items-center gap-3"
               style={{ 
                 color: '#0C2C45',
-                marginBottom: '1.75rem !important',
+                marginBottom: '2.25rem !important',
                 lineHeight: '1.3'
               }}
             >
@@ -51,8 +51,8 @@ const ValueGuideSection = () => {
             </h4>
             <p className="text-sm leading-relaxed" style={{ 
               color: '#476D9E',
-              lineHeight: '1.6',
-              marginBottom: '0.5rem'
+              lineHeight: '1.7',
+              marginBottom: '0'
             }}>
               A Receita Federal exige a declaração pelo valor real de mercado. 
               Valores subdeclarados podem gerar multas e problemas futuros.
@@ -64,7 +64,7 @@ const ValueGuideSection = () => {
               className="font-semibold flex items-center gap-3"
               style={{ 
                 color: '#0C2C45',
-                marginBottom: '1.75rem !important',
+                marginBottom: '2.25rem !important',
                 lineHeight: '1.3'
               }}
             >
@@ -73,8 +73,8 @@ const ValueGuideSection = () => {
             </h4>
             <p className="text-sm leading-relaxed" style={{ 
               color: '#476D9E',
-              lineHeight: '1.6',
-              marginBottom: '0.5rem'
+              lineHeight: '1.7',
+              marginBottom: '0'
             }}>
               O ITCMD é calculado sobre o valor real dos bens. 
               Nossa calculadora usa os valores que você informar para dar uma estimativa precisa.
@@ -90,7 +90,10 @@ const ValueGuideSection = () => {
             padding: '2rem !important'
           }}
         >
-          <p className="text-sm text-center leading-relaxed" style={{ color: '#476D9E' }}>
+          <p className="text-sm text-center leading-relaxed" style={{ 
+            color: '#476D9E',
+            lineHeight: '1.7'
+          }}>
             <strong style={{ color: '#0C2C45' }}>Dica:</strong> Para imóveis, consulte sites especializados ou avaliações recentes. 
             Para veículos, use a tabela FIPE. Para investimentos, considere o valor atual da carteira.
           </p>
