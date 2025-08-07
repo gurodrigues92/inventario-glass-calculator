@@ -14,8 +14,37 @@ const validateAndCreateDefaultData = (data: any) => {
   };
 };
 
+// Função para preparar elemento para captura
+const prepareElementForCapture = (element: HTMLElement): void => {
+  // Garantir que todos os estilos sejam aplicados
+  element.style.transform = 'translateZ(0)';
+  element.style.webkitTransform = 'translateZ(0)';
+  element.style.backfaceVisibility = 'hidden';
+  
+  // Aplicar estilos para impressão
+  const allElements = element.querySelectorAll('*') as NodeListOf<HTMLElement>;
+  allElements.forEach((el) => {
+    // Forçar visibilidade de texto
+    if (el.style.color === 'transparent' || getComputedStyle(el).color === 'rgba(0, 0, 0, 0)') {
+      el.style.color = '#000000';
+    }
+    
+    // Garantir backgrounds sejam visíveis
+    const bgColor = getComputedStyle(el).backgroundColor;
+    if (bgColor === 'rgba(0, 0, 0, 0)' && el.classList.contains('glass-card')) {
+      el.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+      el.style.backdropFilter = 'none';
+    }
+    
+    // Melhorar contraste para elementos importantes
+    if (el.classList.contains('text-muted') || el.classList.contains('text-muted-foreground')) {
+      el.style.color = '#666666';
+    }
+  });
+};
+
 // Função para aguardar elemento estar pronto com retry
-const waitForElement = async (elementId: string, maxRetries: number = 10): Promise<HTMLElement> => {
+const waitForElement = async (elementId: string, maxRetries: number = 15): Promise<HTMLElement> => {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     const element = document.getElementById(elementId);
     
@@ -23,13 +52,19 @@ const waitForElement = async (elementId: string, maxRetries: number = 10): Promi
       // Verificar se o elemento tem conteúdo
       const hasContent = element.children.length > 0 || element.textContent?.trim();
       if (hasContent) {
-        console.log(`Elemento ${elementId} encontrado e pronto (tentativa ${attempt})`);
+        // Aguardar fonts e imagens carregarem
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Preparar elemento para captura
+        prepareElementForCapture(element);
+        
+        console.log(`Elemento ${elementId} encontrado e preparado (tentativa ${attempt})`);
         return element;
       }
     }
     
     console.log(`Aguardando elemento ${elementId} (tentativa ${attempt}/${maxRetries})`);
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 800));
   }
   
   throw new Error(`Elemento ${elementId} não foi encontrado ou não carregou corretamente após ${maxRetries} tentativas`);
@@ -72,36 +107,71 @@ export const usePDF = () => {
 
       console.log('Capturando página 1 (custos e detalhamento)');
       const canvas1 = await html2canvas(page1Element, {
-        scale: 2,
+        scale: 3, // Maior qualidade
         useCORS: true,
-        allowTaint: true,
+        allowTaint: false,
         backgroundColor: '#ffffff',
-        removeContainer: true,
-        imageTimeout: 30000, // Aumentado timeout para 30s
+        removeContainer: false,
+        imageTimeout: 45000,
         scrollX: 0,
         scrollY: 0,
-        windowWidth: page1Element.scrollWidth,
-        windowHeight: page1Element.scrollHeight,
-        logging: false, // Reduzir logs para melhor performance
-        foreignObjectRendering: true, // Melhor renderização de elementos complexos
+        width: page1Element.scrollWidth,
+        height: page1Element.scrollHeight,
+        windowWidth: window.innerWidth,
+        windowHeight: window.innerHeight,
+        logging: true,
+        foreignObjectRendering: false, // Melhor compatibilidade
         ignoreElements: (element) => {
-          // Ignorar elementos que podem causar problemas
           const htmlElement = element as HTMLElement;
           return element.classList?.contains('loading') || 
                  element.classList?.contains('skeleton') ||
-                 htmlElement.style?.display === 'none';
+                 htmlElement.style?.display === 'none' ||
+                 htmlElement.style?.visibility === 'hidden';
         },
-        onclone: (clonedDoc) => {
+        onclone: (clonedDoc, element) => {
           const clonedElement = clonedDoc.getElementById('results-page-1');
           if (clonedElement) {
+            // Aplicar estilos para impressão
             clonedElement.style.backgroundColor = '#ffffff';
             clonedElement.style.padding = '20px';
+            clonedElement.style.minHeight = 'auto';
             clonedElement.style.pageBreakAfter = 'auto';
+            clonedElement.style.transform = 'none';
+            clonedElement.style.filter = 'none';
             
-            const allElements = clonedElement.querySelectorAll('*');
-            allElements.forEach((el: any) => {
-              if (el.style.color === 'transparent' || el.style.color === '') {
-                el.style.color = '#000000';
+            // Forçar aplicação de estilos em todos os elementos
+            const allElements = clonedElement.querySelectorAll('*') as NodeListOf<HTMLElement>;
+            allElements.forEach((el) => {
+              // Garantir texto visível
+              const computedStyle = window.getComputedStyle(el);
+              if (el.style.color === 'transparent' || el.style.color === '' || computedStyle.color === 'rgba(0, 0, 0, 0)') {
+                el.style.color = '#000000 !important';
+              }
+              
+              // Aplicar backgrounds de gradiente como cores sólidas
+              if (el.classList.contains('bg-gradient-to-br') || el.classList.contains('bg-gradient-to-r')) {
+                el.style.background = '#f8fafc !important';
+                el.style.backgroundImage = 'none !important';
+              }
+              
+              // Glass cards - aplicar background sólido
+              if (el.classList.contains('glass-card') || el.classList.contains('backdrop-blur')) {
+                el.style.backgroundColor = 'rgba(255, 255, 255, 0.95) !important';
+                el.style.backdropFilter = 'none !important';
+                el.style.border = '1px solid rgba(0, 0, 0, 0.1) !important';
+                el.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1) !important';
+              }
+              
+              // Botões e elementos interativos
+              if (el.tagName === 'BUTTON' || el.classList.contains('btn')) {
+                el.style.backgroundColor = '#3b82f6 !important';
+                el.style.color = '#ffffff !important';
+                el.style.border = '1px solid #3b82f6 !important';
+              }
+              
+              // Textos coloridos - garantir contraste
+              if (el.style.color?.includes('hsl') || computedStyle.color?.includes('hsl')) {
+                el.style.color = '#1e293b !important';
               }
             });
           }
@@ -149,36 +219,71 @@ export const usePDF = () => {
 
       console.log('Capturando página 2 (holding e CTA)');
       const canvas2 = await html2canvas(page2Element, {
-        scale: 2,
+        scale: 3, // Maior qualidade
         useCORS: true,
-        allowTaint: true,
+        allowTaint: false,
         backgroundColor: '#ffffff',
-        removeContainer: true,
-        imageTimeout: 30000, // Aumentado timeout para 30s
+        removeContainer: false,
+        imageTimeout: 45000,
         scrollX: 0,
         scrollY: 0,
-        windowWidth: page2Element.scrollWidth,
-        windowHeight: page2Element.scrollHeight,
-        logging: false, // Reduzir logs para melhor performance
-        foreignObjectRendering: true, // Melhor renderização de elementos complexos
+        width: page2Element.scrollWidth,
+        height: page2Element.scrollHeight,
+        windowWidth: window.innerWidth,
+        windowHeight: window.innerHeight,
+        logging: true,
+        foreignObjectRendering: false, // Melhor compatibilidade
         ignoreElements: (element) => {
-          // Ignorar elementos que podem causar problemas
           const htmlElement = element as HTMLElement;
           return element.classList?.contains('loading') || 
                  element.classList?.contains('skeleton') ||
-                 htmlElement.style?.display === 'none';
+                 htmlElement.style?.display === 'none' ||
+                 htmlElement.style?.visibility === 'hidden';
         },
-        onclone: (clonedDoc) => {
+        onclone: (clonedDoc, element) => {
           const clonedElement = clonedDoc.getElementById('results-page-2');
           if (clonedElement) {
+            // Aplicar estilos para impressão
             clonedElement.style.backgroundColor = '#ffffff';
             clonedElement.style.padding = '20px';
+            clonedElement.style.minHeight = 'auto';
             clonedElement.style.pageBreakBefore = 'auto';
+            clonedElement.style.transform = 'none';
+            clonedElement.style.filter = 'none';
             
-            const allElements = clonedElement.querySelectorAll('*');
-            allElements.forEach((el: any) => {
-              if (el.style.color === 'transparent' || el.style.color === '') {
-                el.style.color = '#000000';
+            // Forçar aplicação de estilos em todos os elementos
+            const allElements = clonedElement.querySelectorAll('*') as NodeListOf<HTMLElement>;
+            allElements.forEach((el) => {
+              // Garantir texto visível
+              const computedStyle = window.getComputedStyle(el);
+              if (el.style.color === 'transparent' || el.style.color === '' || computedStyle.color === 'rgba(0, 0, 0, 0)') {
+                el.style.color = '#000000 !important';
+              }
+              
+              // Aplicar backgrounds de gradiente como cores sólidas
+              if (el.classList.contains('bg-gradient-to-br') || el.classList.contains('bg-gradient-to-r')) {
+                el.style.background = '#f8fafc !important';
+                el.style.backgroundImage = 'none !important';
+              }
+              
+              // Glass cards - aplicar background sólido
+              if (el.classList.contains('glass-card') || el.classList.contains('backdrop-blur')) {
+                el.style.backgroundColor = 'rgba(255, 255, 255, 0.95) !important';
+                el.style.backdropFilter = 'none !important';
+                el.style.border = '1px solid rgba(0, 0, 0, 0.1) !important';
+                el.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1) !important';
+              }
+              
+              // Botões e elementos interativos
+              if (el.tagName === 'BUTTON' || el.classList.contains('btn')) {
+                el.style.backgroundColor = '#3b82f6 !important';
+                el.style.color = '#ffffff !important';
+                el.style.border = '1px solid #3b82f6 !important';
+              }
+              
+              // Textos coloridos - garantir contraste
+              if (el.style.color?.includes('hsl') || computedStyle.color?.includes('hsl')) {
+                el.style.color = '#1e293b !important';
               }
             });
           }
