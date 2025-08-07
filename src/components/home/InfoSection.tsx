@@ -51,7 +51,7 @@ const InfoSection = () => {
             </h3>
             <p className="text-sm" style={{
             color: '#476D9E'
-          }}>Descubra como economizar até 90% co</p>
+          }}>Descubra como economizar mais de 90%</p>
           </div>
         </div>
       </div>
