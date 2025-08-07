@@ -55,14 +55,7 @@
     padding: 16px 20px !important;
   }
   
-  /* Espaçamentos gerais */
-  .space-y-6 > * + * {
-    margin-top: 1rem !important;
-  }
-  
-  .space-y-8 > * + * {
-    margin-top: 1.5rem !important;
-  }
+  /* Let Tailwind handle spacing naturally */
 }
 
 /* Tablet */
