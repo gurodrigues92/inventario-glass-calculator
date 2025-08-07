@@ -57,7 +57,7 @@ const MobileHeader = () => {
               <span 
                 className="text-xs md:text-sm font-bold tracking-widest"
                 style={{
-                  background: 'linear-gradient(135deg, #B8A082, #C4B394)',
+                  background: 'linear-gradient(135deg, #D1BFA3, #E5D4B1)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   textTransform: 'uppercase',
