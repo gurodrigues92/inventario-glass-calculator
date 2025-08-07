@@ -15,7 +15,7 @@ const ValueGuideSection = () => {
       >
         <div 
           className="text-center"
-          style={{ marginBottom: '5rem !important' }}
+          style={{ marginBottom: '6rem !important' }}
         >
           <h3 
             className="text-xl font-semibold flex items-center justify-center gap-4"
@@ -33,8 +33,8 @@ const ValueGuideSection = () => {
         <div 
           className="grid grid-cols-1 md:grid-cols-2"
           style={{ 
-            gap: '4.5rem !important',
-            marginBottom: '4.5rem !important' 
+            gap: '5rem !important',
+            marginBottom: '5.5rem !important' 
           }}
         >
           <div>
@@ -88,7 +88,7 @@ const ValueGuideSection = () => {
             background: 'rgba(209, 191, 163, 0.1)',
             border: '1px solid rgba(209, 191, 163, 0.2)',
             padding: '2.5rem !important',
-            marginTop: '1rem !important'
+            marginTop: '2rem !important'
           }}
         >
           <p className="text-sm text-center leading-relaxed" style={{ 
