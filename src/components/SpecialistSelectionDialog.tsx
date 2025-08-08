@@ -94,11 +94,24 @@ const SpecialistSelectionDialog = ({ open, onOpenChange }: SpecialistSelectionDi
               {/* Card Content */}
               <div className="p-6 text-center">
                 {/* Specialist Image */}
-                <div className="relative mx-auto mb-4 w-24 h-24 rounded-full overflow-hidden">
+                <div className="relative mx-auto mb-4 w-24 h-24 rounded-full overflow-hidden bg-white/10">
                   <img 
                     src={specialist.image} 
                     alt={specialist.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-opacity duration-300"
+                    loading="eager"
+                    decoding="async"
+                    style={{ 
+                      imageRendering: 'crisp-edges',
+                      backgroundColor: 'rgba(255,255,255,0.1)'
+                    }}
+                    onLoad={(e) => {
+                      (e.target as HTMLImageElement).style.opacity = '1';
+                    }}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.opacity = '0.5';
+                      console.log('Error loading specialist image:', specialist.name);
+                    }}
                   />
                   <div 
                     className="absolute inset-0 rounded-full"
