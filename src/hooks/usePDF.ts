@@ -298,7 +298,7 @@ export const usePDF = () => {
       // Header da página 2
       pdf.setFontSize(16);
       pdf.setTextColor(12, 44, 69);
-      pdf.text('Planejamento Sucessório - Holding Familiar', margin, 20);
+      pdf.text('Planejamento Sucessório - Estratégia Avançada', margin, 20);
       
       pdf.setFontSize(8);
       pdf.setTextColor(150, 150, 150);

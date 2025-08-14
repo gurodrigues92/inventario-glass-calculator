@@ -24,8 +24,8 @@ export const gerarInsights = (dados: DadosCalculoInventario, custoTotal: number,
     
     insights.push({
       tipo: 'estrategia',
-      titulo: `${emoji} Holding Familiar S/A - ${intensidade}`,
-      descricao: `Uma Holding Familiar S/A poderia gerar economia de ${formatCurrency(economiaHolding)} nos custos sucessórios, além de profissionalizar a gestão do patrimônio, otimizar aspectos tributários e facilitar futuras transmissões.`,
+      titulo: `${emoji} Estratégia Jurídica Avançada - ${intensidade}`,
+      descricao: `O instrumento jurídico adequado ao seu perfil poderia gerar economia de ${formatCurrency(economiaHolding)} nos custos sucessórios, além de profissionalizar a gestão do patrimônio, otimizar aspectos tributários e facilitar futuras transmissões.`,
       valor: economiaHolding
     });
   }

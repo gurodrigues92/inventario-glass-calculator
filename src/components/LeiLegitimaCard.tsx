@@ -25,7 +25,7 @@ const LeiLegitimaCard = () => {
                 <li>• Garante proteção aos herdeiros necessários</li>
                 <li>• Permite planejamento da parte disponível</li>
                 <li>• Influencia estratégias de doação em vida</li>
-                <li>• Fundamental para estruturação de holdings</li>
+                <li>• Fundamental para estruturação patrimonial</li>
               </ul>
             </div>
             

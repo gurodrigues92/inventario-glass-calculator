@@ -14,7 +14,7 @@ const Home = () => {
       <SEOHead 
         title="Calculadora de ITCMD - Reduza até 90% do Imposto de Herança"
         description="Calculadora profissional de ITCMD e inventário. Estratégias jurídicas avançadas para reduzir imposto de herança. Análise completa por estado brasileiro."
-        keywords="calculadora ITCMD, imposto herança, inventário judicial, inventário extrajudicial, holding patrimonial, planejamento sucessório"
+        keywords="calculadora ITCMD, imposto herança, inventário judicial, inventário extrajudicial, planejamento patrimonial, estratégia sucessória"
         canonicalUrl="/"
       />
       

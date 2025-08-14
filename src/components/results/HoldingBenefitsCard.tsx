@@ -35,14 +35,14 @@ const HoldingBenefitsCard = ({ resultado, dadosCalculo, economiaPercentual }: Ho
           className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold mb-4`}
           style={{ color: '#D1BFA3' }}
         >
-          Com Holding Familiar S/A
+          Com Estratégia Jurídica Avançada
         </h3>
         
         <p 
           className={`${isMobile ? 'text-sm' : ''} mb-6 leading-relaxed ${isMobile ? 'px-2' : ''}`}
           style={{ color: '#0C2C45' }}
         >
-          Com a constituição de uma Holding Familiar S/A, você pode reduzir 
+          Com a implementação do instrumento jurídico adequado ao seu perfil, você pode reduzir 
           significativamente o custo sucessório — e ainda profissionalizar 
           a gestão do patrimônio.
         </p>
@@ -73,7 +73,7 @@ const HoldingBenefitsCard = ({ resultado, dadosCalculo, economiaPercentual }: Ho
             className={`${isMobile ? 'text-base' : 'text-base'} font-semibold mb-4`}
             style={{ color: '#0C2C45' }}
           >
-            ✅ Benefícios da Holding S/A
+            ✅ Benefícios da Estratégia Otimizada
           </h4>
           <ul className={`${isMobile ? 'space-y-3' : 'space-y-2'}`}>
             <li 
@@ -95,7 +95,7 @@ const HoldingBenefitsCard = ({ resultado, dadosCalculo, economiaPercentual }: Ho
               style={{ color: '#476D9E' }}
             >
               <span style={{ color: '#27AE60', fontSize: isMobile ? '16px' : '14px' }}>✓</span>
-              <span>Constituição em 30 a 60 dias</span>
+              <span>Implementação em 30 a 60 dias</span>
             </li>
             <li 
               className={`flex items-center gap-3 ${isMobile ? 'text-sm' : 'text-sm'} ${isMobile ? 'p-2 bg-green-50 rounded-lg' : ''}`}
@@ -112,12 +112,12 @@ const HoldingBenefitsCard = ({ resultado, dadosCalculo, economiaPercentual }: Ho
             className={`${isMobile ? 'text-base' : 'text-base'} font-semibold mb-4`}
             style={{ color: '#0C2C45' }}
           >
-            💰 Custos da Holding S/A
+            💰 Investimento na Estruturação
           </h4>
           <div className={`${isMobile ? 'space-y-4' : 'space-y-2'}`}>
             <div className={`${isMobile ? 'flex flex-col space-y-2 p-3 bg-blue-50 rounded-lg' : 'flex justify-between text-sm'}`}>
               <span className={`${isMobile ? 'text-sm font-medium' : ''}`} style={{ color: '#476D9E' }}>
-                Honorários Constituição (1,5%):
+                Honorários Implementação (1,5%):
               </span>
               <div className={`${isMobile ? 'text-center' : 'text-right'}`}>
                 <span 

@@ -73,7 +73,7 @@ const CTAEspecialista = ({ patrimonio, custoTotal, temComplexidade }: CTAEspecia
               </li>
               <li className="flex items-center space-x-2">
                 <span className="text-green-600">✓</span>
-                <span>Holding familiar estruturada</span>
+                <span>Instrumento jurídico personalizado</span>
               </li>
               <li className="flex items-center space-x-2">
                 <span className="text-green-600">✓</span>

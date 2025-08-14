@@ -34,7 +34,7 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
           "featureList": [
             "Cálculo de ITCMD por estado",
             "Análise de inventário judicial vs extrajudicial",
-            "Simulação de holding patrimonial",
+            "Simulação de estratégias patrimoniais",
             "Geração de relatórios PDF",
             "Salvamento de cálculos"
           ]
@@ -84,7 +84,7 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
             "Planejamento Patrimonial",
             "Inventário Judicial",
             "Inventário Extrajudicial",
-            "Holding Patrimonial"
+            "Estratégias Patrimoniais"
           ]
         };
 
@@ -104,10 +104,10 @@ const StructuredData = ({ type, data }: StructuredDataProps) => {
             {
               "@type": "Question", 
               "name": "Como posso reduzir o ITCMD?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Através de estratégias como holding patrimonial, doação em vida com usufruto, e planejamento sucessório adequado."
-              }
+               "acceptedAnswer": {
+                 "@type": "Answer",
+                 "text": "Através de estratégias jurídicas avançadas, doação em vida com usufruto, e planejamento sucessório adequado."
+               }
             },
             {
               "@type": "Question",

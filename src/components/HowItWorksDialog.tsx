@@ -27,7 +27,7 @@ const HowItWorksDialog = ({ open, onOpenChange }: HowItWorksDialogProps) => {
     {
       icon: TrendingUp,
       title: "3. Análise de Estratégias",
-      description: "Compare os custos entre inventário tradicional e holding familiar, vendo a economia potencial de até 90%."
+      description: "Compare os custos entre inventário tradicional e planejamento sucessório otimizado, vendo a economia potencial de até 90%."
     },
     {
       icon: FileCheck,
