@@ -195,7 +195,7 @@ export const ESTADOS_DATA: Record<string, EstadoData> = {
   'RN': {
     uf: 'RN',
     nome: 'Rio Grande do Norte',
-    itcmd: { tipo: 'fixa', aliquota: 0.03 }
+    itcmd: { tipo: 'fixa', aliquota: 0.04 }
   },
   'RS': {
     uf: 'RS',
