@@ -68,8 +68,8 @@ export const ESTADOS_DATA: Record<string, EstadoData> = {
     itcmd: {
       tipo: 'progressiva',
       faixas: [
-        { limite: 2000000, aliquota: 0.04 },
-        { limite: 4000000, aliquota: 0.05 },
+        { limite: 50000, aliquota: 0.04 },
+        { limite: 100000, aliquota: 0.05 },
         { limite: Infinity, aliquota: 0.06 }
       ]
     }
@@ -82,34 +82,54 @@ export const ESTADOS_DATA: Record<string, EstadoData> = {
   'GO': {
     uf: 'GO',
     nome: 'Goiás',
-    itcmd: { tipo: 'fixa', aliquota: 0.04 }
+    itcmd: {
+      tipo: 'progressiva',
+      faixas: [
+        { limite: 25000, aliquota: 0.02 },
+        { limite: 200000, aliquota: 0.04 },
+        { limite: 600000, aliquota: 0.06 },
+        { limite: Infinity, aliquota: 0.08 }
+      ]
+    }
   },
   'MA': {
     uf: 'MA',
     nome: 'Maranhão',
-    itcmd: { tipo: 'fixa', aliquota: 0.06 }
+    itcmd: {
+      tipo: 'progressiva',
+      faixas: [
+        { limite: 25000, aliquota: 0.03 },
+        { limite: 50000, aliquota: 0.04 },
+        { limite: 100000, aliquota: 0.05 },
+        { limite: 300000, aliquota: 0.06 },
+        { limite: 600000, aliquota: 0.07 },
+        { limite: Infinity, aliquota: 0.08 }
+      ]
+    }
   },
   'MT': {
     uf: 'MT',
     nome: 'Mato Grosso',
-    itcmd: { tipo: 'fixa', aliquota: 0.04 }
+    itcmd: {
+      tipo: 'progressiva',
+      faixas: [
+        { limite: 5100, aliquota: 0 },
+        { limite: 13600, aliquota: 0.02 },
+        { limite: 27200, aliquota: 0.04 },
+        { limite: 54400, aliquota: 0.06 },
+        { limite: Infinity, aliquota: 0.08 }
+      ]
+    }
   },
   'MS': {
     uf: 'MS',
     nome: 'Mato Grosso do Sul',
-    itcmd: { tipo: 'fixa', aliquota: 0.03 }
+    itcmd: { tipo: 'fixa', aliquota: 0.06 }
   },
   'MG': {
     uf: 'MG',
     nome: 'Minas Gerais',
-    itcmd: {
-      tipo: 'progressiva',
-      faixas: [
-        { limite: 600000, aliquota: 0.04 },
-        { limite: 1200000, aliquota: 0.06 },
-        { limite: Infinity, aliquota: 0.08 }
-      ]
-    }
+    itcmd: { tipo: 'fixa', aliquota: 0.05 }
   },
   'PA': {
     uf: 'PA',
