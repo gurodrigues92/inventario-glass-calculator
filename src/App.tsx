@@ -14,6 +14,7 @@ import Login from "./pages/Login";
 import DefinirSenha from "./pages/DefinirSenha";
 import AcessoNegado from "./pages/AcessoNegado";
 import NotFound from "./pages/NotFound";
+import AuditoriaITCMDPage from "./pages/AuditoriaITCMD";
 import ValidationPanel from "./components/dev/ValidationPanel";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,11 @@ const App = () => (
               <Route path="/calculos-salvos" element={
                 <ProtectedRoute>
                   <CalculosSalvos />
+                </ProtectedRoute>
+              } />
+              <Route path="/auditoria-itcmd" element={
+                <ProtectedRoute>
+                  <AuditoriaITCMDPage />
                 </ProtectedRoute>
               } />
               

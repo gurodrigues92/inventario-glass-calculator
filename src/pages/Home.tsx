@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import HeroSection from '../components/home/HeroSection';
 import PatrimonioForm from '../components/home/PatrimonioForm';
@@ -32,6 +33,19 @@ const Home = () => {
           <PatrimonioForm />
           <ValueGuideSection />
           <InfoSection />
+          
+          {/* Link temporário para auditoria - apenas desenvolvimento */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-yellow-800 mb-2">🔧 Ferramentas de Desenvolvimento:</p>
+              <Link 
+                to="/auditoria-itcmd" 
+                className="text-blue-600 hover:text-blue-800 underline text-sm"
+              >
+                📊 Executar Auditoria Completa ITCMD
+              </Link>
+            </div>
+          )}
         </div>
       </main>
     </div>
