@@ -65,8 +65,8 @@ const App = () => (
               
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <ValidationPanel />
           </BrowserRouter>
-          <ValidationPanel />
         </div>
         </AuthProvider>
       </TooltipProvider>
