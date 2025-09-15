@@ -153,14 +153,7 @@ export const ESTADOS_DATA: Record<string, EstadoData> = {
   'PR': {
     uf: 'PR',
     nome: 'Paraná',
-    itcmd: {
-      tipo: 'progressiva',
-      faixas: [
-        { limite: 300000, aliquota: 0.04 },
-        { limite: 600000, aliquota: 0.06 },
-        { limite: Infinity, aliquota: 0.08 }
-      ]
-    }
+    itcmd: { tipo: 'fixa', aliquota: 0.04 }
   },
   'PE': {
     uf: 'PE',
@@ -168,9 +161,9 @@ export const ESTADOS_DATA: Record<string, EstadoData> = {
     itcmd: {
       tipo: 'progressiva',
       faixas: [
-        { limite: 50000, aliquota: 0.02 },
-        { limite: 200000, aliquota: 0.04 },
-        { limite: 500000, aliquota: 0.06 },
+        { limite: 317412, aliquota: 0.02 },
+        { limite: 476118, aliquota: 0.04 },
+        { limite: 634824, aliquota: 0.06 },
         { limite: Infinity, aliquota: 0.08 }
       ]
     }
@@ -178,7 +171,14 @@ export const ESTADOS_DATA: Record<string, EstadoData> = {
   'PI': {
     uf: 'PI',
     nome: 'Piauí',
-    itcmd: { tipo: 'fixa', aliquota: 0.04 }
+    itcmd: {
+      tipo: 'progressiva',
+      faixas: [
+        { limite: 10000, aliquota: 0.02 },
+        { limite: 150000, aliquota: 0.04 },
+        { limite: Infinity, aliquota: 0.06 }
+      ]
+    }
   },
   'RJ': {
     uf: 'RJ',
