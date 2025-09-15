@@ -139,7 +139,16 @@ export const ESTADOS_DATA: Record<string, EstadoData> = {
   'PB': {
     uf: 'PB',
     nome: 'Paraíba',
-    itcmd: { tipo: 'fixa', aliquota: 0.04 }
+    itcmd: {
+      tipo: 'progressiva',
+      faixas: [
+        { limite: 75000, aliquota: 0.02 },
+        { limite: 150000, aliquota: 0.04 },
+        { limite: 590000, aliquota: 0.06 },
+        { limite: 1180000, aliquota: 0.06 },
+        { limite: Infinity, aliquota: 0.08 }
+      ]
+    }
   },
   'PR': {
     uf: 'PR',
