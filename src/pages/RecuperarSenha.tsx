@@ -1,21 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Eye, EyeOff, Gem } from 'lucide-react';
+import { Loader2, CheckCircle, Gem, ArrowLeft } from 'lucide-react';
 
-export default function Login() {
-  const { login, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+export default function RecuperarSenha() {
+  const { isAuthenticated } = useAuth();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   // Redirecionar se já estiver logado
   if (isAuthenticated) {
@@ -27,33 +25,96 @@ export default function Login() {
     setError('');
     setIsLoading(true);
 
-    const result = await login(email, password);
-    
-    if (result.success) {
-      navigate('/');
-    } else {
-      // Verificar se precisa definir senha
-      if (result.needsPasswordDefinition && result.token) {
-        console.log('Redirecionando para definir senha com token:', result.token);
-        navigate(`/definir-senha?token=${result.token}`);
+    try {
+      const { data, error } = await supabase.functions.invoke('recuperar-senha', {
+        body: { email: email.trim().toLowerCase() }
+      });
+
+      if (error) {
+        console.error('Erro na função recuperar-senha:', error);
+        setError('Erro de conexão. Tente novamente.');
+        setIsLoading(false);
         return;
       }
-      
-      // Mostrar mensagem específica ou genérica
-      if (result.error === 'SENHA_NAO_DEFINIDA') {
-        setError('Você precisa definir sua senha primeiro. Redirecionando...');
-        setTimeout(() => {
-          navigate('/definir-senha');
-        }, 2000);
-      } else if (result.error === 'CONTA_INATIVA') {
-        setError('Sua conta não está ativa. Você precisa definir sua senha primeiro.');
-      } else {
-        setError(result.message || result.error || 'Erro no login');
+
+      if (!data.success) {
+        setError(data.error || 'Erro ao processar solicitação');
+        setIsLoading(false);
+        return;
       }
+
+      setSuccess(true);
+    } catch (error) {
+      console.error('Erro ao recuperar senha:', error);
+      setError('Erro inesperado. Tente novamente.');
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-animated flex items-center justify-center p-4">
+        <Card 
+          className="w-full max-w-md shadow-xl border-0 backdrop-blur-sm"
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            border: '1px solid #E8E2DD',
+            boxShadow: '0 8px 24px rgba(12, 44, 69, 0.16)'
+          }}
+        >
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <CheckCircle 
+                className="mx-auto h-16 w-16 mb-4" 
+                style={{ color: '#476D9E' }}
+              />
+              <h2 
+                className="text-2xl font-bold mb-2"
+                style={{ color: '#0C2C45' }}
+              >
+                E-mail Enviado!
+              </h2>
+              <p 
+                className="mb-4"
+                style={{ color: '#476D9E' }}
+              >
+                Se o e-mail informado estiver cadastrado, você receberá um link para redefinir sua senha.
+              </p>
+              <p 
+                className="text-sm mb-6"
+                style={{ color: '#9FB7D4' }}
+              >
+                Verifique sua caixa de entrada e também a pasta de spam.
+              </p>
+              <Link to="/login">
+                <button
+                  className="font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+                  style={{
+                    background: 'linear-gradient(135deg, #0C2C45, #476D9E)',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    boxShadow: '0 4px 16px rgba(12, 44, 69, 0.2)',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.target as HTMLElement).style.transform = 'translateY(-2px)';
+                    (e.target as HTMLElement).style.boxShadow = '0 8px 24px rgba(12, 44, 69, 0.3)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.target as HTMLElement).style.transform = 'translateY(0)';
+                    (e.target as HTMLElement).style.boxShadow = '0 4px 16px rgba(12, 44, 69, 0.2)';
+                  }}
+                >
+                  Voltar para Login
+                </button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-animated flex items-center justify-center p-4">
@@ -109,11 +170,16 @@ export default function Login() {
                 </span>
               </div>
             </div>
+            <h2 
+              className="text-xl font-bold mt-4"
+              style={{ color: '#0C2C45' }}
+            >
+              Recuperar Senha
+            </h2>
             <CardDescription 
-              className="mt-4"
               style={{ color: '#476D9E' }}
             >
-              Acesse sua conta para usar a calculadora de inventário
+              Informe seu e-mail para receber um link de recuperação
             </CardDescription>
           </CardHeader>
 
@@ -137,7 +203,7 @@ export default function Login() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Digite seu e-mail"
+                  placeholder="Digite seu e-mail cadastrado"
                   required
                   disabled={isLoading}
                   style={{
@@ -147,55 +213,6 @@ export default function Login() {
                   }}
                   className="focus:border-[#9FB7D4] transition-colors"
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label 
-                  htmlFor="password"
-                  style={{ color: '#0C2C45', fontWeight: '600' }}
-                >
-                  Senha
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Digite sua senha"
-                    required
-                    disabled={isLoading}
-                    style={{
-                      background: '#FFFFFF',
-                      border: '1px solid #E8E2DD',
-                      color: '#0C2C45',
-                      paddingRight: '40px'
-                    }}
-                    className="focus:border-[#9FB7D4] transition-colors"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors"
-                    style={{ color: '#476D9E' }}
-                    onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#0C2C45'}
-                    onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#476D9E'}
-                  >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="text-right mb-2">
-                <Link 
-                  to="/recuperar-senha" 
-                  className="text-sm font-medium transition-colors"
-                  style={{ color: '#476D9E' }}
-                  onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#0C2C45'}
-                  onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#476D9E'}
-                >
-                  Esqueceu sua senha?
-                </Link>
               </div>
 
               <button
@@ -225,40 +242,25 @@ export default function Login() {
                 {isLoading ? (
                   <div className="flex items-center justify-center">
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Entrando...
+                    Enviando...
                   </div>
                 ) : (
-                  'Entrar'
+                  'Enviar Link de Recuperação'
                 )}
               </button>
             </form>
 
-            <div className="mt-6 text-center space-y-3">
-              <p style={{ color: '#476D9E', fontSize: '14px' }}>
-                Ainda não tem acesso?{' '}
-                <Link 
-                  to="/acesso-negado" 
-                  className="font-medium transition-colors"
-                  style={{ color: '#476D9E' }}
-                  onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#0C2C45'}
-                  onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#476D9E'}
-                >
-                  Saiba como adquirir
-                </Link>
-              </p>
-              
-              <p style={{ color: '#476D9E', fontSize: '12px' }}>
-                Recebeu um link de ativação?{' '}
-                <Link 
-                  to="/definir-senha" 
-                  className="font-medium transition-colors"
-                  style={{ color: '#476D9E' }}
-                  onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#0C2C45'}
-                  onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#476D9E'}
-                >
-                  Definir senha
-                </Link>
-              </p>
+            <div className="mt-6 text-center">
+              <Link 
+                to="/login" 
+                className="inline-flex items-center gap-2 text-sm font-medium transition-colors"
+                style={{ color: '#476D9E' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#0C2C45')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#476D9E')}
+              >
+                <ArrowLeft size={16} />
+                Voltar para o login
+              </Link>
             </div>
           </CardContent>
         </Card>

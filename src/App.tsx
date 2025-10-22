@@ -12,6 +12,8 @@ import Results from "./pages/Results";
 import CalculosSalvos from "./pages/CalculosSalvos";
 import Login from "./pages/Login";
 import DefinirSenha from "./pages/DefinirSenha";
+import RecuperarSenha from "./pages/RecuperarSenha";
+import RedefinirSenha from "./pages/RedefinirSenha";
 import AcessoNegado from "./pages/AcessoNegado";
 import NotFound from "./pages/NotFound";
 import AuditoriaITCMDPage from "./pages/AuditoriaITCMD";
@@ -39,6 +41,8 @@ const App = () => (
               {/* Rotas públicas */}
               <Route path="/login" element={<Login />} />
               <Route path="/definir-senha" element={<DefinirSenha />} />
+              <Route path="/recuperar-senha" element={<RecuperarSenha />} />
+              <Route path="/redefinir-senha" element={<RedefinirSenha />} />
               <Route path="/acesso-negado" element={<AcessoNegado />} />
               
               {/* Rotas protegidas */}
