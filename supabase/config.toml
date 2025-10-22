@@ -46,3 +46,6 @@ verify_jwt = false
 
 [functions.health-check-hotmart]
 verify_jwt = false
+
+[functions.reenviar-email-manual]
+verify_jwt = false
