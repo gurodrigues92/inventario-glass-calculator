@@ -154,7 +154,7 @@ serve(async (req) => {
 
     // Enviar e-mail via Resend
     const emailResponse = await resend.emails.send({
-      from: 'Inventário Descomplicado <noreply@inventariodescomplicado.com.br>',
+      from: 'Inventário Descomplicado <noreply@upload.patrimonioseminventario.com.br>',
       to: [email],
       subject: `🎉 Bem-vindo ao Inventário Descomplicado - Defina sua senha`,
       html: emailHtml,
