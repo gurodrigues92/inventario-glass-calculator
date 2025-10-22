@@ -93,12 +93,17 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders })
   }
 
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  const supabase = createClient(supabaseUrl, supabaseKey)
+
   try {
     // Rate limiting por IP
     const clientIP = req.headers.get('x-forwarded-for') || 
                      req.headers.get('cf-connecting-ip') || 
                      'unknown'
     
+    const userAgent = req.headers.get('user-agent') || 'unknown'
     console.log('Cliente IP:', clientIP)
     
     if (!checkRateLimit(clientIP)) {
@@ -111,10 +116,6 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       })
     }
-    
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const supabase = createClient(supabaseUrl, supabaseKey)
 
     // Timeout para operações críticas
     const timeoutMs = 30000 // 30 segundos
@@ -162,9 +163,27 @@ serve(async (req) => {
     const email = sanitizeString(webhookData.buyer.email).toLowerCase()
     const name = sanitizeString(webhookData.buyer.name)
     const produto = sanitizeString(webhookData.product?.name || 'Calculadora Inventário')
+    
+    // LOG 1: Webhook recebido
+    await supabase.from('log_compras_hotmart').insert({
+      request_id: requestId,
+      email,
+      nome: name,
+      produto,
+      status: 'webhook_recebido',
+      webhook_payload: webhookData,
+      ip_origem: clientIP,
+      user_agent: userAgent
+    })
 
     if (!isValidEmail(email)) {
       console.error('E-mail inválido:', email)
+      await supabase.from('log_compras_hotmart').update({
+        status: 'erro_validacao',
+        etapa_falha: 'validacao_email',
+        erro_mensagem: 'E-mail inválido'
+      }).eq('request_id', requestId)
+      
       return new Response(JSON.stringify({ 
         success: false, 
         error: 'E-mail inválido' 
@@ -176,6 +195,12 @@ serve(async (req) => {
 
     if (!name || name.length < 2) {
       console.error('Nome inválido:', name)
+      await supabase.from('log_compras_hotmart').update({
+        status: 'erro_validacao',
+        etapa_falha: 'validacao_nome',
+        erro_mensagem: 'Nome inválido'
+      }).eq('request_id', requestId)
+      
       return new Response(JSON.stringify({ 
         success: false, 
         error: 'Nome inválido' 
@@ -211,8 +236,12 @@ serve(async (req) => {
     
     tokenDefinicaoSenha = tokenData
 
+    let usuarioId: string | null = null
+
     if (usuarioExistente) {
       console.log('Atualizando usuário existente...')
+      usuarioId = usuarioExistente.id
+      
       // Atualizar usuário existente (com retry)
       await retryOperation(async () => {
         const { error: updateError } = await supabase
@@ -233,13 +262,19 @@ serve(async (req) => {
       })
 
       console.log('Usuário atualizado com sucesso:', email)
+      
+      // LOG 2: Usuário atualizado
+      await supabase.from('log_compras_hotmart').update({
+        status: 'usuario_atualizado',
+        usuario_id: usuarioId
+      }).eq('request_id', requestId)
     } else {
       console.log('Criando novo usuário...')
       isNewUser = true
       
       // Criar novo usuário (com retry)
-      await retryOperation(async () => {
-        const { error: insertError } = await supabase
+      const { data: novoUsuario } = await retryOperation(async () => {
+        const result = await supabase
           .from('usuarios')
           .insert({
             nome: name,
@@ -250,14 +285,24 @@ serve(async (req) => {
             token_definicao_senha: tokenDefinicaoSenha,
             token_gerado_em: new Date().toISOString()
           })
+          .select()
+          .single()
 
-        if (insertError) {
-          console.error('Erro ao criar usuário:', insertError)
-          throw insertError
+        if (result.error) {
+          console.error('Erro ao criar usuário:', result.error)
+          throw result.error
         }
+        return result
       })
 
+      usuarioId = novoUsuario?.id || null
       console.log('Usuário criado com sucesso:', email)
+      
+      // LOG 3: Usuário criado
+      await supabase.from('log_compras_hotmart').update({
+        status: 'usuario_criado',
+        usuario_id: usuarioId
+      }).eq('request_id', requestId)
     }
 
     // Enviar e-mail de boas-vindas automático
@@ -277,14 +322,64 @@ serve(async (req) => {
 
       if (emailResponse.error) {
         console.error('Erro ao enviar e-mail:', emailResponse.error)
-        // Log do erro mas não falha o webhook - usuário foi criado com sucesso
+        
+        // LOG 4A: Erro ao enviar email
+        await supabase.from('log_compras_hotmart').update({
+          status: 'erro_email',
+          etapa_falha: 'envio_email',
+          erro_mensagem: emailResponse.error.message || 'Erro desconhecido',
+          tempo_processamento_ms: Date.now() - startTime
+        }).eq('request_id', requestId)
+        
+        // Notificar admin do erro
+        await supabase.functions.invoke('notificar-admin-erro', {
+          body: {
+            request_id: requestId,
+            email,
+            nome: name,
+            produto,
+            etapa_falha: 'envio_email',
+            erro_mensagem: emailResponse.error.message || 'Erro ao enviar email',
+            timestamp: new Date().toISOString()
+          }
+        })
+        
         console.warn('E-mail não enviado, mas usuário foi processado. Token:', tokenDefinicaoSenha)
       } else {
         console.log('E-mail enviado com sucesso:', emailResponse.data)
+        
+        // LOG 4B: Email enviado com sucesso
+        await supabase.from('log_compras_hotmart').update({
+          status: 'email_enviado',
+          processado_em: new Date().toISOString(),
+          tempo_processamento_ms: Date.now() - startTime
+        }).eq('request_id', requestId)
       }
     } catch (emailError) {
       console.error('Falha crítica no envio de e-mail:', emailError)
-      // Log do erro mas não falha o webhook
+      
+      // LOG 4C: Erro crítico no email
+      await supabase.from('log_compras_hotmart').update({
+        status: 'erro_email',
+        etapa_falha: 'envio_email_critico',
+        erro_mensagem: emailError.message,
+        erro_stack: emailError.stack,
+        tempo_processamento_ms: Date.now() - startTime
+      }).eq('request_id', requestId)
+      
+      // Notificar admin do erro crítico
+      await supabase.functions.invoke('notificar-admin-erro', {
+        body: {
+          request_id: requestId,
+          email,
+          nome: name,
+          produto,
+          etapa_falha: 'envio_email_critico',
+          erro_mensagem: emailError.message,
+          timestamp: new Date().toISOString()
+        }
+      })
+      
       console.warn('E-mail não enviado devido a erro, mas usuário foi processado. Token:', tokenDefinicaoSenha)
     }
 
@@ -309,6 +404,38 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Erro no webhook Hotmart:', error)
+    
+    // LOG ERRO: Erro geral não capturado
+    try {
+      await supabase.from('log_compras_hotmart').insert({
+        request_id: requestId,
+        email: 'erro_webhook@desconhecido.com',
+        nome: 'Erro ao processar',
+        status: 'erro_banco',
+        etapa_falha: 'processamento_geral',
+        erro_mensagem: error.message,
+        erro_stack: error.stack,
+        webhook_payload: {},
+        ip_origem: req.headers.get('x-forwarded-for') || 'unknown',
+        user_agent: req.headers.get('user-agent') || 'unknown'
+      })
+      
+      // Notificar admin do erro geral
+      await supabase.functions.invoke('notificar-admin-erro', {
+        body: {
+          request_id: requestId,
+          email: 'erro_webhook@desconhecido.com',
+          nome: 'Erro ao processar',
+          produto: 'N/A',
+          etapa_falha: 'processamento_geral',
+          erro_mensagem: error.message,
+          timestamp: new Date().toISOString()
+        }
+      })
+    } catch (logError) {
+      console.error('Erro ao registrar erro no log:', logError)
+    }
+    
     return new Response(JSON.stringify({ 
       success: false, 
       error: error.message 

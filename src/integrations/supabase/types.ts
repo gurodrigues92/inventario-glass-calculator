@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -154,7 +154,7 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           profile_id: string | null
           tipo_calculadora: string
           user_agent: string | null
@@ -162,7 +162,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           profile_id?: string | null
           tipo_calculadora: string
           user_agent?: string | null
@@ -170,7 +170,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           profile_id?: string | null
           tipo_calculadora?: string
           user_agent?: string | null
@@ -181,6 +181,77 @@ export type Database = {
             columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      log_compras_hotmart: {
+        Row: {
+          created_at: string | null
+          email: string
+          erro_mensagem: string | null
+          erro_stack: string | null
+          etapa_falha: string | null
+          hotmart_transaction_id: string | null
+          id: string
+          ip_origem: string | null
+          nome: string
+          processado_em: string | null
+          produto: string | null
+          request_id: string
+          status: string
+          tempo_processamento_ms: number | null
+          tentativa_numero: number | null
+          user_agent: string | null
+          usuario_id: string | null
+          webhook_payload: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          erro_mensagem?: string | null
+          erro_stack?: string | null
+          etapa_falha?: string | null
+          hotmart_transaction_id?: string | null
+          id?: string
+          ip_origem?: string | null
+          nome: string
+          processado_em?: string | null
+          produto?: string | null
+          request_id: string
+          status: string
+          tempo_processamento_ms?: number | null
+          tentativa_numero?: number | null
+          user_agent?: string | null
+          usuario_id?: string | null
+          webhook_payload?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          erro_mensagem?: string | null
+          erro_stack?: string | null
+          etapa_falha?: string | null
+          hotmart_transaction_id?: string | null
+          id?: string
+          ip_origem?: string | null
+          nome?: string
+          processado_em?: string | null
+          produto?: string | null
+          request_id?: string
+          status?: string
+          tempo_processamento_ms?: number | null
+          tentativa_numero?: number | null
+          user_agent?: string | null
+          usuario_id?: string | null
+          webhook_payload?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "log_compras_hotmart_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
             referencedColumns: ["id"]
           },
         ]
@@ -259,10 +330,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      gerar_token_seguro: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      gerar_token_seguro: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never
