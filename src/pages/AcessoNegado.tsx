@@ -177,18 +177,32 @@ export default function AcessoNegado() {
                 <span>Adquirir Calculadora</span>
               </button>
 
-              <p style={{ color: '#476D9E', fontSize: '14px' }}>
-                Já comprou o produto?{' '}
-                <Link 
-                  to="/login" 
-                  className="font-medium transition-colors"
-                  style={{ color: '#476D9E' }}
-                  onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#0C2C45'}
-                  onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#476D9E'}
-                >
-                  Fazer login
-                </Link>
-              </p>
+              <div className="space-y-2">
+                <p style={{ color: '#476D9E', fontSize: '14px' }}>
+                  Já comprou o produto?{' '}
+                  <Link 
+                    to="/login" 
+                    className="font-medium transition-colors"
+                    style={{ color: '#476D9E' }}
+                    onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#0C2C45'}
+                    onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#476D9E'}
+                  >
+                    Fazer login
+                  </Link>
+                </p>
+                <p style={{ color: '#476D9E', fontSize: '14px' }}>
+                  Esqueceu sua senha?{' '}
+                  <Link 
+                    to="/recuperar-senha" 
+                    className="font-medium transition-colors"
+                    style={{ color: '#476D9E' }}
+                    onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#0C2C45'}
+                    onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#476D9E'}
+                  >
+                    Recuperar acesso
+                  </Link>
+                </p>
+              </div>
             </div>
 
             <div 
