@@ -155,7 +155,7 @@ export default function AcessoNegado() {
 
             <div className="text-center space-y-4">
               <button
-                onClick={() => window.open('https://pay.hotmart.com/seulink', '_blank')}
+                onClick={() => window.open('https://lp.patrimonioseminventario.com.br/', '_blank')}
                 className="inline-flex items-center space-x-2 font-semibold py-3 px-8 rounded-lg transition-all duration-300"
                 style={{
                   background: 'linear-gradient(135deg, #0C2C45, #476D9E)',
