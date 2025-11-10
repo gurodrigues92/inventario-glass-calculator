@@ -61,23 +61,23 @@ serve(async (req) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bem-vindo ao Inventário Descomplicado</title>
+    <title>Bem-vindo ao Patrimônio Sem Inventário</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc;">
     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
         
         <!-- Header -->
-        <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); padding: 40px 30px; text-align: center;">
+        <div style="background: linear-gradient(135deg, #0C2C45 0%, #476D9E 100%); padding: 40px 30px; text-align: center;">
             <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
-                Inventário Descomplicado
+                Patrimônio Sem Inventário
             </h1>
-            <p style="color: #e0e7ff; margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">
-                Sua calculadora profissional de inventário
+            <p style="color: #E0E7FF; margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">
+                Sua calculadora profissional de ITCMD e ITBI
             </p>
         </div>
 
-        <!-- Content -->
-        <div style="padding: 40px 30px;">
+        <!-- Seção 1: Confirmação da Compra -->
+        <div style="padding: 40px 30px 20px 30px;">
             <div style="text-align: center; margin-bottom: 30px;">
                 <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center;">
                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -85,47 +85,157 @@ serve(async (req) => {
                     </svg>
                 </div>
                 <h2 style="color: #1e293b; margin: 0; font-size: 24px; font-weight: 600;">
-                    Parabéns, ${nome}!
+                    🎉 Parabéns, ${nome}!
                 </h2>
                 <p style="color: #64748b; margin: 15px 0 0 0; font-size: 16px; line-height: 1.6;">
-                    Sua compra do <strong>${produto}</strong> foi confirmada com sucesso.
+                    Sua compra foi aprovada com sucesso!
+                </p>
+                <p style="color: #0C2C45; margin: 10px 0 0 0; font-size: 15px; font-weight: 600;">
+                    Produto: ${produto}
                 </p>
             </div>
 
-            <div style="background-color: #f8fafc; border-radius: 12px; padding: 25px; margin: 30px 0; border-left: 4px solid #3b82f6;">
+            <!-- Seção 2: Benefícios -->
+            <div style="background-color: #f0fdf4; border-radius: 12px; padding: 25px; margin: 25px 0; border-left: 4px solid #10b981; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
                 <h3 style="color: #1e293b; margin: 0 0 15px 0; font-size: 18px; font-weight: 600;">
-                    📧 Próximo Passo: Defina sua Senha
+                    ✨ O que você terá acesso
+                </h3>
+                <div style="color: #475569; font-size: 14px; line-height: 1.8;">
+                    <p style="margin: 8px 0; display: flex; align-items: start;">
+                        <span style="color: #10b981; margin-right: 8px; font-size: 16px;">✅</span>
+                        <span>Calcular ITCMD para inventário e doações</span>
+                    </p>
+                    <p style="margin: 8px 0; display: flex; align-items: start;">
+                        <span style="color: #10b981; margin-right: 8px; font-size: 16px;">✅</span>
+                        <span>Calcular ITBI para compra de imóveis</span>
+                    </p>
+                    <p style="margin: 8px 0; display: flex; align-items: start;">
+                        <span style="color: #10b981; margin-right: 8px; font-size: 16px;">✅</span>
+                        <span>Comparar custos: Processo Formal vs Holding Patrimonial</span>
+                    </p>
+                    <p style="margin: 8px 0; display: flex; align-items: start;">
+                        <span style="color: #10b981; margin-right: 8px; font-size: 16px;">✅</span>
+                        <span>Gerar relatórios profissionais em PDF</span>
+                    </p>
+                    <p style="margin: 8px 0; display: flex; align-items: start;">
+                        <span style="color: #10b981; margin-right: 8px; font-size: 16px;">✅</span>
+                        <span>Salvar e compartilhar seus cálculos</span>
+                    </p>
+                    <p style="margin: 8px 0; display: flex; align-items: start;">
+                        <span style="color: #10b981; margin-right: 8px; font-size: 16px;">✅</span>
+                        <span>Suporte especializado incluso</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Seção 3: CTA Principal - Definir Senha -->
+            <div style="background-color: #eff6ff; border-radius: 12px; padding: 25px; margin: 25px 0; border-left: 4px solid #0C2C45; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                <h3 style="color: #1e293b; margin: 0 0 15px 0; font-size: 18px; font-weight: 600;">
+                    🔐 Próximo Passo: Defina sua Senha
                 </h3>
                 <p style="color: #64748b; margin: 0 0 20px 0; font-size: 14px; line-height: 1.6;">
-                    Para acessar sua calculadora, você precisa definir uma senha de acesso. Clique no botão abaixo:
+                    Para começar a usar a calculadora, você precisa definir uma senha de acesso. É rápido e simples:
                 </p>
-                <div style="text-align: center;">
+                <div style="text-align: center; margin-bottom: 15px;">
                     <a href="${definirSenhaUrl}" 
-                       style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3); transition: all 0.2s ease;">
+                       style="display: inline-block; background: linear-gradient(135deg, #0C2C45 0%, #476D9E 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 14px rgba(12, 44, 69, 0.3);">
                         🔐 Definir Minha Senha
                     </a>
                 </div>
+                <p style="color: #f59e0b; margin: 15px 0 0 0; font-size: 13px; text-align: center; font-weight: 500;">
+                    ⚠️ Link válido por 7 dias
+                </p>
             </div>
 
-            <div style="background-color: #fef3c7; border-radius: 12px; padding: 20px; margin: 25px 0; border-left: 4px solid #f59e0b;">
-                <div style="display: flex; align-items: flex-start;">
-                    <div style="color: #f59e0b; margin-right: 10px; font-size: 20px;">⚠️</div>
-                    <div>
-                        <h4 style="color: #92400e; margin: 0 0 8px 0; font-size: 16px; font-weight: 600;">
-                            Importante
-                        </h4>
-                        <p style="color: #92400e; margin: 0; font-size: 14px; line-height: 1.5;">
-                            Este link é válido por <strong>7 dias</strong>. Após definir sua senha, você poderá acessar a calculadora sempre que precisar.
-                        </p>
-                    </div>
+            <!-- Seção 4: Acesso Direto à Calculadora -->
+            <div style="text-align: center; margin: 25px 0; padding: 20px; background-color: #f8fafc; border-radius: 12px;">
+                <p style="color: #64748b; margin: 0 0 15px 0; font-size: 14px;">
+                    Já definiu sua senha? Acesse a calculadora agora:
+                </p>
+                <a href="https://calculadora.patrimonioseminventario.com.br/login"
+                   style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);">
+                    🚀 Acessar Calculadora
+                </a>
+            </div>
+
+            <!-- Seção 5: Passo a Passo -->
+            <div style="background-color: #fefce8; border-radius: 12px; padding: 25px; margin: 25px 0; border-left: 4px solid #eab308; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                <h3 style="color: #1e293b; margin: 0 0 15px 0; font-size: 18px; font-weight: 600;">
+                    📋 Como começar em 3 minutos
+                </h3>
+                <div style="color: #475569; font-size: 14px; line-height: 1.8;">
+                    <p style="margin: 10px 0;">
+                        <strong style="color: #0C2C45;">1️⃣</strong> Clique em "Definir Minha Senha"
+                    </p>
+                    <p style="margin: 10px 0;">
+                        <strong style="color: #0C2C45;">2️⃣</strong> Crie uma senha segura (mínimo 6 caracteres)
+                    </p>
+                    <p style="margin: 10px 0;">
+                        <strong style="color: #0C2C45;">3️⃣</strong> Faça login com seu email e senha
+                    </p>
+                    <p style="margin: 10px 0;">
+                        <strong style="color: #0C2C45;">4️⃣</strong> Comece a calcular imediatamente!
+                    </p>
                 </div>
             </div>
 
-            <div style="text-align: center; margin: 30px 0;">
-                <p style="color: #64748b; margin: 0; font-size: 14px;">
-                    Se você não conseguir clicar no botão, copie e cole este link no seu navegador:
+            <!-- Seção 6: E-mail não chegou? -->
+            <div style="background-color: #fef2f2; border-radius: 12px; padding: 25px; margin: 25px 0; border-left: 4px solid #ef4444; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                <h3 style="color: #1e293b; margin: 0 0 15px 0; font-size: 18px; font-weight: 600;">
+                    ⏰ E-mail não chegou?
+                </h3>
+                <div style="color: #475569; font-size: 14px; line-height: 1.8;">
+                    <p style="margin: 8px 0;">
+                        • Verifique sua caixa de <strong>SPAM ou Lixo Eletrônico</strong>
+                    </p>
+                    <p style="margin: 8px 0;">
+                        • Adicione <strong>team@updates.patrimonioseminventario.com.br</strong> aos seus contatos
+                    </p>
+                    <p style="margin: 8px 0;">
+                        • Aguarde até 10 minutos (pode haver atraso na entrega)
+                    </p>
+                    <p style="margin: 8px 0;">
+                        • Se não receber, entre em contato via WhatsApp
+                    </p>
+                </div>
+            </div>
+
+            <!-- Seção 7: Garantia -->
+            <div style="background-color: #f0f9ff; border-radius: 12px; padding: 25px; margin: 25px 0; text-align: center; border: 2px solid #0ea5e9; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                <div style="font-size: 32px; margin-bottom: 10px;">🛡️</div>
+                <h3 style="color: #1e293b; margin: 0 0 10px 0; font-size: 18px; font-weight: 600;">
+                    Garantia Incondicional de 7 Dias
+                </h3>
+                <p style="color: #475569; margin: 0; font-size: 14px; line-height: 1.6;">
+                    Se você não tiver clareza total sobre seu caso,<br>
+                    devolvemos 100% do seu investimento. Sem perguntas.
                 </p>
-                <p style="color: #3b82f6; word-break: break-all; font-size: 12px; margin: 10px 0; padding: 10px; background-color: #f1f5f9; border-radius: 6px;">
+            </div>
+
+            <!-- Seção 8: Suporte -->
+            <div style="background-color: #f8fafc; border-radius: 12px; padding: 25px; margin: 25px 0; text-align: center; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                <h3 style="color: #1e293b; margin: 0 0 15px 0; font-size: 18px; font-weight: 600;">
+                    💬 Precisa de Ajuda?
+                </h3>
+                <div style="color: #475569; font-size: 14px; line-height: 1.8;">
+                    <p style="margin: 10px 0;">
+                        <strong style="color: #0C2C45;">📱 WhatsApp:</strong> (11) 91787-8336
+                    </p>
+                    <p style="margin: 10px 0;">
+                        <strong style="color: #0C2C45;">📧 Email:</strong> contato@patrimonioseminventario.com.br
+                    </p>
+                    <p style="margin: 10px 0; color: #64748b; font-size: 13px;">
+                        ⏱️ Respondemos em até 24h
+                    </p>
+                </div>
+            </div>
+
+            <!-- Link alternativo -->
+            <div style="text-align: center; margin: 25px 0;">
+                <p style="color: #94a3b8; margin: 0 0 10px 0; font-size: 12px;">
+                    Se você não conseguir clicar no botão, copie e cole este link:
+                </p>
+                <p style="color: #0C2C45; word-break: break-all; font-size: 11px; margin: 0; padding: 10px; background-color: #f1f5f9; border-radius: 6px;">
                     ${definirSenhaUrl}
                 </p>
             </div>
@@ -134,14 +244,14 @@ serve(async (req) => {
         <!-- Footer -->
         <div style="background-color: #f8fafc; padding: 25px 30px; text-align: center; border-top: 1px solid #e2e8f0;">
             <p style="color: #64748b; margin: 0 0 10px 0; font-size: 14px;">
-                Obrigado por escolher o <strong>Inventário Descomplicado</strong>
+                Obrigado por escolher o <strong>Patrimônio Sem Inventário</strong>
             </p>
             <p style="color: #94a3b8; margin: 0; font-size: 12px;">
                 Se você não fez esta compra, pode ignorar este e-mail com segurança.
             </p>
             <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
                 <p style="color: #94a3b8; margin: 0; font-size: 11px;">
-                    © ${new Date().getFullYear()} Inventário Descomplicado. Todos os direitos reservados.
+                    © ${new Date().getFullYear()} Patrimônio Sem Inventário. Todos os direitos reservados.
                 </p>
             </div>
         </div>
@@ -154,9 +264,9 @@ serve(async (req) => {
 
     // Enviar e-mail via Resend
     const emailResponse = await resend.emails.send({
-      from: 'Inventário Descomplicado <noreply@upload.patrimonioseminventario.com.br>',
+      from: 'Patrimônio Sem Inventário <team@updates.patrimonioseminventario.com.br>',
       to: [email],
-      subject: `🎉 Bem-vindo ao Inventário Descomplicado - Defina sua senha`,
+      subject: `🎉 Bem-vindo ao Patrimônio Sem Inventário - Defina sua senha`,
       html: emailHtml,
     })
 
