@@ -76,32 +76,94 @@ serve(async (req) => {
       })
     }
 
-    // Buscar usuário pelo token
+    // Primeiro, tentar buscar como token de ativação (usuarios.token_definicao_senha)
     const { data: usuario, error: userError } = await supabase
       .from('usuarios')
       .select('*')
       .eq('token_definicao_senha', token)
-      .single()
+      .maybeSingle()
 
-    if (userError || !usuario) {
-      console.log('Token inválido ou expirado:', token)
-      return new Response(JSON.stringify({ 
-        success: false, 
-        error: 'Token inválido ou expirado' 
-      }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+    let isActivationToken = false;
+    let isRecoveryToken = false;
+    let recoveryTokenData = null;
+    let userId = null;
+
+    if (usuario) {
+      // É um token de ativação
+      isActivationToken = true;
+      userId = usuario.id;
+      
+      // Verificar expiração do token de ativação (7 dias desde token_gerado_em)
+      if (usuario.token_gerado_em) {
+        const tokenIdade = new Date().getTime() - new Date(usuario.token_gerado_em).getTime()
+        const setesDiasEmMs = 7 * 24 * 60 * 60 * 1000
+        
+        if (tokenIdade > setesDiasEmMs) {
+          return new Response(JSON.stringify({ 
+            success: false, 
+            error: 'Token expirado. Solicite um novo link de ativação.' 
+          }), {
+            status: 401,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          })
+        }
+      }
+      
+      console.log('Token de ativação encontrado para usuário:', usuario.email)
+    } else {
+      // Não é token de ativação, verificar se é token de recuperação
+      const { data: resetToken, error: resetError } = await supabase
+        .from('password_reset_tokens')
+        .select('*')
+        .eq('token', token)
+        .eq('used', false)
+        .maybeSingle()
+
+      if (resetError) {
+        console.error('Erro ao buscar token de recuperação:', resetError)
+        return new Response(JSON.stringify({ 
+          success: false, 
+          error: 'Token inválido ou expirado' 
+        }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      if (!resetToken) {
+        console.log('Token não encontrado ou já utilizado:', token)
+        return new Response(JSON.stringify({ 
+          success: false, 
+          error: 'Token inválido ou expirado' 
+        }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // Verificar se o token expirou
+      if (new Date(resetToken.expires_at) < new Date()) {
+        console.log('Token de recuperação expirado:', token)
+        return new Response(JSON.stringify({ 
+          success: false, 
+          error: 'Token expirado. Solicite uma nova recuperação de senha.' 
+        }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      isRecoveryToken = true;
+      recoveryTokenData = resetToken;
+      userId = resetToken.user_id;
+      
+      console.log('Token de recuperação encontrado para usuário:', userId)
     }
 
-    // Verificar se o token não é muito antigo (7 dias)
-    const tokenIdade = new Date().getTime() - new Date(usuario.created_at).getTime()
-    const setesDiasEmMs = 7 * 24 * 60 * 60 * 1000
-    
-    if (tokenIdade > setesDiasEmMs) {
+    if (!userId) {
       return new Response(JSON.stringify({ 
         success: false, 
-        error: 'Token expirado. Solicite um novo link de ativação.' 
+        error: 'Token inválido' 
       }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -109,30 +171,73 @@ serve(async (req) => {
     }
 
     // Gerar hash da senha usando Web Crypto API
-    console.log('Gerando hash da senha para usuário:', usuario.email);
+    console.log('Gerando hash da senha para usuário:', userId);
     const senhaHash = await hashPassword(password);
 
-    // Atualizar usuário com a nova senha e remover o token
-    const { error: updateError } = await supabase
+    // Buscar dados do usuário para retorno
+    const { data: usuarioCompleto, error: fetchError } = await supabase
       .from('usuarios')
-      .update({
-        senha_hash: senhaHash,
-        token_definicao_senha: null,
-        token_gerado_em: null,
-        ativo: true,
-        data_ativacao: new Date().toISOString()
-      })
-      .eq('id', usuario.id)
+      .select('*')
+      .eq('id', userId)
+      .single()
 
-    if (updateError) {
-      console.error('Erro ao definir senha:', updateError)
-      throw updateError
+    if (fetchError || !usuarioCompleto) {
+      console.error('Erro ao buscar dados do usuário:', fetchError)
+      throw new Error('Erro ao buscar dados do usuário')
     }
 
-    console.log('Senha definida com sucesso para:', usuario.email)
+    if (isActivationToken) {
+      // Token de ativação - remover token e ativar conta
+      const { error: updateError } = await supabase
+        .from('usuarios')
+        .update({
+          senha_hash: senhaHash,
+          token_definicao_senha: null,
+          token_gerado_em: null,
+          ativo: true,
+          data_ativacao: new Date().toISOString()
+        })
+        .eq('id', userId)
+
+      if (updateError) {
+        console.error('Erro ao definir senha (ativação):', updateError)
+        throw updateError
+      }
+
+      console.log('Conta ativada com sucesso para:', usuarioCompleto.email)
+    } else if (isRecoveryToken) {
+      // Token de recuperação - atualizar senha e marcar token como usado
+      const { error: updateError } = await supabase
+        .from('usuarios')
+        .update({
+          senha_hash: senhaHash
+        })
+        .eq('id', userId)
+
+      if (updateError) {
+        console.error('Erro ao redefinir senha:', updateError)
+        throw updateError
+      }
+
+      // Marcar token de recuperação como usado
+      const { error: markUsedError } = await supabase
+        .from('password_reset_tokens')
+        .update({
+          used: true,
+          used_at: new Date().toISOString()
+        })
+        .eq('id', recoveryTokenData.id)
+
+      if (markUsedError) {
+        console.error('Erro ao marcar token como usado:', markUsedError)
+        // Não falhar a operação por isso
+      }
+
+      console.log('Senha redefinida com sucesso para:', usuarioCompleto.email)
+    }
 
     // Retornar dados do usuário sem informações sensíveis
-    const { senha_hash, token_definicao_senha, ...usuarioSeguro } = usuario
+    const { senha_hash, token_definicao_senha, ...usuarioSeguro } = usuarioCompleto
 
     return new Response(JSON.stringify({ 
       success: true, 

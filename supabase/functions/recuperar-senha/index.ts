@@ -102,21 +102,26 @@ serve(async (req) => {
     const token = tokenData;
     console.log('Token gerado com sucesso');
 
-    // Atualizar usuário com o novo token
-    const { error: updateError } = await supabase
-      .from('usuarios')
-      .update({
-        token_definicao_senha: token,
-        token_gerado_em: new Date().toISOString()
-      })
-      .eq('id', usuario.id);
+    // Calcular data de expiração (7 dias)
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
 
-    if (updateError) {
-      console.error('Erro ao atualizar token:', updateError);
+    // Inserir token na tabela password_reset_tokens
+    const { error: insertError } = await supabase
+      .from('password_reset_tokens')
+      .insert({
+        user_id: usuario.id,
+        token: token,
+        expires_at: expiresAt.toISOString(),
+        used: false
+      });
+
+    if (insertError) {
+      console.error('Erro ao inserir token de recuperação:', insertError);
       throw new Error('Erro ao processar recuperação');
     }
 
-    console.log('Token atualizado no banco de dados');
+    console.log('Token de recuperação salvo no banco de dados');
 
     // Construir URL de recuperação
     const urlBase = supabaseUrl.replace('.supabase.co', '.lovableproject.com');
