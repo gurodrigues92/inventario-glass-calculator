@@ -45,8 +45,10 @@ export default function Login() {
         setTimeout(() => {
           navigate('/definir-senha');
         }, 2000);
-      } else if (result.error === 'CONTA_INATIVA') {
+              } else if (result.error === 'CONTA_INATIVA') {
         setError('Sua conta não está ativa. Você precisa definir sua senha primeiro.');
+      } else if (result.error === 'Credenciais inválidas' || result.error === 'Email ou senha incorretos') {
+        setError('Email ou senha incorretos. Se você ainda não definiu sua senha, clique em "Não recebeu o email?" abaixo.');
       } else {
         setError(result.message || result.error || 'Erro no login');
       }

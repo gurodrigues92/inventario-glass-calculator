@@ -28,11 +28,13 @@ serve(async (req) => {
     
     const { nome, email, token, produto, siteUrl }: WelcomeEmailRequest = await req.json()
     
+    console.log('📧 Preparando envio de email de boas-vindas')
     console.log('Dados recebidos:', {
       nome,
       email: email?.substring(0, 5) + '***', // Log parcial por segurança
       produto,
       hasToken: !!token,
+      tokenLength: token?.length,
       siteUrl
     })
 

@@ -60,7 +60,14 @@ export default function DefinirSenha() {
       }
 
       if (!data.success) {
-        setError(data.error);
+        // Mensagens de erro mais claras
+        if (data.error.includes('expirado') || data.error.includes('Token expirado')) {
+          setError('Seu link de ativação expirou. Solicite um novo clicando no botão abaixo.');
+        } else if (data.error.includes('inválido') || data.error.includes('Token inválido')) {
+          setError('Link inválido ou já utilizado. Solicite um novo clicando no botão abaixo.');
+        } else {
+          setError(data.error);
+        }
         return;
       }
 

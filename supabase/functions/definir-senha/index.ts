@@ -49,11 +49,18 @@ serve(async (req) => {
   }
 
   try {
+    console.log('=== DEFINIR SENHA ===')
+    console.log('Timestamp:', new Date().toISOString())
+    
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)
 
     const { token, password }: DefinirSenhaRequest = await req.json()
+    
+    console.log('🔑 Tentativa de definição de senha')
+    console.log('Token recebido:', token ? `${token.substring(0, 8)}...` : 'AUSENTE')
+    console.log('Senha recebida:', password ? `${password.length} caracteres` : 'AUSENTE')
 
     if (!token || !password) {
       return new Response(JSON.stringify({ 
@@ -99,6 +106,10 @@ serve(async (req) => {
         const setesDiasEmMs = 7 * 24 * 60 * 60 * 1000
         
         if (tokenIdade > setesDiasEmMs) {
+          console.warn('⏰ Token de ativação expirado')
+          console.warn('Token gerado em:', usuario.token_gerado_em)
+          console.warn('Idade do token:', Math.floor(tokenIdade / (24 * 60 * 60 * 1000)), 'dias')
+          
           return new Response(JSON.stringify({ 
             success: false, 
             error: 'Token expirado. Solicite um novo link de ativação.' 
@@ -120,7 +131,7 @@ serve(async (req) => {
         .maybeSingle()
 
       if (resetError) {
-        console.error('Erro ao buscar token de recuperação:', resetError)
+        console.error('❌ Erro ao buscar token de recuperação:', resetError)
         return new Response(JSON.stringify({ 
           success: false, 
           error: 'Token inválido ou expirado' 
