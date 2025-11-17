@@ -87,10 +87,27 @@ serve(async (req) => {
   console.log('Request ID:', requestId)
   console.log('Timestamp:', new Date().toISOString())
   console.log('Method:', req.method)
+  console.log('Headers:', Object.fromEntries(req.headers.entries()))
   
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
+  }
+
+  // CRÍTICO: Verificar se é GET (erro comum de configuração)
+  if (req.method === 'GET') {
+    console.error('❌ ERRO: Webhook recebeu GET ao invés de POST!')
+    console.error('Configure o webhook na Hotmart para usar método POST')
+    console.error('URL correta:', `${supabaseUrl}/functions/v1/webhook-hotmart`)
+    
+    return new Response(JSON.stringify({ 
+      success: false, 
+      error: 'Método GET não suportado. Configure o webhook para usar POST.',
+      instrucoes: 'Acesse https://app.hotmart.com/tools/webhook e configure: Método = POST, Formato = JSON'
+    }), {
+      status: 405,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    })
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!

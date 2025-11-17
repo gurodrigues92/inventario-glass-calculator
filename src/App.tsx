@@ -14,9 +14,11 @@ import Login from "./pages/Login";
 import DefinirSenha from "./pages/DefinirSenha";
 import RecuperarSenha from "./pages/RecuperarSenha";
 import RedefinirSenha from "./pages/RedefinirSenha";
+import SolicitarAtivacao from "./pages/SolicitarAtivacao";
 import AcessoNegado from "./pages/AcessoNegado";
 import NotFound from "./pages/NotFound";
 import AuditoriaITCMDPage from "./pages/AuditoriaITCMD";
+import ReenviarAtivacao from "./pages/Admin/ReenviarAtivacao";
 import ValidationPanel from "./components/dev/ValidationPanel";
 
 const queryClient = new QueryClient();
@@ -43,6 +45,7 @@ const App = () => (
               <Route path="/definir-senha" element={<DefinirSenha />} />
               <Route path="/recuperar-senha" element={<RecuperarSenha />} />
               <Route path="/redefinir-senha" element={<RedefinirSenha />} />
+              <Route path="/solicitar-ativacao" element={<SolicitarAtivacao />} />
               <Route path="/acesso-negado" element={<AcessoNegado />} />
               
               {/* Rotas protegidas */}
@@ -64,6 +67,11 @@ const App = () => (
               <Route path="/auditoria-itcmd" element={
                 <ProtectedRoute>
                   <AuditoriaITCMDPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/reenviar-ativacao" element={
+                <ProtectedRoute>
+                  <ReenviarAtivacao />
                 </ProtectedRoute>
               } />
               
