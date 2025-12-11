@@ -432,6 +432,33 @@ serve(async (req) => {
       console.warn('E-mail não enviado devido a erro, mas usuário foi processado. Token:', tokenDefinicaoSenha)
     }
 
+    // Enviar WhatsApp de boas-vindas (se telefone disponível)
+    const buyerPhone = webhookData.data?.buyer?.phone
+    if (buyerPhone) {
+      console.log('Enviando WhatsApp de boas-vindas...')
+      try {
+        const whatsappResponse = await supabase.functions.invoke('send-whatsapp-welcome', {
+          body: {
+            nome: name,
+            telefone: buyerPhone,
+            token: tokenDefinicaoSenha,
+            produto: produto,
+            siteUrl: 'https://calculadora.patrimonioseminventario.com.br'
+          }
+        })
+        
+        if (whatsappResponse.error) {
+          console.warn('Erro ao enviar WhatsApp (não crítico):', whatsappResponse.error.message)
+        } else {
+          console.log('WhatsApp enviado com sucesso!')
+        }
+      } catch (whatsappError) {
+        console.warn('Falha no envio do WhatsApp (não crítico):', whatsappError.message)
+      }
+    } else {
+      console.log('Telefone não fornecido, WhatsApp não enviado')
+    }
+
     // Métricas de performance
     const processingTime = Date.now() - startTime
     console.log('=== WEBHOOK HOTMART CONCLUÍDO ===')
@@ -439,6 +466,7 @@ serve(async (req) => {
     console.log('Tempo de processamento:', processingTime + 'ms')
     console.log('Novo usuário:', isNewUser)
     console.log('E-mail enviado para:', email.substring(0, 5) + '***')
+    console.log('WhatsApp enviado:', buyerPhone ? 'Sim' : 'Não (telefone não fornecido)')
 
     return new Response(JSON.stringify({ 
       success: true, 

@@ -49,3 +49,6 @@ verify_jwt = false
 
 [functions.reenviar-email-manual]
 verify_jwt = false
+
+[functions.send-whatsapp-welcome]
+verify_jwt = false
