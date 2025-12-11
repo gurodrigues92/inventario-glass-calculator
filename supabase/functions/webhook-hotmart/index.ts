@@ -11,17 +11,30 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
 const RATE_LIMIT_WINDOW = 60000 // 1 minuto
 const RATE_LIMIT_MAX_REQUESTS = 10 // máximo 10 requests por minuto por IP
 
-interface HotmartWebhookData {
-  action: string;
-  buyer: {
-    email: string;
-    name: string;
-  };
-  purchase: {
-    status: string;
-  };
-  product: {
-    name: string;
+// Interface atualizada para Hotmart Webhook v2.0.0
+interface HotmartWebhookDataV2 {
+  event: string; // "PURCHASE_APPROVED", "PURCHASE_COMPLETE", etc.
+  version: string; // "2.0.0"
+  data: {
+    buyer: {
+      email: string;
+      name: string;
+      first_name?: string;
+      last_name?: string;
+      phone?: string;
+    };
+    purchase: {
+      transaction: string;
+      status: string;
+      approved_date?: number;
+    };
+    product: {
+      id: number;
+      name: string;
+    };
+    producer?: {
+      name: string;
+    };
   };
 }
 
@@ -94,6 +107,10 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders })
   }
 
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  const supabase = createClient(supabaseUrl, supabaseKey)
+
   // CRÍTICO: Verificar se é GET (erro comum de configuração)
   if (req.method === 'GET') {
     console.error('❌ ERRO: Webhook recebeu GET ao invés de POST!')
@@ -109,10 +126,6 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })
   }
-
-  const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-  const supabase = createClient(supabaseUrl, supabaseKey)
 
   try {
     // Rate limiting por IP
@@ -140,36 +153,54 @@ serve(async (req) => {
       setTimeout(() => reject(new Error('Timeout na operação')), timeoutMs)
     )
 
-    const webhookData: HotmartWebhookData = await Promise.race([
+    const webhookData: HotmartWebhookDataV2 = await Promise.race([
       req.json(),
       timeoutPromise
-    ]) as HotmartWebhookData
+    ]) as HotmartWebhookDataV2
 
-    console.log('Dados do webhook recebidos:', {
-      action: webhookData.action,
-      buyerEmail: webhookData.buyer?.email?.substring(0, 5) + '***',
-      purchaseStatus: webhookData.purchase?.status,
-      productName: webhookData.product?.name
+    // LOG: Payload completo para debug
+    console.log('=== PAYLOAD COMPLETO ===')
+    console.log(JSON.stringify(webhookData, null, 2))
+
+    // Extrair dados do formato v2.0.0
+    const event = webhookData.event
+    const buyerEmail = webhookData.data?.buyer?.email
+    const buyerName = webhookData.data?.buyer?.name
+    const productName = webhookData.data?.product?.name
+    const transactionId = webhookData.data?.purchase?.transaction
+
+    console.log('Dados do webhook (v2.0.0):', {
+      event: event,
+      buyerEmail: buyerEmail?.substring(0, 5) + '***',
+      buyerName: buyerName,
+      productName: productName,
+      transactionId: transactionId
     })
 
     // Validações rigorosas dos dados
-    if (!webhookData.buyer?.email || !webhookData.buyer?.name) {
-      console.error('Dados do comprador ausentes:', webhookData.buyer)
+    if (!buyerEmail || !buyerName) {
+      console.error('Dados do comprador ausentes:', webhookData.data?.buyer)
       return new Response(JSON.stringify({ 
         success: false, 
-        error: 'Dados do comprador inválidos' 
+        error: 'Dados do comprador inválidos',
+        debug: {
+          hasEmail: !!buyerEmail,
+          hasName: !!buyerName,
+          event: event
+        }
       }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       })
     }
 
-    // Verificar se é uma compra aprovada
-    if (webhookData.purchase?.status !== 'approved') {
-      console.log('Status da compra não é aprovado:', webhookData.purchase?.status)
+    // Verificar se é uma compra aprovada (v2.0.0 usa event ao invés de purchase.status)
+    const eventosAprovados = ['PURCHASE_APPROVED', 'PURCHASE_COMPLETE']
+    if (!eventosAprovados.includes(event)) {
+      console.log('Evento não é de compra aprovada:', event)
       return new Response(JSON.stringify({ 
-        success: false, 
-        message: 'Compra não aprovada' 
+        success: true, 
+        message: `Evento ${event} recebido e ignorado (não é compra aprovada)`
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200
@@ -177,9 +208,9 @@ serve(async (req) => {
     }
 
     // Sanitizar e validar dados de entrada
-    const email = sanitizeString(webhookData.buyer.email).toLowerCase()
-    const name = sanitizeString(webhookData.buyer.name)
-    const produto = sanitizeString(webhookData.product?.name || 'Calculadora Inventário')
+    const email = sanitizeString(buyerEmail).toLowerCase()
+    const name = sanitizeString(buyerName)
+    const produto = sanitizeString(productName || 'Calculadora Inventário')
     
     // LOG 1: Webhook recebido
     await supabase.from('log_compras_hotmart').insert({
@@ -190,7 +221,8 @@ serve(async (req) => {
       status: 'webhook_recebido',
       webhook_payload: webhookData,
       ip_origem: clientIP,
-      user_agent: userAgent
+      user_agent: userAgent,
+      hotmart_transaction_id: transactionId
     })
 
     if (!isValidEmail(email)) {
