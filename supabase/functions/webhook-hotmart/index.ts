@@ -433,7 +433,8 @@ serve(async (req) => {
     }
 
     // Enviar WhatsApp de boas-vindas (se telefone disponível)
-    const buyerPhone = webhookData.data?.buyer?.phone
+    // Hotmart v2.0.0 usa checkout_phone (com DDD) - fallback para phone se não existir
+    const buyerPhone = webhookData.data?.buyer?.checkout_phone || webhookData.data?.buyer?.phone
     if (buyerPhone) {
       console.log('Enviando WhatsApp de boas-vindas...')
       try {
