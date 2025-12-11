@@ -265,11 +265,18 @@ serve(async (req) => {
     console.log('Iniciando envio do e-mail...')
 
     // Enviar e-mail via Resend
+    // Desabilitar link tracking para evitar redirecionamentos quebrados
     const emailResponse = await resend.emails.send({
       from: 'Patrimônio Sem Inventário <team@updates.patrimonioseminventario.com.br>',
       to: [email],
       subject: `🎉 Bem-vindo ao Patrimônio Sem Inventário - Defina sua senha`,
       html: emailHtml,
+      headers: {
+        'X-Entity-Ref-ID': crypto.randomUUID() // Evita threading no Gmail
+      },
+      tags: [
+        { name: 'category', value: 'welcome' }
+      ]
     })
 
     console.log('E-mail enviado com sucesso:', {
