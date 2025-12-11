@@ -365,7 +365,7 @@ serve(async (req) => {
           email: email,
           token: tokenDefinicaoSenha,
           produto: produto,
-          siteUrl: 'https://app.inventariodescomplicado.com.br' // URL de produção
+          siteUrl: 'https://calculadora.patrimonioseminventario.com.br' // URL de produção
         }
       })
 
