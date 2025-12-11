@@ -51,7 +51,7 @@ serve(async (req) => {
     }
 
     // URL base para definir senha
-    const baseUrl = siteUrl || 'https://app.inventariodescomplicado.com.br'
+    const baseUrl = siteUrl || 'https://calculadora.patrimonioseminventario.com.br'
     const definirSenhaUrl = `${baseUrl}/definir-senha?token=${token}`
 
     console.log('URL gerada:', definirSenhaUrl.replace(token, 'TOKEN_HIDDEN'))
