@@ -294,6 +294,7 @@ export type Database = {
           nome: string
           telefone: string | null
           updated_at: string | null
+          usuario_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -302,6 +303,7 @@ export type Database = {
           nome: string
           telefone?: string | null
           updated_at?: string | null
+          usuario_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -310,8 +312,17 @@ export type Database = {
           nome?: string
           telefone?: string | null
           updated_at?: string | null
+          usuario_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       usuarios: {
         Row: {
