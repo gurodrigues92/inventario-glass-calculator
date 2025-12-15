@@ -5,7 +5,7 @@ import LuxuryField from './LuxuryField';
 
 interface LuxuryInputProps {
   label: string;
-  icon?: string;
+  icon?: React.ReactNode;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
