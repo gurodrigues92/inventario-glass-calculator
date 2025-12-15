@@ -1,6 +1,7 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useDiagnostico } from '@/contexts/DiagnosticoContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -8,6 +9,8 @@ interface ProtectedRouteProps {
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading, user } = useAuth();
+  const { isPreenchido } = useDiagnostico();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -22,6 +25,11 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (!isAuthenticated || !user) {
     return <Navigate to="/login" replace />;
+  }
+
+  // Se não preencheu diagnóstico e não está na página de diagnóstico, redireciona
+  if (!isPreenchido && location.pathname !== '/diagnostico') {
+    return <Navigate to="/diagnostico" replace />;
   }
 
   return <>{children}</>;
