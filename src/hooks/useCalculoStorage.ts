@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface DadosUsuario {
   nome: string;
@@ -34,6 +35,7 @@ interface DadosCalculo {
 
 export const useCalculoStorage = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
 
   const salvarCalculo = async (
     dadosUsuario: DadosUsuario,
@@ -43,17 +45,46 @@ export const useCalculoStorage = () => {
     setIsLoading(true);
     
     try {
-      // Criar novo perfil apenas com nome
-      const { data: newProfile, error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          nome: dadosUsuario.nome
-        })
-        .select('id')
-        .single();
-      
-      if (profileError) throw profileError;
-      const profileId = newProfile.id;
+      let profileId: string;
+
+      // Se usuário está logado, buscar ou criar profile vinculado
+      if (user?.id) {
+        const { data: existingProfile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('usuario_id', user.id)
+          .maybeSingle();
+
+        if (existingProfile) {
+          profileId = existingProfile.id;
+        } else {
+          // Criar novo profile vinculado ao usuário logado
+          const { data: newProfile, error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              nome: dadosUsuario.nome || user.nome,
+              email: user.email,
+              usuario_id: user.id
+            })
+            .select('id')
+            .single();
+          
+          if (profileError) throw profileError;
+          profileId = newProfile.id;
+        }
+      } else {
+        // Usuário não logado - criar profile anônimo
+        const { data: newProfile, error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            nome: dadosUsuario.nome
+          })
+          .select('id')
+          .single();
+        
+        if (profileError) throw profileError;
+        profileId = newProfile.id;
+      }
 
       // Salvar o cálculo
       const { data: calculo, error: calculoError } = await supabase

@@ -52,3 +52,6 @@ verify_jwt = false
 
 [functions.send-whatsapp-welcome]
 verify_jwt = false
+
+[functions.get-user-calculos]
+verify_jwt = false

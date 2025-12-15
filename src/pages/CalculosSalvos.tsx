@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import CalculosHeader from '../components/calculos-salvos/CalculosHeader';
 import SearchBar from '../components/calculos-salvos/SearchBar';
 import CalculoCard from '../components/calculos-salvos/CalculoCard';
@@ -28,10 +29,13 @@ const CalculosSalvos = () => {
   const [filteredCalculos, setFilteredCalculos] = useState<CalculoSalvo[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
-    carregarCalculos();
-  }, []);
+    if (user?.id) {
+      carregarCalculos();
+    }
+  }, [user?.id]);
 
   useEffect(() => {
     if (searchTerm.trim() === '') {
@@ -47,32 +51,20 @@ const CalculosSalvos = () => {
   }, [searchTerm, calculos]);
 
   const carregarCalculos = async () => {
+    if (!user?.id) {
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const { data, error } = await supabase
-        .from('calculos_inventario')
-        .select(`
-          id,
-          patrimonio,
-          estado,
-          tipo_processo,
-          custo_total,
-          tempo_estimado,
-          created_at,
-          profiles:profile_id (
-            nome,
-            email,
-            telefone
-          )
-        `)
-        .order('created_at', { ascending: false });
+      // Usar edge function para buscar cálculos do usuário
+      const { data, error } = await supabase.functions.invoke('get-user-calculos', {
+        body: { usuarioId: user.id }
+      });
 
       if (error) throw error;
 
-      const calculosFormatados = data.map(calculo => ({
-        ...calculo,
-        profile: calculo.profiles
-      }));
-
+      const calculosFormatados = data.calculos || [];
       setCalculos(calculosFormatados);
       setFilteredCalculos(calculosFormatados);
     } catch (error) {
