@@ -28,16 +28,24 @@ const LuxuryTextarea = ({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={rows}
-        className="glass-input text-base font-medium resize-none"
+        className="text-base font-medium resize-none"
         style={{
-          background: 'rgba(26, 26, 26, 0.7)',
-          border: '1px solid rgba(133, 149, 171, 0.3)',
-          borderRadius: '12px',
-          color: '#e1e5ea',
-          padding: '16px 20px',
+          background: '#FFFFFF',
+          border: '1px solid #E8E2DD',
+          borderRadius: '8px',
+          color: '#2C2C2C',
+          padding: '16px',
           fontSize: '16px',
           fontWeight: '500',
           transition: 'all 0.3s ease'
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.borderColor = '#9FB7D4';
+          e.currentTarget.style.boxShadow = '0 0 0 3px rgba(159, 183, 212, 0.1)';
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.borderColor = '#E8E2DD';
+          e.currentTarget.style.boxShadow = 'none';
         }}
       />
     </LuxuryField>
