@@ -1,11 +1,9 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import ResultsSimplified from '../components/ResultsSimplified';
 import ResultsActions from '../components/ResultsActions';
-import SalvarCalculoModal from '../components/SalvarCalculoModal';
 import ResultsLoadingState from '../components/ResultsLoadingState';
 import { useResultsData } from '../hooks/useResultsData';
 import { useResultsSave } from '../hooks/useResultsSave';
@@ -14,7 +12,6 @@ import { useIsMobile } from '../hooks/use-mobile';
 const Results = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const [showSalvarModal, setShowSalvarModal] = useState(false);
   
   const { 
     isLoading, 
@@ -26,7 +23,8 @@ const Results = () => {
     loadingMessage
   } = useResultsData();
   
-  const { calculoSalvoId, isSaving, handleSalvarCalculo } = useResultsSave(
+  // Auto-save acontece automaticamente dentro do hook
+  const { calculoSalvoId, isSaving } = useResultsSave(
     resultado, 
     formData, 
     'simplificada'
@@ -85,24 +83,16 @@ const Results = () => {
             />
           </div>
 
-          {/* Actions Section - Agora com os 3 botões padronizados */}
+          {/* Actions Section - Agora só com PDF e Nova Consulta */}
           <div className={`fade-in-up ${isMobile ? 'mt-8' : 'mt-12'}`}>
             <ResultsActions 
               shareData={shareData}
-              onSalvar={() => setShowSalvarModal(true)}
               isSaving={isSaving}
               calculoSalvoId={calculoSalvoId}
             />
           </div>
         </div>
       </main>
-
-      <SalvarCalculoModal
-        isOpen={showSalvarModal}
-        onClose={() => setShowSalvarModal(false)}
-        onSalvar={handleSalvarCalculo}
-        isLoading={isSaving}
-      />
     </div>
   );
 };

@@ -61,3 +61,6 @@ verify_jwt = false
 
 [functions.exportar-diagnosticos]
 verify_jwt = false
+
+[functions.salvar-calculo]
+verify_jwt = false

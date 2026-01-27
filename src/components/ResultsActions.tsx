@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, Save, ArrowLeft } from 'lucide-react';
+import { Download, ArrowLeft } from 'lucide-react';
 import { usePDF } from '../hooks/usePDF';
 import { useToast } from '../hooks/use-toast';
 import { useIsMobile } from '../hooks/use-mobile';
@@ -13,12 +12,11 @@ interface ResultsActionsProps {
     estado: string;
     tipoProcesso: string;
   };
-  onSalvar: () => void;
   isSaving: boolean;
   calculoSalvoId: string | null;
 }
 
-const ResultsActions = ({ shareData, onSalvar, isSaving, calculoSalvoId }: ResultsActionsProps) => {
+const ResultsActions = ({ shareData, isSaving, calculoSalvoId }: ResultsActionsProps) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { generatePDF, isGenerating } = usePDF();
@@ -26,14 +24,12 @@ const ResultsActions = ({ shareData, onSalvar, isSaving, calculoSalvoId }: Resul
 
   const handleDownloadPDF = async () => {
     try {
-      // Aguardar um pouco para garantir que o conteúdo esteja renderizado
       await new Promise(resolve => setTimeout(resolve, 300));
       
       console.log('Iniciando geração de PDF com dados:', shareData);
       
-      // Usar um ID genérico pois agora capturamos páginas específicas
       await generatePDF(
-        'results-content', // ID genérico, não usado mais
+        'results-content',
         `inventario-itcmd-${Date.now()}.pdf`, 
         shareData
       );
@@ -52,13 +48,12 @@ const ResultsActions = ({ shareData, onSalvar, isSaving, calculoSalvoId }: Resul
     }
   };
 
-  // Estilo base dos botões melhorado para parecer mais clicável
   const buttonBaseStyle = {
     background: isMobile ? 
       'linear-gradient(135deg, #0C2C45 0%, #476D9E 50%, #0C2C45 100%)' :
       'linear-gradient(135deg, #0C2C45, #476D9E)',
     color: '#FFFFFF',
-    backgroundColor: '#0C2C45', // Fallback
+    backgroundColor: '#0C2C45',
     border: '2px solid rgba(255, 255, 255, 0.1)',
     borderRadius: '12px',
     padding: isMobile ? '16px 24px' : '14px 28px',
@@ -107,52 +102,11 @@ const ResultsActions = ({ shareData, onSalvar, isSaving, calculoSalvoId }: Resul
         className={`flex ${isMobile ? 'flex-col' : 'flex-row'} ${isMobile ? 'gap-4' : 'gap-3'} justify-center items-center`}
         style={{
           width: '100%',
-          maxWidth: isMobile ? '100%' : '700px',
+          maxWidth: isMobile ? '100%' : '500px',
           margin: '0 auto',
           padding: isMobile ? '0' : '0 16px'
         }}
       >
-        {/* Botão Salvar Cálculo */}
-        <button 
-          onClick={onSalvar}
-          disabled={isSaving}
-          className="results-action-button touchable"
-          style={{
-            ...buttonBaseStyle,
-            ...(isSaving ? buttonDisabledStyle : {}),
-            width: isMobile ? '100%' : 'auto',
-            minWidth: isMobile ? 'auto' : '180px'
-          }}
-          onMouseEnter={(e) => {
-            if (!isSaving) {
-              Object.assign(e.currentTarget.style, buttonHoverStyle);
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!isSaving) {
-              Object.assign(e.currentTarget.style, buttonBaseStyle);
-            }
-          }}
-          onTouchStart={(e) => {
-            if (!isSaving) {
-              Object.assign(e.currentTarget.style, {
-                ...buttonHoverStyle,
-                transform: 'translateY(-1px) scale(0.98)'
-              });
-            }
-          }}
-          onTouchEnd={(e) => {
-            if (!isSaving) {
-              setTimeout(() => {
-                Object.assign(e.currentTarget.style, buttonBaseStyle);
-              }, 150);
-            }
-          }}
-        >
-          <Save className="w-5 h-5" />
-          <span>{calculoSalvoId ? 'Cálculo Salvo' : 'Salvar Cálculo'}</span>
-        </button>
-
         {/* Botão Baixar PDF */}
         <button 
           onClick={handleDownloadPDF}
