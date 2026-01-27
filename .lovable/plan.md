@@ -1,162 +1,114 @@
 
-# Analise Geral do Sistema - Problemas Identificados e Solucoes
+# Plano: Corrigir Meus Calculos e Esclarecer Webhook do Diagnostico
 
-## Resumo dos Problemas Encontrados
+## Problemas Identificados
 
-Apos analise completa do codigo, identifiquei **15 problemas** divididos em 4 categorias principais:
+### Problema 1: Calculos nao aparecem em "Meus Calculos"
 
----
+**Causa Raiz**: A edge function `get-user-calculos` tem uma logica ineficiente que:
+1. Busca TODOS os calculos do banco
+2. Filtra em memoria pelo usuario_id
 
-## Categoria 1: Cabecalhos Inconsistentes
+Isso funciona, mas pode falhar se o calculo ainda nao foi salvo quando o usuario acessou a pagina.
 
-### Problema 1.1: Paginas SEM Header (cabecalho)
-| Pagina | Rota | Status |
-|--------|------|--------|
-| Diagnostico | /diagnostico | SEM HEADER |
-| AuditoriaITCMD | /auditoria-itcmd | SEM HEADER |
-| ReenviarAtivacao | /admin/reenviar-ativacao | SEM HEADER |
+**Evidencia no banco de dados**:
+- O calculo `32d7398f-2a9e-45bc-a15b-89f691077145` ESTA salvo corretamente
+- Vinculado ao profile `39d34163-de28-4267-bce5-915bffe08eae`
+- Profile tem `usuario_id = a7519c3b-40c6-4303-9b59-142c7b17bf1b`
 
-**Impacto**: Usuario nao tem como navegar de volta ou acessar menu do usuario
-
-**Solucao**: Adicionar `<Header />` nestas 3 paginas
-
-### Problema 1.2: MobileHeader sem menu de usuario
-O `Header.tsx` tem menu dropdown com nome do usuario e opcao de logout, mas o `MobileHeader.tsx` NAO tem:
-- Falta exibir nome do usuario
-- Falta opcao de logout no mobile
-- Falta link para "Meus Calculos" no menu mobile
-
-**Solucao**: Adicionar menu do usuario no MobileHeader igual ao desktop
+**Timeline do problema**:
+- 15:56:40 - Usuario acessou "Meus Calculos" (0 resultados)
+- 15:57:39 - Calculo foi salvo (apos a busca!)
 
 ---
 
-## Categoria 2: Navegacao Quebrada / Paginas Orfas
+## Solucao Parte 1: Otimizar Edge Function `get-user-calculos`
 
-### Problema 2.1: Pagina Index.tsx nao utilizada
-O arquivo `src/pages/Index.tsx` existe mas NAO esta nas rotas. E uma pagina placeholder sem funcao.
+Mudar de buscar tudo e filtrar em memoria para buscar diretamente com filtro no banco:
 
-**Solucao**: Deletar arquivo (nao usado)
+**Arquivo: `supabase/functions/get-user-calculos/index.ts`**
 
-### Problema 2.2: Pagina NotFound com visual inconsistente
-A pagina 404 usa:
-- `bg-gray-100` (diferente do padrao `bg-animated`)
-- Texto em ingles ("Oops! Page not found")
-- Link azul basico (`text-blue-500`)
-
-**Solucao**: Atualizar visual para seguir design system
-
-### Problema 2.3: Diagnostico sem botao voltar ao login
-Se usuario quiser sair do diagnostico, nao tem como - so pode continuar preenchendo.
-
-**Solucao**: Adicionar Header com opcao de logout
-
-### Problema 2.4: AcessoNegado sem botao voltar
-Pagina nao tem forma de voltar para tela anterior.
-
-**Solucao**: Adicionar link "Voltar" ou incluir Header minimo
-
----
-
-## Categoria 3: Inconsistencias de UX
-
-### Problema 3.1: Botao "Ver Detalhes" em Calculos Salvos nao faz nada
 ```typescript
-const handleViewDetails = (calculoId: string) => {
-  console.log('Ver detalhes do cálculo:', calculoId);
-};
+// ANTES (ineficiente - busca tudo e filtra em memoria)
+const { data: calculos } = await supabaseAdmin
+  .from('calculos_inventario')
+  .select(`...`)
+  .order('created_at', { ascending: false });
+
+const calculosDoUsuario = calculos?.filter(calculo => {
+  return calculo.profiles?.usuario_id === usuarioId;
+}) || [];
+
+// DEPOIS (eficiente - filtra direto no banco via join)
+// Primeiro buscar o profile_id do usuario
+const { data: profile } = await supabaseAdmin
+  .from('profiles')
+  .select('id')
+  .eq('usuario_id', usuarioId)
+  .maybeSingle();
+
+if (!profile) {
+  return Response({ calculos: [] });
+}
+
+// Buscar calculos apenas desse profile
+const { data: calculos } = await supabaseAdmin
+  .from('calculos_inventario')
+  .select(`
+    id, patrimonio, estado, tipo_processo, custo_total, tempo_estimado, created_at,
+    custo_itcmd, custo_honorarios, custo_custas, ...
+  `)
+  .eq('profile_id', profile.id)
+  .order('created_at', { ascending: false });
 ```
-Apenas faz console.log, nao abre os detalhes.
-
-**Solucao**: Implementar navegacao para /resultados com dados do calculo OU remover botao
-
-### Problema 3.2: Logo do Header nao e clicavel
-No Header desktop e mobile, clicar no logo/nome nao navega para home.
-
-**Solucao**: Envolver logo em `<Link to="/">`
-
-### Problema 3.3: Paginas de autenticacao sem voltar consistente
-| Pagina | Tem Voltar? |
-|--------|-------------|
-| Login | NAO |
-| DefinirSenha | SIM (link para login) |
-| RecuperarSenha | SIM (ArrowLeft + link) |
-| RedefinirSenha | NAO |
-| SolicitarAtivacao | SIM (link para login) |
-
-**Solucao**: Padronizar todas com ArrowLeft + "Voltar" no topo
 
 ---
 
-## Categoria 4: Problemas Tecnicos
+## Solucao Parte 2: Melhorar Busca no Frontend
 
-### Problema 4.1: ValidationPanel aparece em todas as paginas (DEV)
-```typescript
-<ValidationPanel />
-```
-Esta dentro do BrowserRouter, aparece em todas as rotas incluindo login.
+**Arquivo: `src/components/calculos-salvos/SearchBar.tsx`**
 
-**Solucao**: Mover para dentro de ProtectedRoute ou remover em producao
-
-### Problema 4.2: Link para auditoria so aparece em development
-```typescript
-{process.env.NODE_ENV === 'development' && (...)}
-```
-Porem a rota /auditoria-itcmd existe e e acessivel por URL direta.
-
-**Solucao**: Proteger rota com verificacao de admin ou remover completamente
-
-### Problema 4.3: Admin/ReenviarAtivacao acessivel por qualquer usuario
-Nao ha verificacao se usuario e admin - qualquer usuario logado pode acessar.
-
-**Solucao**: Adicionar verificacao de permissao (is_admin ou similar)
+Adicionar mais campos de busca alem de nome/email/estado:
+- Buscar por valor de patrimonio
+- Buscar por data
+- Buscar por tipo de processo
 
 ---
 
-## Plano de Implementacao
+## Documentacao: Webhook do Diagnostico
 
-### Fase 1: Correcoes Criticas de Navegacao
+### Quando e disparado
 
-**Arquivo: `src/pages/Diagnostico.tsx`**
-- Adicionar `import Header from '../components/Header';`
-- Envolver conteudo com Header
+O webhook do diagnostico e disparado na edge function `salvar-diagnostico` quando:
 
-**Arquivo: `src/pages/AuditoriaITCMD.tsx`**
-- Adicionar Header
+1. Usuario preenche formulario em `/diagnostico`
+2. Clica no botao "Continuar para Calculadora"
+3. Dados sao validados
+4. Edge function executa:
+   - Salva no banco de dados (tabela `diagnosticos`)
+   - Envia POST para `https://n8n.altavance.media/webhook/diagnostico-calculadora-psi`
+5. Usuario e redirecionado para `/` (calculadora)
 
-**Arquivo: `src/pages/Admin/ReenviarAtivacao.tsx`**
-- Adicionar Header
-- Adicionar verificacao de admin
+### Payload do Webhook
 
-### Fase 2: Padronizar Navegacao
-
-**Arquivo: `src/components/MobileHeader.tsx`**
-- Adicionar menu do usuario com nome e logout
-- Adicionar imports: `User, LogOut` de lucide-react
-- Adicionar `useAuth` hook
-
-**Arquivo: `src/components/Header.tsx` e `MobileHeader.tsx`**
-- Tornar logo clicavel com Link para "/"
-
-**Arquivo: `src/pages/NotFound.tsx`**
-- Atualizar visual para design system
-- Traduzir para portugues
-- Adicionar animacao consistente
-
-### Fase 3: Correcoes de Funcionalidade
-
-**Arquivo: `src/pages/CalculosSalvos.tsx`**
-- Implementar `handleViewDetails` ou remover botao
-
-**Arquivos de autenticacao (Login, RedefinirSenha)**
-- Adicionar botao voltar consistente
-
-### Fase 4: Limpeza
-
-**Arquivo: `src/pages/Index.tsx`**
-- Deletar (nao utilizado)
-
-**Arquivo: `src/App.tsx`**
-- Mover ValidationPanel para local apropriado
+```json
+{
+  "id": "uuid-do-diagnostico",
+  "nome": "Nome do usuario",
+  "cidade": "Cidade",
+  "estado": "SP",
+  "faixa_patrimonio": "5M",
+  "possui_holding": false,
+  "cnpj_holding": null,
+  "possui_empresas_ltda": false,
+  "empresas": [],
+  "imoveis_alugados": false,
+  "receita_aluguel": null,
+  "herdeiros": [{ "nome": "...", "parentesco": "...", "tipo": "..." }],
+  "observacoes": null,
+  "created_at": "2026-01-27T15:00:00Z"
+}
+```
 
 ---
 
@@ -164,28 +116,14 @@ Nao ha verificacao se usuario e admin - qualquer usuario logado pode acessar.
 
 | Arquivo | Acao |
 |---------|------|
-| `src/pages/Diagnostico.tsx` | Adicionar Header |
-| `src/pages/AuditoriaITCMD.tsx` | Adicionar Header |
-| `src/pages/Admin/ReenviarAtivacao.tsx` | Adicionar Header + verificacao admin |
-| `src/components/MobileHeader.tsx` | Adicionar menu usuario + logout |
-| `src/components/Header.tsx` | Logo clicavel |
-| `src/pages/NotFound.tsx` | Redesenhar com design system |
-| `src/pages/Login.tsx` | Adicionar botao voltar |
-| `src/pages/RedefinirSenha.tsx` | Adicionar botao voltar |
-| `src/pages/AcessoNegado.tsx` | Adicionar botao voltar |
-| `src/pages/CalculosSalvos.tsx` | Implementar/remover handleViewDetails |
-| `src/pages/Index.tsx` | DELETAR |
-| `src/App.tsx` | Mover ValidationPanel |
+| `supabase/functions/get-user-calculos/index.ts` | Otimizar query para filtrar no banco |
+| `src/components/calculos-salvos/SearchBar.tsx` | Expandir campos de busca |
 
 ---
 
 ## Resultado Esperado
 
-Apos implementacao:
-- Todas as paginas terao cabecalho consistente
-- Usuario podera navegar de volta de qualquer pagina
-- Logo funcionara como link para home
-- Mobile tera paridade de funcionalidades com desktop
-- Pagina 404 tera visual profissional
-- Botoes farao o que prometem
-- Sistema limpo sem arquivos orfaos
+1. Calculos aparecerao corretamente em "Meus Calculos" para o usuario logado
+2. Busca sera mais eficiente (filtra no banco ao inves de memoria)
+3. Busca incluira mais campos (patrimonio, data, tipo)
+4. Webhook do diagnostico continua funcionando como esta
