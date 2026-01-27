@@ -150,6 +150,71 @@ export type Database = {
           },
         ]
       }
+      diagnosticos: {
+        Row: {
+          cidade: string
+          cnpj_holding: string | null
+          created_at: string
+          empresas: Json | null
+          estado: string
+          faixa_patrimonio: string
+          herdeiros: Json
+          id: string
+          imoveis_alugados: boolean
+          nome: string
+          observacoes: string | null
+          possui_empresas_ltda: boolean
+          possui_holding: boolean
+          receita_aluguel: string | null
+          updated_at: string
+          usuario_id: string | null
+        }
+        Insert: {
+          cidade: string
+          cnpj_holding?: string | null
+          created_at?: string
+          empresas?: Json | null
+          estado: string
+          faixa_patrimonio: string
+          herdeiros?: Json
+          id?: string
+          imoveis_alugados?: boolean
+          nome: string
+          observacoes?: string | null
+          possui_empresas_ltda?: boolean
+          possui_holding?: boolean
+          receita_aluguel?: string | null
+          updated_at?: string
+          usuario_id?: string | null
+        }
+        Update: {
+          cidade?: string
+          cnpj_holding?: string | null
+          created_at?: string
+          empresas?: Json | null
+          estado?: string
+          faixa_patrimonio?: string
+          herdeiros?: Json
+          id?: string
+          imoveis_alugados?: boolean
+          nome?: string
+          observacoes?: string | null
+          possui_empresas_ltda?: boolean
+          possui_holding?: boolean
+          receita_aluguel?: string | null
+          updated_at?: string
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnosticos_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       historico_consultas: {
         Row: {
           created_at: string | null

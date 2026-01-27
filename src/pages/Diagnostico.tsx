@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Building2, Briefcase, Home, Users, FileText, ArrowRight, Plus, Trash2, MapPin } from 'lucide-react';
+import { User, Building2, Briefcase, Home, Users, FileText, ArrowRight, Plus, Trash2, MapPin, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import LuxuryInput from '@/components/ui/LuxuryInput';
@@ -9,6 +9,8 @@ import LuxuryRadioGroup from '@/components/ui/LuxuryRadioGroup';
 import LuxuryTextarea from '@/components/ui/LuxuryTextarea';
 import { useDiagnostico, Empresa, Herdeiro } from '@/contexts/DiagnosticoContext';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 const estadosBrasileiros = [
   { value: 'AC', label: 'Acre' },
@@ -58,7 +60,9 @@ const tipoHerdeiroOptions = [
 export default function Diagnostico() {
   const navigate = useNavigate();
   const { dados, updateField } = useDiagnostico();
+  const { user } = useAuth();
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSaving, setIsSaving] = useState(false);
 
   const formatCNPJ = (value: string) => {
     const numbers = value.replace(/\D/g, '');
@@ -129,12 +133,48 @@ export default function Diagnostico() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validate()) {
+  const handleSubmit = async () => {
+    if (!validate()) {
+      toast.error('Preencha todos os campos obrigatórios');
+      return;
+    }
+
+    setIsSaving(true);
+    
+    try {
+      // Salvar no Supabase via edge function
+      const { data, error } = await supabase.functions.invoke('salvar-diagnostico', {
+        body: {
+          nome: dados.nome,
+          cidade: dados.cidade,
+          estado: dados.estado,
+          possuiHolding: dados.possuiHolding,
+          cnpjHolding: dados.cnpjHolding,
+          possuiEmpresasLTDA: dados.possuiEmpresasLTDA,
+          empresas: dados.empresas,
+          faixaPatrimonio: dados.faixaPatrimonio,
+          imoveisAlugados: dados.imoveisAlugados,
+          receitaAluguel: dados.receitaAluguel,
+          herdeiros: dados.herdeiros,
+          observacoes: dados.observacoes,
+          usuarioId: user?.id || null
+        }
+      });
+
+      if (error) {
+        console.error('Erro ao salvar diagnóstico:', error);
+        toast.error('Erro ao salvar diagnóstico. Tente novamente.');
+        return;
+      }
+
+      console.log('Diagnóstico salvo:', data);
       toast.success('Diagnóstico salvo com sucesso!');
       navigate('/');
-    } else {
-      toast.error('Preencha todos os campos obrigatórios');
+    } catch (error) {
+      console.error('Erro inesperado:', error);
+      toast.error('Erro ao salvar diagnóstico. Tente novamente.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -446,10 +486,20 @@ export default function Diagnostico() {
           <div className="pt-6">
             <Button
               onClick={handleSubmit}
+              disabled={isSaving}
               className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300"
             >
-              Continuar para Calculadora
-              <ArrowRight className="w-5 h-5 ml-2" />
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  Continuar para Calculadora
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </>
+              )}
             </Button>
           </div>
         </Card>
