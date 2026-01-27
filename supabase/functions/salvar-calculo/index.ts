@@ -88,6 +88,59 @@ Deno.serve(async (req) => {
       user_agent: req.headers.get('user-agent')
     })
 
+    // 4. Enviar para n8n webhook
+    const N8N_WEBHOOK_CALCULO_URL = 'https://n8n.altavance.media/webhook/calculo-calculadora-psi';
+
+    try {
+      const webhookPayload = {
+        id: calculo.id,
+        usuario: {
+          id: usuarioId || null,
+          nome: nome || 'Visitante',
+          email: email || null
+        },
+        calculo: {
+          patrimonio: dadosCalculo.patrimonio,
+          estado: dadosCalculo.estado,
+          tipo_processo: dadosCalculo.tipo_processo,
+          numero_herdeiros: dadosCalculo.numero_herdeiros,
+          tem_testamento: dadosCalculo.tem_testamento,
+          tem_menores_incapazes: dadosCalculo.tem_menores_incapazes,
+          tem_litigio: dadosCalculo.tem_litigio,
+          valor_imoveis: dadosCalculo.valor_imoveis,
+          valor_veiculos: dadosCalculo.valor_veiculos,
+          valor_investimentos: dadosCalculo.valor_investimentos
+        },
+        resultado: {
+          custo_total: dadosCalculo.custo_total,
+          custo_itcmd: dadosCalculo.custo_itcmd,
+          custo_honorarios: dadosCalculo.custo_honorarios,
+          custo_custas: dadosCalculo.custo_custas,
+          tempo_estimado: dadosCalculo.tempo_estimado,
+          percentual_sobre_patrimonio: dadosCalculo.percentual_sobre_patrimonio
+        },
+        tipo_calculadora: tipoCalculadora,
+        created_at: new Date().toISOString()
+      };
+
+      console.log('Enviando calculo para webhook n8n...');
+      
+      const webhookResponse = await fetch(N8N_WEBHOOK_CALCULO_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(webhookPayload)
+      });
+
+      if (webhookResponse.ok) {
+        console.log('Webhook calculo enviado com sucesso');
+      } else {
+        console.error('Erro ao enviar webhook calculo:', webhookResponse.status);
+      }
+    } catch (webhookError) {
+      // Não falha a operação principal se o webhook falhar
+      console.error('Erro ao chamar webhook calculo:', webhookError);
+    }
+
     return new Response(
       JSON.stringify({ success: true, calculoId: calculo.id }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
