@@ -1,104 +1,149 @@
 
 
-# Plano: Mostrar Resultados Completos Imediatamente
+# Plano: Implementar Logs Detalhados no auth-login e Testar Fluxo Completo
 
 ## Objetivo
 
-Remover o fluxo de revelação progressiva (4 etapas com botões) e exibir todos os resultados, incluindo o gráfico comparativo, automaticamente quando a página de resultados carregar.
+Adicionar logs detalhados na função `auth-login` para diagnosticar exatamente onde a verificação de senha está falhando, e testar o fluxo completo de login.
 
 ---
 
-## Situação Atual
+## Diagnóstico Atual
 
-```
-ETAPA 1 (automática) → Botão "Possibilidade de redução" → 
-ETAPA 2 (Holding LTDA) → Botão "Ver opção mais eficiente" → 
-ETAPA 3 (Holding S/A) → Botão "Ver o comparativo" → 
-ETAPA 4 (Gráfico)
-```
-
-O usuário precisa clicar em **3 botões** para ver o gráfico comparativo.
-
----
-
-## Novo Comportamento
-
-Ao carregar a página de resultados, **TODOS** os conteúdos são exibidos imediatamente:
-
-1. Custos Pessoa Física (CostSummaryCard, CostBreakdownCard, ProcessSummaryCard)
-2. Holding LTDA (HoldingLTDACard)  
-3. Holding S/A (HoldingBenefitsCard, TaxReformWarningCard)
-4. Gráfico Comparativo (ComparisonSection) 
-5. CTA Final (CTACard)
+| Usuário | Status |
+|---------|--------|
+| gurodrigues92@gmail.com | ❌ Tem senha mas falha ao verificar |
+| ketlenmarin@gmail.com | ✅ Tem senha (precisa testar) |
+| gustavodoads2@outlook.com | ✅ Tem senha (precisa testar) |
+| 5 outros usuários | ⚠️ Nunca definiram senha |
 
 ---
 
 ## Modificações Técnicas
 
-### Arquivo: `src/components/ResultsSimplified.tsx`
+### Arquivo: `supabase/functions/auth-login/index.ts`
 
-**Remover:**
-- Estado `etapaVisivel`
-- Refs para scroll (`etapa2Ref`, `etapa3Ref`, `etapa4Ref`)
-- Funções de revelação (`handleRevealEtapa2`, `handleRevealEtapa3`, `handleRevealEtapa4`)
-- Função `scrollToRef`
-- Todos os componentes `RevealButton`
-- Condicionais `{etapaVisivel >= X && ...}`
-- Import do `RevealButton` e ícones não utilizados
-
-**Manter:**
-- Todos os cards de conteúdo (na mesma ordem)
-- Cálculos de custos
-- Layout responsivo
-
----
-
-## Código Resultante (Simplificado)
+Adicionar logs detalhados na função `verifyPassword()` para rastrear cada etapa:
 
 ```typescript
-const ResultsSimplified = ({ resultado, dadosCalculo, formData }) => {
-  const isMobile = useIsMobile();
+async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  console.log('=== VERIFICAÇÃO DE SENHA - INÍCIO ===');
+  console.log('Timestamp:', new Date().toISOString());
+  
+  try {
+    // Log do formato do hash
+    console.log('Hash recebido - primeiros 20 chars:', hash.substring(0, 20));
+    console.log('Hash recebido - comprimento total:', hash.length);
+    
+    // Verificar bcrypt
+    if (hash.startsWith('$2')) {
+      console.log('❌ Hash bcrypt detectado - formato incompatível');
+      return false;
+    }
+    
+    // Validar entrada
+    if (!password || !hash) {
+      console.log('❌ Password ou hash vazio');
+      return false;
+    }
 
-  // Cálculos (mantidos)
-  const custoTotalPF = resultado.resumo.custoTotal;
-  const resultadoLTDA = calcularHoldingLTDA(...);
-  const custoTotalSA = dadosCalculo.patrimonio * 0.015;
-  const economiaPercentual = ...;
+    // Separar salt e hash
+    const [saltHex, hashHex] = hash.split(':');
+    console.log('Salt hex - comprimento:', saltHex?.length);
+    console.log('Hash hex - comprimento:', hashHex?.length);
+    
+    if (!saltHex || !hashHex) {
+      console.log('❌ Formato de hash inválido - não contém ":"');
+      return false;
+    }
+    
+    // Validar formato hexadecimal
+    const saltValid = /^[a-f0-9]+$/i.test(saltHex);
+    const hashValid = /^[a-f0-9]+$/i.test(hashHex);
+    console.log('Salt é hex válido:', saltValid);
+    console.log('Hash é hex válido:', hashValid);
+    
+    if (!saltValid || !hashValid) {
+      console.log('❌ Hash contém caracteres inválidos');
+      return false;
+    }
+    
+    // Converter salt
+    const salt = new Uint8Array(saltHex.match(/.{2}/g)!.map(byte => parseInt(byte, 16)));
+    console.log('Salt convertido - bytes:', salt.length);
+    
+    // Converter hash esperado
+    const expectedHash = hashHex.match(/.{2}/g)!.map(byte => parseInt(byte, 16));
+    console.log('Hash esperado - bytes:', expectedHash.length);
+    
+    // Derivar hash da senha fornecida
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    console.log('Senha codificada - bytes:', data.length);
+    
+    const key = await crypto.subtle.importKey(
+      'raw', data, { name: 'PBKDF2' }, false, ['deriveBits']
+    );
+    
+    const bits = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', salt: salt, iterations: 100000, hash: 'SHA-256' },
+      key, 256
+    );
+    
+    const actualHash = Array.from(new Uint8Array(bits));
+    console.log('Hash calculado - bytes:', actualHash.length);
+    
+    // Comparar byte a byte
+    let mismatchIndex = -1;
+    const match = actualHash.every((byte, index) => {
+      if (byte !== expectedHash[index]) {
+        if (mismatchIndex === -1) mismatchIndex = index;
+        return false;
+      }
+      return true;
+    });
+    
+    if (match) {
+      console.log('✅ Senha verificada com sucesso');
+    } else {
+      console.log('❌ Senha não corresponde');
+      console.log('Primeiro byte diferente no índice:', mismatchIndex);
+      console.log('Esperado (hex):', expectedHash.slice(0, 8).map(b => b.toString(16).padStart(2, '0')).join(''));
+      console.log('Calculado (hex):', actualHash.slice(0, 8).map(b => b.toString(16).padStart(2, '0')).join(''));
+    }
+    
+    console.log('=== VERIFICAÇÃO DE SENHA - FIM ===');
+    return match;
+    
+  } catch (error) {
+    console.error('❌ Erro na verificação da senha:', error);
+    console.error('Stack:', error.stack);
+    return false;
+  }
+}
+```
 
-  return (
-    <div className={`space-y-8 ...`} id="results-content">
-      {/* Pessoa Física */}
-      <CostSummaryCard ... />
-      <CostBreakdownCard ... />
-      <ProcessSummaryCard ... />
+### Logs Adicionais no Handler Principal
 
-      {/* Holding LTDA */}
-      <HoldingLTDACard ... />
-
-      {/* Holding S/A */}
-      <HoldingBenefitsCard ... />
-      <TaxReformWarningCard />
-
-      {/* Gráfico Comparativo - SEMPRE VISÍVEL */}
-      <ComparisonSection ... />
-
-      {/* CTA */}
-      <CTACard />
-    </div>
-  );
-};
+```typescript
+// Após buscar usuário
+console.log('📋 Dados do usuário encontrado:');
+console.log('- ID:', usuario.id);
+console.log('- Email:', usuario.email);
+console.log('- Ativo:', usuario.ativo);
+console.log('- Tem senha_hash:', !!usuario.senha_hash);
+console.log('- Hash prefixo:', usuario.senha_hash?.substring(0, 20) + '...');
 ```
 
 ---
 
-## Resultado Esperado
+## Teste do Fluxo Completo
 
-| Antes | Depois |
-|-------|--------|
-| 4 cliques para ver gráfico | Gráfico aparece imediatamente |
-| UX "gamificada" | UX direta e completa |
-| Botões de revelação | Sem botões intermediários |
-| Scroll fragmentado | Conteúdo contínuo |
+Após implementar os logs, vou:
+
+1. **Chamar a edge function auth-login** com um usuário de teste
+2. **Verificar os logs** para identificar exatamente onde falha
+3. **Comparar o hash gerado** com o hash armazenado
 
 ---
 
@@ -106,7 +151,21 @@ const ResultsSimplified = ({ resultado, dadosCalculo, formData }) => {
 
 | Arquivo | Ação |
 |---------|------|
-| `src/components/ResultsSimplified.tsx` | Simplificar para mostrar tudo |
+| `supabase/functions/auth-login/index.ts` | Adicionar logs detalhados |
 
-O componente `RevealButton` pode ser mantido no projeto (não será usado aqui, mas pode servir em outras partes).
+---
+
+## Resultado Esperado
+
+Com os logs detalhados, poderemos identificar:
+
+- Se o formato do hash está correto
+- Se o salt está sendo extraído corretamente
+- Se o PBKDF2 está gerando o mesmo resultado
+- Em qual byte exato a comparação falha
+
+Isso permitirá diagnosticar se o problema é:
+1. Hash gerado com parâmetros diferentes
+2. Problema na conversão hex -> bytes
+3. Senha diferente da que foi definida
 
