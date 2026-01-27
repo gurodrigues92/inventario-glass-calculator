@@ -1,190 +1,112 @@
 
 
-# Plano: Unificar Webhook - Diagnóstico + Cálculo
+# Plano: Mostrar Resultados Completos Imediatamente
 
 ## Objetivo
 
-Enviar os dados do diagnóstico junto com os dados da calculadora em um único webhook, permitindo ter o perfil completo do usuário + os resultados do cálculo em uma única chamada.
+Remover o fluxo de revelação progressiva (4 etapas com botões) e exibir todos os resultados, incluindo o gráfico comparativo, automaticamente quando a página de resultados carregar.
 
 ---
 
-## Como é possível
-
-Os dados do diagnóstico já estão disponíveis via `DiagnosticoContext`, que envolve toda a aplicação (incluindo a página de resultados). Basta:
-
-1. Acessar o contexto no hook `useResultsSave`
-2. Enviar os dados do diagnóstico junto para a edge function `salvar-calculo`
-3. Incluir no payload do webhook
-
----
-
-## Fluxo Atualizado
+## Situação Atual
 
 ```
-1. Usuário preenche diagnóstico → dados salvos no localStorage + contexto
-2. Usuário preenche calculadora → clica "Calcular"
-3. Página de resultados carrega
-4. useResultsSave:
-   - Lê dados do DiagnosticoContext ← NOVO
-   - Chama edge function salvar-calculo com AMBOS os dados
-5. Edge function:
-   - Salva cálculo no banco (como antes)
-   - Dispara webhook com dados UNIFICADOS
+ETAPA 1 (automática) → Botão "Possibilidade de redução" → 
+ETAPA 2 (Holding LTDA) → Botão "Ver opção mais eficiente" → 
+ETAPA 3 (Holding S/A) → Botão "Ver o comparativo" → 
+ETAPA 4 (Gráfico)
 ```
 
----
-
-## Payload Unificado do Webhook
-
-```json
-{
-  "id": "uuid-do-calculo",
-  "usuario": {
-    "id": "uuid-do-usuario-ou-null",
-    "nome": "Nome do usuario",
-    "email": "email@exemplo.com"
-  },
-  "diagnostico": {
-    "nome": "Nome do cliente",
-    "cidade": "São Paulo",
-    "estado": "SP",
-    "faixa_patrimonio": "5M",
-    "possui_holding": false,
-    "cnpj_holding": null,
-    "possui_empresas_ltda": false,
-    "empresas": [],
-    "imoveis_alugados": true,
-    "receita_aluguel": "R$ 15.000,00",
-    "herdeiros": [
-      { "nome": "Filho 1", "parentesco": "filho", "tipo": "herdeiro" },
-      { "nome": "Filho 2", "parentesco": "filho", "tipo": "socio" }
-    ],
-    "observacoes": "Cliente interessado em planejamento"
-  },
-  "calculo": {
-    "patrimonio": 5000000,
-    "estado": "SP",
-    "tipo_processo": "extrajudicial",
-    "numero_herdeiros": 3,
-    "tem_testamento": false,
-    "tem_menores_incapazes": false,
-    "tem_litigio": false,
-    "valor_imoveis": 3000000,
-    "valor_veiculos": 200000,
-    "valor_investimentos": 1800000
-  },
-  "resultado": {
-    "custo_total": 450000,
-    "custo_itcmd": 200000,
-    "custo_honorarios": 200000,
-    "custo_custas": 50000,
-    "tempo_estimado": "3 a 6 meses",
-    "percentual_sobre_patrimonio": 9.0
-  },
-  "tipo_calculadora": "basica",
-  "created_at": "2026-01-27T15:00:00Z"
-}
-```
+O usuário precisa clicar em **3 botões** para ver o gráfico comparativo.
 
 ---
 
-## Arquivos a Modificar
+## Novo Comportamento
 
-| Arquivo | Ação |
-|---------|------|
-| `src/hooks/useResultsSave.ts` | Importar `useDiagnostico` e enviar dados junto |
-| `supabase/functions/salvar-calculo/index.ts` | Receber e incluir dados do diagnóstico no webhook |
+Ao carregar a página de resultados, **TODOS** os conteúdos são exibidos imediatamente:
+
+1. Custos Pessoa Física (CostSummaryCard, CostBreakdownCard, ProcessSummaryCard)
+2. Holding LTDA (HoldingLTDACard)  
+3. Holding S/A (HoldingBenefitsCard, TaxReformWarningCard)
+4. Gráfico Comparativo (ComparisonSection) 
+5. CTA Final (CTACard)
 
 ---
 
-## Implementação Detalhada
+## Modificações Técnicas
 
-### 1. Modificar `src/hooks/useResultsSave.ts`
+### Arquivo: `src/components/ResultsSimplified.tsx`
+
+**Remover:**
+- Estado `etapaVisivel`
+- Refs para scroll (`etapa2Ref`, `etapa3Ref`, `etapa4Ref`)
+- Funções de revelação (`handleRevealEtapa2`, `handleRevealEtapa3`, `handleRevealEtapa4`)
+- Função `scrollToRef`
+- Todos os componentes `RevealButton`
+- Condicionais `{etapaVisivel >= X && ...}`
+- Import do `RevealButton` e ícones não utilizados
+
+**Manter:**
+- Todos os cards de conteúdo (na mesma ordem)
+- Cálculos de custos
+- Layout responsivo
+
+---
+
+## Código Resultante (Simplificado)
 
 ```typescript
-import { useDiagnostico } from '@/contexts/DiagnosticoContext';
+const ResultsSimplified = ({ resultado, dadosCalculo, formData }) => {
+  const isMobile = useIsMobile();
 
-export const useResultsSave = (resultado: any, formData: any, calculationType: string) => {
-  const { user } = useAuth();
-  const { dados: dadosDiagnostico } = useDiagnostico(); // NOVO
-  
-  // ... no autoSaveCalculo:
-  
-  const { data, error } = await supabase.functions.invoke('salvar-calculo', {
-    body: {
-      usuarioId: user?.id || null,
-      nome: user?.nome || 'Visitante',
-      email: user?.email || null,
-      dadosCalculo,
-      tipoCalculadora,
-      dadosDiagnostico  // NOVO - enviar dados do diagnóstico
-    }
-  });
+  // Cálculos (mantidos)
+  const custoTotalPF = resultado.resumo.custoTotal;
+  const resultadoLTDA = calcularHoldingLTDA(...);
+  const custoTotalSA = dadosCalculo.patrimonio * 0.015;
+  const economiaPercentual = ...;
+
+  return (
+    <div className={`space-y-8 ...`} id="results-content">
+      {/* Pessoa Física */}
+      <CostSummaryCard ... />
+      <CostBreakdownCard ... />
+      <ProcessSummaryCard ... />
+
+      {/* Holding LTDA */}
+      <HoldingLTDACard ... />
+
+      {/* Holding S/A */}
+      <HoldingBenefitsCard ... />
+      <TaxReformWarningCard />
+
+      {/* Gráfico Comparativo - SEMPRE VISÍVEL */}
+      <ComparisonSection ... />
+
+      {/* CTA */}
+      <CTACard />
+    </div>
+  );
 };
 ```
-
-### 2. Modificar `supabase/functions/salvar-calculo/index.ts`
-
-```typescript
-const data = await req.json()
-const { usuarioId, nome, email, dadosCalculo, tipoCalculadora, dadosDiagnostico } = data
-
-// ... após salvar no banco, no webhook payload:
-
-const webhookPayload = {
-  id: calculo.id,
-  usuario: {
-    id: usuarioId || null,
-    nome: nome || 'Visitante',
-    email: email || null
-  },
-  diagnostico: dadosDiagnostico ? {
-    nome: dadosDiagnostico.nome,
-    cidade: dadosDiagnostico.cidade,
-    estado: dadosDiagnostico.estado,
-    faixa_patrimonio: dadosDiagnostico.faixaPatrimonio,
-    possui_holding: dadosDiagnostico.possuiHolding,
-    cnpj_holding: dadosDiagnostico.cnpjHolding || null,
-    possui_empresas_ltda: dadosDiagnostico.possuiEmpresasLTDA,
-    empresas: dadosDiagnostico.empresas,
-    imoveis_alugados: dadosDiagnostico.imoveisAlugados,
-    receita_aluguel: dadosDiagnostico.receitaAluguel || null,
-    herdeiros: dadosDiagnostico.herdeiros,
-    observacoes: dadosDiagnostico.observacoes || null
-  } : null,
-  calculo: { ... },
-  resultado: { ... },
-  tipo_calculadora: tipoCalculadora,
-  created_at: new Date().toISOString()
-};
-```
-
----
-
-## Comparativo: Webhooks Separados vs Unificado
-
-| Aspecto | Antes (2 webhooks) | Depois (1 webhook) |
-|---------|-------------------|-------------------|
-| Disparos | 2 (diagnóstico + cálculo) | 1 (tudo junto) |
-| Webhook diagnóstico | Continua existindo | Pode remover se quiser |
-| Dados disponíveis | Separados no n8n | Tudo em um só payload |
-| Automação | Precisa correlacionar | Dados já correlacionados |
-
----
-
-## Observação Importante
-
-O webhook do diagnóstico (`salvar-diagnostico`) **continuará funcionando** independentemente. Você terá duas opções:
-
-1. **Manter ambos**: Diagnóstico dispara seu webhook, cálculo dispara com dados unificados
-2. **Remover webhook do diagnóstico**: Só dispara quando faz o cálculo (dados completos)
 
 ---
 
 ## Resultado Esperado
 
-1. Um único webhook terá TODOS os dados necessários
-2. n8n recebe perfil completo + resultados do cálculo
-3. Facilita automações (enviar para CRM, Google Sheets, etc.)
-4. Correlação automática entre diagnóstico e cálculo
+| Antes | Depois |
+|-------|--------|
+| 4 cliques para ver gráfico | Gráfico aparece imediatamente |
+| UX "gamificada" | UX direta e completa |
+| Botões de revelação | Sem botões intermediários |
+| Scroll fragmentado | Conteúdo contínuo |
+
+---
+
+## Arquivos Afetados
+
+| Arquivo | Ação |
+|---------|------|
+| `src/components/ResultsSimplified.tsx` | Simplificar para mostrar tudo |
+
+O componente `RevealButton` pode ser mantido no projeto (não será usado aqui, mas pode servir em outras partes).
 
