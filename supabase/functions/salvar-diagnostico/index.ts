@@ -87,6 +87,45 @@ Deno.serve(async (req) => {
 
     console.log('Diagnóstico salvo com sucesso:', diagnostico.id);
 
+    // Enviar para n8n webhook de produção
+    const N8N_WEBHOOK_URL = 'https://n8n.altavance.media/webhook/diagnostico-calculadora-psi';
+
+    try {
+      const webhookPayload = {
+        id: diagnostico.id,
+        nome: data.nome,
+        cidade: data.cidade,
+        estado: data.estado,
+        faixa_patrimonio: data.faixaPatrimonio,
+        possui_holding: data.possuiHolding,
+        cnpj_holding: data.cnpjHolding || null,
+        possui_empresas_ltda: data.possuiEmpresasLTDA,
+        empresas: data.empresas,
+        imoveis_alugados: data.imoveisAlugados,
+        receita_aluguel: data.receitaAluguel || null,
+        herdeiros: data.herdeiros,
+        observacoes: data.observacoes || null,
+        created_at: diagnostico.created_at
+      };
+
+      console.log('Enviando para webhook n8n...');
+      
+      const webhookResponse = await fetch(N8N_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(webhookPayload)
+      });
+
+      if (webhookResponse.ok) {
+        console.log('Webhook n8n enviado com sucesso');
+      } else {
+        console.error('Erro ao enviar webhook n8n:', webhookResponse.status);
+      }
+    } catch (webhookError) {
+      // Não falha a operação principal se o webhook falhar
+      console.error('Erro ao chamar webhook n8n:', webhookError);
+    }
+
     return new Response(
       JSON.stringify({ success: true, id: diagnostico.id }),
       { 
