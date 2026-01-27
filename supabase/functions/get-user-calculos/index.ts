@@ -31,8 +31,34 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Buscar cálculos vinculados ao usuário via profile
-    const { data: calculos, error } = await supabaseAdmin
+    // OTIMIZADO: Primeiro buscar o profile_id do usuário
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .select('id, nome, email, telefone')
+      .eq('usuario_id', usuarioId)
+      .maybeSingle();
+
+    if (profileError) {
+      console.error('[get-user-calculos] Erro ao buscar profile:', profileError);
+      return new Response(
+        JSON.stringify({ error: 'Erro ao buscar perfil do usuário' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Se usuário não tem profile, retornar lista vazia
+    if (!profile) {
+      console.log('[get-user-calculos] Usuário não possui profile, retornando lista vazia');
+      return new Response(
+        JSON.stringify({ calculos: [] }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('[get-user-calculos] Profile encontrado:', profile.id);
+
+    // OTIMIZADO: Buscar cálculos diretamente pelo profile_id (filtro no banco)
+    const { data: calculos, error: calculosError } = await supabaseAdmin
       .from('calculos_inventario')
       .select(`
         id,
@@ -52,37 +78,30 @@ serve(async (req) => {
         insights,
         alertas,
         detalhamento,
-        comparacao,
-        profiles:profile_id (
-          id,
-          nome,
-          email,
-          telefone,
-          usuario_id
-        )
+        comparacao
       `)
+      .eq('profile_id', profile.id)
       .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('[get-user-calculos] Erro ao buscar cálculos:', error);
+    if (calculosError) {
+      console.error('[get-user-calculos] Erro ao buscar cálculos:', calculosError);
       return new Response(
         JSON.stringify({ error: 'Erro ao buscar cálculos' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Filtrar cálculos que pertencem ao usuário
-    const calculosDoUsuario = calculos?.filter(calculo => {
-      const profile = calculo.profiles;
-      return profile && profile.usuario_id === usuarioId;
-    }) || [];
+    console.log('[get-user-calculos] Encontrados', calculos?.length || 0, 'cálculos para o usuário');
 
-    console.log('[get-user-calculos] Encontrados', calculosDoUsuario.length, 'cálculos para o usuário');
-
-    // Formatar para o frontend
-    const calculosFormatados = calculosDoUsuario.map(calculo => ({
+    // Formatar para o frontend - anexar dados do profile em cada cálculo
+    const calculosFormatados = (calculos || []).map(calculo => ({
       ...calculo,
-      profile: calculo.profiles
+      profile: {
+        id: profile.id,
+        nome: profile.nome,
+        email: profile.email,
+        telefone: profile.telefone
+      }
     }));
 
     return new Response(

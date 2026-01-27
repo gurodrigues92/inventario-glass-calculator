@@ -8,6 +8,7 @@ import SearchBar from '../components/calculos-salvos/SearchBar';
 import CalculoCard from '../components/calculos-salvos/CalculoCard';
 import SummarySection from '../components/calculos-salvos/SummarySection';
 import EmptyState from '../components/calculos-salvos/EmptyState';
+import { formatCurrency } from '../utils/formatters';
 
 interface CalculoSalvo {
   id: string;
@@ -28,6 +29,7 @@ const CalculosSalvos = () => {
   const [calculos, setCalculos] = useState<CalculoSalvo[]>([]);
   const [filteredCalculos, setFilteredCalculos] = useState<CalculoSalvo[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [tipoFiltro, setTipoFiltro] = useState('todos');
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
 
@@ -38,17 +40,45 @@ const CalculosSalvos = () => {
   }, [user?.id]);
 
   useEffect(() => {
-    if (searchTerm.trim() === '') {
-      setFilteredCalculos(calculos);
-    } else {
-      const filtered = calculos.filter(calculo =>
-        calculo.profile.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        calculo.estado.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        calculo.profile.email?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredCalculos(filtered);
+    let filtered = calculos;
+
+    // Filtrar por tipo de processo
+    if (tipoFiltro !== 'todos') {
+      filtered = filtered.filter(calculo => calculo.tipo_processo === tipoFiltro);
     }
-  }, [searchTerm, calculos]);
+
+    // Filtrar por termo de busca
+    if (searchTerm.trim() !== '') {
+      const termo = searchTerm.toLowerCase();
+      filtered = filtered.filter(calculo => {
+        // Buscar por estado
+        if (calculo.estado.toLowerCase().includes(termo)) return true;
+        
+        // Buscar por valor de patrimônio (formatado ou numérico)
+        const patrimonioStr = calculo.patrimonio.toString();
+        if (patrimonioStr.includes(termo)) return true;
+        
+        // Buscar por custo total
+        const custoStr = calculo.custo_total.toString();
+        if (custoStr.includes(termo)) return true;
+        
+        // Buscar por data (formato brasileiro)
+        const data = new Date(calculo.created_at);
+        const dataFormatada = data.toLocaleDateString('pt-BR');
+        if (dataFormatada.includes(termo)) return true;
+        
+        // Buscar por nome do perfil
+        if (calculo.profile.nome.toLowerCase().includes(termo)) return true;
+        
+        // Buscar por email
+        if (calculo.profile.email?.toLowerCase().includes(termo)) return true;
+
+        return false;
+      });
+    }
+
+    setFilteredCalculos(filtered);
+  }, [searchTerm, tipoFiltro, calculos]);
 
   const carregarCalculos = async () => {
     if (!user?.id) {
@@ -101,12 +131,14 @@ const CalculosSalvos = () => {
           <SearchBar 
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
+            tipoFiltro={tipoFiltro}
+            onTipoFiltroChange={setTipoFiltro}
           />
 
           {filteredCalculos.length === 0 ? (
             <EmptyState 
               hasCalculos={calculos.length > 0}
-              hasSearchTerm={searchTerm.trim() !== ''}
+              hasSearchTerm={searchTerm.trim() !== '' || tipoFiltro !== 'todos'}
             />
           ) : (
             <div className="grid gap-6">
