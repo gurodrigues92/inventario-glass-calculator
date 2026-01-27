@@ -1,114 +1,230 @@
 
 
-## Plano: Corrigir Radio Buttons e Selects que Nao Respondem a Cliques
+## Plano: Salvar Calculo Automaticamente ao Carregar Resultados
 
-### Problema Identificado
+### Objetivo
+Remover o botao "Salvar Calculo" e o modal que pede nome. O calculo sera salvo automaticamente quando a pagina de resultados carrega, usando o nome do usuario logado.
 
-O componente `LuxuryRadioGroup` nao tem nenhum evento de clique configurado. Os labels sao puramente visuais e nao disparam a funcao `onChange` quando clicados.
+### Problema de RLS Identificado
 
-**Codigo atual (linha 32-64 de LuxuryRadioGroup.tsx):**
-
-```tsx
-<label
-  key={option.value}
-  className={...}
-  style={{ ... }}
->
-  // Visual do radio button
-  // Texto da opcao
-</label>
+Nos network requests, ha um erro critico:
+```
+POST /rest/v1/profiles → 401
+"new row violates row-level security policy for table profiles"
 ```
 
-**O que falta**: Um `onClick` handler no label para chamar `onChange(option.value)`.
+A policy atual de INSERT na tabela `profiles` exige que `auth.uid() = id`, mas estamos usando autenticacao customizada (tabela `usuarios`), nao Supabase Auth. Por isso, `auth.uid()` retorna `null` e a insercao falha.
+
+### Solucao em 2 Partes
 
 ---
 
-### Solucao
+## Parte 1: Corrigir RLS da tabela `profiles`
 
-**Arquivo: `src/components/ui/LuxuryRadioGroup.tsx`**
+A politica atual:
+```sql
+Policy: "Usuários autenticados podem inserir seu próprio perfil"
+WITH CHECK: (SELECT auth.uid() AS uid) = id
+```
 
-Adicionar `onClick` ao label para disparar a mudanca de valor:
+**Problema**: O sistema usa autenticacao propria (tabela `usuarios`), nao Supabase Auth. `auth.uid()` sempre sera `null`.
 
-```tsx
-<label
-  key={option.value}
-  onClick={() => onChange(option.value)}  // <-- ADICIONAR ISSO
-  className={`
-    flex items-center gap-3 px-5 py-4 rounded-xl cursor-pointer transition-all duration-300
-    ${value === option.value 
-      ? 'bg-primary/20 border-2 border-primary shadow-lg' 
-      : 'bg-card/50 border-2 border-border/30 hover:border-primary/50 hover:bg-card/70'
+**Solucao**: Criar uma edge function `salvar-calculo` que use `service_role` para inserir dados, similar ao `salvar-diagnostico`.
+
+---
+
+## Parte 2: Implementar Auto-Save
+
+### Arquivos a Modificar
+
+| Arquivo | Mudanca |
+|---------|---------|
+| `src/hooks/useResultsSave.ts` | Adicionar funcao `autoSaveCalculo` que salva via edge function |
+| `src/hooks/useResultsData.ts` | Chamar auto-save apos carregar resultados |
+| `src/pages/Results.tsx` | Remover modal e botao "Salvar Calculo" |
+| `src/components/ResultsActions.tsx` | Remover botao "Salvar Calculo" |
+| `supabase/functions/salvar-calculo/index.ts` | Nova edge function (CRIAR) |
+
+---
+
+### Nova Edge Function: `salvar-calculo`
+
+```typescript
+// supabase/functions/salvar-calculo/index.ts
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders })
+  }
+
+  try {
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    )
+
+    const data = await req.json()
+    const { usuarioId, nome, email, dadosCalculo, tipoCalculadora } = data
+
+    // 1. Buscar ou criar profile
+    let profileId: string
+
+    if (usuarioId) {
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('usuario_id', usuarioId)
+        .maybeSingle()
+
+      if (existingProfile) {
+        profileId = existingProfile.id
+      } else {
+        const { data: newProfile, error } = await supabase
+          .from('profiles')
+          .insert({ nome, email, usuario_id: usuarioId })
+          .select('id')
+          .single()
+        
+        if (error) throw error
+        profileId = newProfile.id
+      }
+    } else {
+      // Usuario anonimo
+      const { data: newProfile, error } = await supabase
+        .from('profiles')
+        .insert({ nome: nome || 'Anonimo' })
+        .select('id')
+        .single()
+      
+      if (error) throw error
+      profileId = newProfile.id
     }
-  `}
-  style={{ 
-    minWidth: orientation === 'horizontal' ? '140px' : 'auto',
-    position: 'relative',
-    zIndex: 1
-  }}
->
+
+    // 2. Salvar calculo
+    const { data: calculo, error: calculoError } = await supabase
+      .from('calculos_inventario')
+      .insert({
+        profile_id: profileId,
+        ...dadosCalculo
+      })
+      .select('id')
+      .single()
+
+    if (calculoError) throw calculoError
+
+    // 3. Registrar historico
+    await supabase.from('historico_consultas').insert({
+      profile_id: profileId,
+      tipo_calculadora: tipoCalculadora,
+      user_agent: req.headers.get('user-agent')
+    })
+
+    return new Response(
+      JSON.stringify({ success: true, calculoId: calculo.id }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ success: false, error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+  }
+})
 ```
 
 ---
 
-### Mudanca Completa
+### Mudancas em `useResultsSave.ts`
 
-Linha 32-46 do arquivo `src/components/ui/LuxuryRadioGroup.tsx`:
+Remover `salvarCalculo` via client e usar edge function:
 
-**Antes:**
-```tsx
-<label
-  key={option.value}
-  className={`
-    flex items-center gap-3 px-5 py-4 rounded-xl cursor-pointer transition-all duration-300
-    ${value === option.value 
-      ? 'bg-primary/20 border-2 border-primary shadow-lg' 
-      : 'bg-card/50 border-2 border-border/30 hover:border-primary/50 hover:bg-card/70'
+```typescript
+const autoSaveCalculo = async () => {
+  if (!resultado || !formData || calculoSalvoId) return;
+
+  const { data, error } = await supabase.functions.invoke('salvar-calculo', {
+    body: {
+      usuarioId: user?.id || null,
+      nome: user?.nome || 'Visitante',
+      email: user?.email || null,
+      dadosCalculo: { ... },
+      tipoCalculadora: calculationType === 'advanced' ? 'avancada' : 'basica'
     }
-  `}
-  style={{ 
-    minWidth: orientation === 'horizontal' ? '140px' : 'auto',
-    position: 'relative',
-    zIndex: 1
-  }}
->
-```
+  });
 
-**Depois:**
-```tsx
-<label
-  key={option.value}
-  onClick={() => onChange(option.value)}
-  className={`
-    flex items-center gap-3 px-5 py-4 rounded-xl cursor-pointer transition-all duration-300
-    ${value === option.value 
-      ? 'bg-primary/20 border-2 border-primary shadow-lg' 
-      : 'bg-card/50 border-2 border-border/30 hover:border-primary/50 hover:bg-card/70'
-    }
-  `}
-  style={{ 
-    minWidth: orientation === 'horizontal' ? '140px' : 'auto',
-    position: 'relative',
-    zIndex: 1
-  }}
->
+  if (data?.success) {
+    setCalculoSalvoId(data.calculoId);
+  }
+};
 ```
 
 ---
 
-### Resultado Esperado
+### Mudancas em `useResultsData.ts`
 
-| Componente | Antes | Depois |
-|------------|-------|--------|
-| Faixa de Patrimonio (5M, 20M, 50M) | Nao responde a clique | Seleciona ao clicar |
-| Radio "Possui Holding?" | Nao responde a clique | Alterna Sim/Nao ao clicar |
-| Radio "Empresas LTDA?" | Nao responde a clique | Alterna Sim/Nao ao clicar |
-| Radio "Imoveis Alugados?" | Nao responde a clique | Alterna Sim/Nao ao clicar |
+Chamar auto-save quando loading terminar:
 
-### Arquivo Modificado
+```typescript
+useEffect(() => {
+  if (!isLoading && hasValidData && resultado) {
+    autoSaveCalculo();
+  }
+}, [isLoading, hasValidData]);
+```
 
-- `src/components/ui/LuxuryRadioGroup.tsx` (1 linha adicionada)
+---
 
-### Observacao sobre os Selects
+### Mudancas em `Results.tsx`
 
-Os selects (`LuxurySelect`) ja possuem o `onChange` corretamente configurado no elemento `<select>`. Se eles nao estiverem funcionando, pode ser um problema de z-index que o fix anterior ja deveria ter resolvido. Apos corrigir o LuxuryRadioGroup, testaremos se os selects tambem voltam a funcionar.
+1. Remover `useState(showSalvarModal)`
+2. Remover import `SalvarCalculoModal`
+3. Remover componente `<SalvarCalculoModal />`
+4. Remover prop `onSalvar` do `ResultsActions`
+
+---
+
+### Mudancas em `ResultsActions.tsx`
+
+1. Remover prop `onSalvar`
+2. Remover botao "Salvar Calculo"
+3. Manter apenas "Baixar PDF" e "Nova Consulta"
+
+---
+
+### Fluxo Resultante
+
+```text
+Usuario preenche formulario
+        ↓
+Clica "Calcular"
+        ↓
+Navega para /resultados
+        ↓
+useResultsData carrega dados
+        ↓
+Loading termina → Auto-save dispara
+        ↓
+Edge function salvar-calculo executa
+        ↓
+Calculo disponivel em "Meus Calculos"
+```
+
+---
+
+### Arquivos Criados/Modificados
+
+| Arquivo | Acao |
+|---------|------|
+| `supabase/functions/salvar-calculo/index.ts` | CRIAR |
+| `src/hooks/useResultsSave.ts` | MODIFICAR (usar edge function) |
+| `src/hooks/useResultsData.ts` | MODIFICAR (chamar auto-save) |
+| `src/pages/Results.tsx` | MODIFICAR (remover modal) |
+| `src/components/ResultsActions.tsx` | MODIFICAR (remover botao salvar) |
+| `src/components/SalvarCalculoModal.tsx` | REMOVER (nao mais necessario) |
 
