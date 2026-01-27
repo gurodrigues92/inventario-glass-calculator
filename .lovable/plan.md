@@ -1,28 +1,40 @@
 
 
-# Plano: Adicionar Webhook para Preenchimento da Calculadora
+# Plano: Unificar Webhook - Diagnóstico + Cálculo
 
 ## Objetivo
-Disparar um webhook para o n8n sempre que um usuário fizer um cálculo na calculadora, similar ao que já existe para o diagnóstico.
+
+Enviar os dados do diagnóstico junto com os dados da calculadora em um único webhook, permitindo ter o perfil completo do usuário + os resultados do cálculo em uma única chamada.
 
 ---
 
-## Quando será disparado
+## Como é possível
 
-O webhook será disparado na edge function `salvar-calculo`, que é executada automaticamente quando:
+Os dados do diagnóstico já estão disponíveis via `DiagnosticoContext`, que envolve toda a aplicação (incluindo a página de resultados). Basta:
 
-1. Usuário preenche o formulário da calculadora (patrimônio, estado, etc.)
-2. Clica em "Calcular Custos do Inventário"
+1. Acessar o contexto no hook `useResultsSave`
+2. Enviar os dados do diagnóstico junto para a edge function `salvar-calculo`
+3. Incluir no payload do webhook
+
+---
+
+## Fluxo Atualizado
+
+```
+1. Usuário preenche diagnóstico → dados salvos no localStorage + contexto
+2. Usuário preenche calculadora → clica "Calcular"
 3. Página de resultados carrega
-4. `useResultsSave` dispara auto-save
-5. Edge function `salvar-calculo` executa:
-   - Salva no banco de dados (tabela `calculos_inventario`) ✓ já existe
-   - **NOVO: Envia POST para webhook n8n**
-6. Dados ficam disponíveis no n8n para automações
+4. useResultsSave:
+   - Lê dados do DiagnosticoContext ← NOVO
+   - Chama edge function salvar-calculo com AMBOS os dados
+5. Edge function:
+   - Salva cálculo no banco (como antes)
+   - Dispara webhook com dados UNIFICADOS
+```
 
 ---
 
-## Payload do Webhook (proposta)
+## Payload Unificado do Webhook
 
 ```json
 {
@@ -31,6 +43,23 @@ O webhook será disparado na edge function `salvar-calculo`, que é executada au
     "id": "uuid-do-usuario-ou-null",
     "nome": "Nome do usuario",
     "email": "email@exemplo.com"
+  },
+  "diagnostico": {
+    "nome": "Nome do cliente",
+    "cidade": "São Paulo",
+    "estado": "SP",
+    "faixa_patrimonio": "5M",
+    "possui_holding": false,
+    "cnpj_holding": null,
+    "possui_empresas_ltda": false,
+    "empresas": [],
+    "imoveis_alugados": true,
+    "receita_aluguel": "R$ 15.000,00",
+    "herdeiros": [
+      { "nome": "Filho 1", "parentesco": "filho", "tipo": "herdeiro" },
+      { "nome": "Filho 2", "parentesco": "filho", "tipo": "socio" }
+    ],
+    "observacoes": "Cliente interessado em planejamento"
   },
   "calculo": {
     "patrimonio": 5000000,
@@ -59,98 +88,103 @@ O webhook será disparado na edge function `salvar-calculo`, que é executada au
 
 ---
 
-## Arquivo a Modificar
+## Arquivos a Modificar
 
 | Arquivo | Ação |
 |---------|------|
-| `supabase/functions/salvar-calculo/index.ts` | Adicionar envio de webhook após salvar |
+| `src/hooks/useResultsSave.ts` | Importar `useDiagnostico` e enviar dados junto |
+| `supabase/functions/salvar-calculo/index.ts` | Receber e incluir dados do diagnóstico no webhook |
 
 ---
 
-## Implementação
+## Implementação Detalhada
 
-Adicionar o seguinte código na edge function `salvar-calculo`, logo após salvar o cálculo e antes do return:
+### 1. Modificar `src/hooks/useResultsSave.ts`
 
 ```typescript
-// 4. Enviar para n8n webhook
-const N8N_WEBHOOK_CALCULO_URL = 'https://n8n.altavance.media/webhook/calculo-calculadora-psi';
+import { useDiagnostico } from '@/contexts/DiagnosticoContext';
 
-try {
-  const webhookPayload = {
-    id: calculo.id,
-    usuario: {
-      id: usuarioId || null,
-      nome: nome || 'Visitante',
-      email: email || null
-    },
-    calculo: {
-      patrimonio: dadosCalculo.patrimonio,
-      estado: dadosCalculo.estado,
-      tipo_processo: dadosCalculo.tipo_processo,
-      numero_herdeiros: dadosCalculo.numero_herdeiros,
-      tem_testamento: dadosCalculo.tem_testamento,
-      tem_menores_incapazes: dadosCalculo.tem_menores_incapazes,
-      tem_litigio: dadosCalculo.tem_litigio,
-      valor_imoveis: dadosCalculo.valor_imoveis,
-      valor_veiculos: dadosCalculo.valor_veiculos,
-      valor_investimentos: dadosCalculo.valor_investimentos
-    },
-    resultado: {
-      custo_total: dadosCalculo.custo_total,
-      custo_itcmd: dadosCalculo.custo_itcmd,
-      custo_honorarios: dadosCalculo.custo_honorarios,
-      custo_custas: dadosCalculo.custo_custas,
-      tempo_estimado: dadosCalculo.tempo_estimado,
-      percentual_sobre_patrimonio: dadosCalculo.percentual_sobre_patrimonio
-    },
-    tipo_calculadora: tipoCalculadora,
-    created_at: new Date().toISOString()
-  };
-
-  console.log('Enviando calculo para webhook n8n...');
+export const useResultsSave = (resultado: any, formData: any, calculationType: string) => {
+  const { user } = useAuth();
+  const { dados: dadosDiagnostico } = useDiagnostico(); // NOVO
   
-  const webhookResponse = await fetch(N8N_WEBHOOK_CALCULO_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(webhookPayload)
+  // ... no autoSaveCalculo:
+  
+  const { data, error } = await supabase.functions.invoke('salvar-calculo', {
+    body: {
+      usuarioId: user?.id || null,
+      nome: user?.nome || 'Visitante',
+      email: user?.email || null,
+      dadosCalculo,
+      tipoCalculadora,
+      dadosDiagnostico  // NOVO - enviar dados do diagnóstico
+    }
   });
+};
+```
 
-  if (webhookResponse.ok) {
-    console.log('Webhook calculo enviado com sucesso');
-  } else {
-    console.error('Erro ao enviar webhook calculo:', webhookResponse.status);
-  }
-} catch (webhookError) {
-  // Não falha a operação principal se o webhook falhar
-  console.error('Erro ao chamar webhook calculo:', webhookError);
-}
+### 2. Modificar `supabase/functions/salvar-calculo/index.ts`
+
+```typescript
+const data = await req.json()
+const { usuarioId, nome, email, dadosCalculo, tipoCalculadora, dadosDiagnostico } = data
+
+// ... após salvar no banco, no webhook payload:
+
+const webhookPayload = {
+  id: calculo.id,
+  usuario: {
+    id: usuarioId || null,
+    nome: nome || 'Visitante',
+    email: email || null
+  },
+  diagnostico: dadosDiagnostico ? {
+    nome: dadosDiagnostico.nome,
+    cidade: dadosDiagnostico.cidade,
+    estado: dadosDiagnostico.estado,
+    faixa_patrimonio: dadosDiagnostico.faixaPatrimonio,
+    possui_holding: dadosDiagnostico.possuiHolding,
+    cnpj_holding: dadosDiagnostico.cnpjHolding || null,
+    possui_empresas_ltda: dadosDiagnostico.possuiEmpresasLTDA,
+    empresas: dadosDiagnostico.empresas,
+    imoveis_alugados: dadosDiagnostico.imoveisAlugados,
+    receita_aluguel: dadosDiagnostico.receitaAluguel || null,
+    herdeiros: dadosDiagnostico.herdeiros,
+    observacoes: dadosDiagnostico.observacoes || null
+  } : null,
+  calculo: { ... },
+  resultado: { ... },
+  tipo_calculadora: tipoCalculadora,
+  created_at: new Date().toISOString()
+};
 ```
 
 ---
 
-## URL do Webhook
+## Comparativo: Webhooks Separados vs Unificado
 
-Estou sugerindo: `https://n8n.altavance.media/webhook/calculo-calculadora-psi`
-
-Você precisa criar esse endpoint no n8n para receber os dados. Se preferir outra URL, me avise.
+| Aspecto | Antes (2 webhooks) | Depois (1 webhook) |
+|---------|-------------------|-------------------|
+| Disparos | 2 (diagnóstico + cálculo) | 1 (tudo junto) |
+| Webhook diagnóstico | Continua existindo | Pode remover se quiser |
+| Dados disponíveis | Separados no n8n | Tudo em um só payload |
+| Automação | Precisa correlacionar | Dados já correlacionados |
 
 ---
 
-## Comparativo: Diagnóstico vs Calculadora
+## Observação Importante
 
-| Aspecto | Diagnóstico | Calculadora |
-|---------|-------------|-------------|
-| Momento | Ao clicar "Continuar" | Ao ver resultados |
-| Webhook | `diagnostico-calculadora-psi` | `calculo-calculadora-psi` (novo) |
-| Dados | Perfil + situação atual | Valores + resultados |
-| Tabela | `diagnosticos` | `calculos_inventario` |
+O webhook do diagnóstico (`salvar-diagnostico`) **continuará funcionando** independentemente. Você terá duas opções:
+
+1. **Manter ambos**: Diagnóstico dispara seu webhook, cálculo dispara com dados unificados
+2. **Remover webhook do diagnóstico**: Só dispara quando faz o cálculo (dados completos)
 
 ---
 
 ## Resultado Esperado
 
-1. Cada cálculo feito na calculadora dispara webhook para n8n
-2. n8n pode processar e enviar para Google Sheets, CRM, etc.
-3. Erro no webhook NÃO bloqueia o salvamento do cálculo
-4. Logs registram sucesso/falha do webhook
+1. Um único webhook terá TODOS os dados necessários
+2. n8n recebe perfil completo + resultados do cálculo
+3. Facilita automações (enviar para CRM, Google Sheets, etc.)
+4. Correlação automática entre diagnóstico e cálculo
 
