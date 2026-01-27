@@ -38,6 +38,8 @@ const LuxurySelect = ({
         disabled={disabled}
         className="w-full"
         style={{
+          position: 'relative',
+          zIndex: 1,
           background: '#FFFFFF',
           border: '1px solid #E8E2DD',
           borderRadius: '8px',
