@@ -31,6 +31,7 @@ const LuxuryRadioGroup = ({
         {options.map((option) => (
           <label
             key={option.value}
+            onClick={() => onChange(option.value)}
             className={`
               flex items-center gap-3 px-5 py-4 rounded-xl cursor-pointer transition-all duration-300
               ${value === option.value 
