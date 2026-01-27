@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useDiagnostico } from '@/contexts/DiagnosticoContext';
 import { parseCurrencyValue } from '../utils/formatters';
 
 export const useResultsSave = (resultado: any, formData: any, calculationType: string) => {
   const { user } = useAuth();
+  const { dados: dadosDiagnostico } = useDiagnostico();
   const [calculoSalvoId, setCalculoSalvoId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const saveAttempted = useRef(false);
@@ -60,7 +62,8 @@ export const useResultsSave = (resultado: any, formData: any, calculationType: s
             nome: user?.nome || 'Visitante',
             email: user?.email || null,
             dadosCalculo,
-            tipoCalculadora
+            tipoCalculadora,
+            dadosDiagnostico
           }
         });
 

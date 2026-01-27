@@ -17,9 +17,9 @@ Deno.serve(async (req) => {
     )
 
     const data = await req.json()
-    const { usuarioId, nome, email, dadosCalculo, tipoCalculadora } = data
+    const { usuarioId, nome, email, dadosCalculo, tipoCalculadora, dadosDiagnostico } = data
 
-    console.log('Recebendo dados para salvar calculo:', { usuarioId, nome, tipoCalculadora })
+    console.log('Recebendo dados para salvar calculo:', { usuarioId, nome, tipoCalculadora, temDiagnostico: !!dadosDiagnostico })
 
     // 1. Buscar ou criar profile
     let profileId: string
@@ -99,6 +99,20 @@ Deno.serve(async (req) => {
           nome: nome || 'Visitante',
           email: email || null
         },
+        diagnostico: dadosDiagnostico ? {
+          nome: dadosDiagnostico.nome,
+          cidade: dadosDiagnostico.cidade,
+          estado: dadosDiagnostico.estado,
+          faixa_patrimonio: dadosDiagnostico.faixaPatrimonio,
+          possui_holding: dadosDiagnostico.possuiHolding,
+          cnpj_holding: dadosDiagnostico.cnpjHolding || null,
+          possui_empresas_ltda: dadosDiagnostico.possuiEmpresasLTDA,
+          empresas: dadosDiagnostico.empresas,
+          imoveis_alugados: dadosDiagnostico.imoveisAlugados,
+          receita_aluguel: dadosDiagnostico.receitaAluguel || null,
+          herdeiros: dadosDiagnostico.herdeiros,
+          observacoes: dadosDiagnostico.observacoes || null
+        } : null,
         calculo: {
           patrimonio: dadosCalculo.patrimonio,
           estado: dadosCalculo.estado,
