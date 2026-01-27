@@ -1,6 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import AuditoriaITCMD from '../components/dev/AuditoriaITCMD';
+import Header from '../components/Header';
 
 const AuditoriaITCMDPage = () => {
   return (
@@ -11,8 +12,11 @@ const AuditoriaITCMDPage = () => {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       
-      <div className="min-h-screen bg-background py-8">
-        <AuditoriaITCMD />
+      <div className="min-h-screen bg-animated">
+        <Header />
+        <main className="pt-28 pb-12">
+          <AuditoriaITCMD />
+        </main>
       </div>
     </>
   );

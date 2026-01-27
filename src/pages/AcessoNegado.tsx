@@ -1,13 +1,24 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Gem, ShoppingCart, Mail, CheckCircle } from 'lucide-react';
+import { Gem, ShoppingCart, Mail, CheckCircle, ArrowLeft } from 'lucide-react';
 
 export default function AcessoNegado() {
   return (
     <div className="min-h-screen bg-animated flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
+        {/* Back Button */}
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center space-x-2 mb-6 font-medium transition-colors"
+          style={{ color: '#476D9E' }}
+          onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.color = '#0C2C45'}
+          onMouseLeave={(e) => (e.currentTarget as HTMLElement).style.color = '#476D9E'}
+        >
+          <ArrowLeft size={20} />
+          <span>Voltar</span>
+        </button>
+
         <Card 
           className="shadow-xl border-0 backdrop-blur-sm"
           style={{
