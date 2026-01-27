@@ -44,42 +44,59 @@ async function hashPassword(password: string): Promise<string> {
 
 // Função para verificar senha usando Web Crypto API
 async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  console.log('=== VERIFICAÇÃO DE SENHA - INÍCIO ===');
+  console.log('Timestamp:', new Date().toISOString());
+  
   try {
+    // Log do formato do hash
+    console.log('Hash recebido - primeiros 20 chars:', hash?.substring(0, 20));
+    console.log('Hash recebido - comprimento total:', hash?.length);
+    
     // Se o hash parece ser do bcrypt (começa com $2), falha para forçar reset
     if (hash.startsWith('$2')) {
-      console.log('Hash bcrypt detectado, usuário precisa redefinir senha');
+      console.log('❌ Hash bcrypt detectado - formato incompatível');
       return false;
     }
     
     // Validar entrada
     if (!password || !hash) {
-      console.log('Password ou hash vazio');
+      console.log('❌ Password ou hash vazio');
       return false;
     }
 
-    // TEMPORÁRIO: Verificação especial para o usuário de teste
-    if (password === '123456' && hash.includes('27701d03100ee13c3dddb84ef77e1d7182ad17a07fc43ef5de192c8400d7c4d1')) {
-      console.log('Login temporário aprovado para usuário de teste');
-      return true;
-    }
-    
+    // Separar salt e hash
     const [saltHex, hashHex] = hash.split(':');
+    console.log('Salt hex - comprimento:', saltHex?.length);
+    console.log('Hash hex - comprimento:', hashHex?.length);
+    
     if (!saltHex || !hashHex) {
-      console.log('Formato de hash inválido');
+      console.log('❌ Formato de hash inválido - não contém ":"');
       return false;
     }
     
     // Validar formato hexadecimal
-    if (!/^[a-f0-9]+$/i.test(saltHex) || !/^[a-f0-9]+$/i.test(hashHex)) {
-      console.log('Hash contém caracteres inválidos');
+    const saltValid = /^[a-f0-9]+$/i.test(saltHex);
+    const hashValid = /^[a-f0-9]+$/i.test(hashHex);
+    console.log('Salt é hex válido:', saltValid);
+    console.log('Hash é hex válido:', hashValid);
+    
+    if (!saltValid || !hashValid) {
+      console.log('❌ Hash contém caracteres inválidos');
       return false;
     }
     
+    // Converter salt
     const salt = new Uint8Array(saltHex.match(/.{2}/g)!.map(byte => parseInt(byte, 16)));
-    const expectedHash = hashHex.match(/.{2}/g)!.map(byte => parseInt(byte, 16));
+    console.log('Salt convertido - bytes:', salt.length);
     
+    // Converter hash esperado
+    const expectedHash = hashHex.match(/.{2}/g)!.map(byte => parseInt(byte, 16));
+    console.log('Hash esperado - bytes:', expectedHash.length);
+    
+    // Derivar hash da senha fornecida
     const encoder = new TextEncoder();
     const data = encoder.encode(password);
+    console.log('Senha codificada - bytes:', data.length);
     
     const key = await crypto.subtle.importKey(
       'raw',
@@ -101,10 +118,33 @@ async function verifyPassword(password: string, hash: string): Promise<boolean> 
     );
     
     const actualHash = Array.from(new Uint8Array(bits));
+    console.log('Hash calculado - bytes:', actualHash.length);
     
-    return actualHash.every((byte, index) => byte === expectedHash[index]);
+    // Comparar byte a byte
+    let mismatchIndex = -1;
+    const match = actualHash.every((byte, index) => {
+      if (byte !== expectedHash[index]) {
+        if (mismatchIndex === -1) mismatchIndex = index;
+        return false;
+      }
+      return true;
+    });
+    
+    if (match) {
+      console.log('✅ Senha verificada com sucesso');
+    } else {
+      console.log('❌ Senha não corresponde');
+      console.log('Primeiro byte diferente no índice:', mismatchIndex);
+      console.log('Esperado (hex):', expectedHash.slice(0, 8).map(b => b.toString(16).padStart(2, '0')).join(''));
+      console.log('Calculado (hex):', actualHash.slice(0, 8).map(b => b.toString(16).padStart(2, '0')).join(''));
+    }
+    
+    console.log('=== VERIFICAÇÃO DE SENHA - FIM ===');
+    return match;
+    
   } catch (error) {
-    console.error('Erro na verificação da senha:', error);
+    console.error('❌ Erro na verificação da senha:', error);
+    console.error('Stack:', error.stack);
     return false;
   }
 }
@@ -179,6 +219,14 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
+
+    // Log detalhado do usuário encontrado
+    console.log('📋 Dados do usuário encontrado:');
+    console.log('- ID:', usuario.id);
+    console.log('- Email:', usuario.email);
+    console.log('- Ativo:', usuario.ativo);
+    console.log('- Tem senha_hash:', !!usuario.senha_hash);
+    console.log('- Hash prefixo:', usuario.senha_hash?.substring(0, 20) + '...');
 
     // Verificar senha
     console.log('Verificando senha para usuário:', email);
