@@ -1,129 +1,156 @@
 
-# Plano: Corrigir Meus Calculos e Esclarecer Webhook do Diagnostico
 
-## Problemas Identificados
+# Plano: Adicionar Webhook para Preenchimento da Calculadora
 
-### Problema 1: Calculos nao aparecem em "Meus Calculos"
-
-**Causa Raiz**: A edge function `get-user-calculos` tem uma logica ineficiente que:
-1. Busca TODOS os calculos do banco
-2. Filtra em memoria pelo usuario_id
-
-Isso funciona, mas pode falhar se o calculo ainda nao foi salvo quando o usuario acessou a pagina.
-
-**Evidencia no banco de dados**:
-- O calculo `32d7398f-2a9e-45bc-a15b-89f691077145` ESTA salvo corretamente
-- Vinculado ao profile `39d34163-de28-4267-bce5-915bffe08eae`
-- Profile tem `usuario_id = a7519c3b-40c6-4303-9b59-142c7b17bf1b`
-
-**Timeline do problema**:
-- 15:56:40 - Usuario acessou "Meus Calculos" (0 resultados)
-- 15:57:39 - Calculo foi salvo (apos a busca!)
+## Objetivo
+Disparar um webhook para o n8n sempre que um usuário fizer um cálculo na calculadora, similar ao que já existe para o diagnóstico.
 
 ---
 
-## Solucao Parte 1: Otimizar Edge Function `get-user-calculos`
+## Quando será disparado
 
-Mudar de buscar tudo e filtrar em memoria para buscar diretamente com filtro no banco:
+O webhook será disparado na edge function `salvar-calculo`, que é executada automaticamente quando:
 
-**Arquivo: `supabase/functions/get-user-calculos/index.ts`**
-
-```typescript
-// ANTES (ineficiente - busca tudo e filtra em memoria)
-const { data: calculos } = await supabaseAdmin
-  .from('calculos_inventario')
-  .select(`...`)
-  .order('created_at', { ascending: false });
-
-const calculosDoUsuario = calculos?.filter(calculo => {
-  return calculo.profiles?.usuario_id === usuarioId;
-}) || [];
-
-// DEPOIS (eficiente - filtra direto no banco via join)
-// Primeiro buscar o profile_id do usuario
-const { data: profile } = await supabaseAdmin
-  .from('profiles')
-  .select('id')
-  .eq('usuario_id', usuarioId)
-  .maybeSingle();
-
-if (!profile) {
-  return Response({ calculos: [] });
-}
-
-// Buscar calculos apenas desse profile
-const { data: calculos } = await supabaseAdmin
-  .from('calculos_inventario')
-  .select(`
-    id, patrimonio, estado, tipo_processo, custo_total, tempo_estimado, created_at,
-    custo_itcmd, custo_honorarios, custo_custas, ...
-  `)
-  .eq('profile_id', profile.id)
-  .order('created_at', { ascending: false });
-```
+1. Usuário preenche o formulário da calculadora (patrimônio, estado, etc.)
+2. Clica em "Calcular Custos do Inventário"
+3. Página de resultados carrega
+4. `useResultsSave` dispara auto-save
+5. Edge function `salvar-calculo` executa:
+   - Salva no banco de dados (tabela `calculos_inventario`) ✓ já existe
+   - **NOVO: Envia POST para webhook n8n**
+6. Dados ficam disponíveis no n8n para automações
 
 ---
 
-## Solucao Parte 2: Melhorar Busca no Frontend
-
-**Arquivo: `src/components/calculos-salvos/SearchBar.tsx`**
-
-Adicionar mais campos de busca alem de nome/email/estado:
-- Buscar por valor de patrimonio
-- Buscar por data
-- Buscar por tipo de processo
-
----
-
-## Documentacao: Webhook do Diagnostico
-
-### Quando e disparado
-
-O webhook do diagnostico e disparado na edge function `salvar-diagnostico` quando:
-
-1. Usuario preenche formulario em `/diagnostico`
-2. Clica no botao "Continuar para Calculadora"
-3. Dados sao validados
-4. Edge function executa:
-   - Salva no banco de dados (tabela `diagnosticos`)
-   - Envia POST para `https://n8n.altavance.media/webhook/diagnostico-calculadora-psi`
-5. Usuario e redirecionado para `/` (calculadora)
-
-### Payload do Webhook
+## Payload do Webhook (proposta)
 
 ```json
 {
-  "id": "uuid-do-diagnostico",
-  "nome": "Nome do usuario",
-  "cidade": "Cidade",
-  "estado": "SP",
-  "faixa_patrimonio": "5M",
-  "possui_holding": false,
-  "cnpj_holding": null,
-  "possui_empresas_ltda": false,
-  "empresas": [],
-  "imoveis_alugados": false,
-  "receita_aluguel": null,
-  "herdeiros": [{ "nome": "...", "parentesco": "...", "tipo": "..." }],
-  "observacoes": null,
+  "id": "uuid-do-calculo",
+  "usuario": {
+    "id": "uuid-do-usuario-ou-null",
+    "nome": "Nome do usuario",
+    "email": "email@exemplo.com"
+  },
+  "calculo": {
+    "patrimonio": 5000000,
+    "estado": "SP",
+    "tipo_processo": "extrajudicial",
+    "numero_herdeiros": 3,
+    "tem_testamento": false,
+    "tem_menores_incapazes": false,
+    "tem_litigio": false,
+    "valor_imoveis": 3000000,
+    "valor_veiculos": 200000,
+    "valor_investimentos": 1800000
+  },
+  "resultado": {
+    "custo_total": 450000,
+    "custo_itcmd": 200000,
+    "custo_honorarios": 200000,
+    "custo_custas": 50000,
+    "tempo_estimado": "3 a 6 meses",
+    "percentual_sobre_patrimonio": 9.0
+  },
+  "tipo_calculadora": "basica",
   "created_at": "2026-01-27T15:00:00Z"
 }
 ```
 
 ---
 
-## Arquivos a Modificar
+## Arquivo a Modificar
 
-| Arquivo | Acao |
+| Arquivo | Ação |
 |---------|------|
-| `supabase/functions/get-user-calculos/index.ts` | Otimizar query para filtrar no banco |
-| `src/components/calculos-salvos/SearchBar.tsx` | Expandir campos de busca |
+| `supabase/functions/salvar-calculo/index.ts` | Adicionar envio de webhook após salvar |
+
+---
+
+## Implementação
+
+Adicionar o seguinte código na edge function `salvar-calculo`, logo após salvar o cálculo e antes do return:
+
+```typescript
+// 4. Enviar para n8n webhook
+const N8N_WEBHOOK_CALCULO_URL = 'https://n8n.altavance.media/webhook/calculo-calculadora-psi';
+
+try {
+  const webhookPayload = {
+    id: calculo.id,
+    usuario: {
+      id: usuarioId || null,
+      nome: nome || 'Visitante',
+      email: email || null
+    },
+    calculo: {
+      patrimonio: dadosCalculo.patrimonio,
+      estado: dadosCalculo.estado,
+      tipo_processo: dadosCalculo.tipo_processo,
+      numero_herdeiros: dadosCalculo.numero_herdeiros,
+      tem_testamento: dadosCalculo.tem_testamento,
+      tem_menores_incapazes: dadosCalculo.tem_menores_incapazes,
+      tem_litigio: dadosCalculo.tem_litigio,
+      valor_imoveis: dadosCalculo.valor_imoveis,
+      valor_veiculos: dadosCalculo.valor_veiculos,
+      valor_investimentos: dadosCalculo.valor_investimentos
+    },
+    resultado: {
+      custo_total: dadosCalculo.custo_total,
+      custo_itcmd: dadosCalculo.custo_itcmd,
+      custo_honorarios: dadosCalculo.custo_honorarios,
+      custo_custas: dadosCalculo.custo_custas,
+      tempo_estimado: dadosCalculo.tempo_estimado,
+      percentual_sobre_patrimonio: dadosCalculo.percentual_sobre_patrimonio
+    },
+    tipo_calculadora: tipoCalculadora,
+    created_at: new Date().toISOString()
+  };
+
+  console.log('Enviando calculo para webhook n8n...');
+  
+  const webhookResponse = await fetch(N8N_WEBHOOK_CALCULO_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(webhookPayload)
+  });
+
+  if (webhookResponse.ok) {
+    console.log('Webhook calculo enviado com sucesso');
+  } else {
+    console.error('Erro ao enviar webhook calculo:', webhookResponse.status);
+  }
+} catch (webhookError) {
+  // Não falha a operação principal se o webhook falhar
+  console.error('Erro ao chamar webhook calculo:', webhookError);
+}
+```
+
+---
+
+## URL do Webhook
+
+Estou sugerindo: `https://n8n.altavance.media/webhook/calculo-calculadora-psi`
+
+Você precisa criar esse endpoint no n8n para receber os dados. Se preferir outra URL, me avise.
+
+---
+
+## Comparativo: Diagnóstico vs Calculadora
+
+| Aspecto | Diagnóstico | Calculadora |
+|---------|-------------|-------------|
+| Momento | Ao clicar "Continuar" | Ao ver resultados |
+| Webhook | `diagnostico-calculadora-psi` | `calculo-calculadora-psi` (novo) |
+| Dados | Perfil + situação atual | Valores + resultados |
+| Tabela | `diagnosticos` | `calculos_inventario` |
 
 ---
 
 ## Resultado Esperado
 
-1. Calculos aparecerao corretamente em "Meus Calculos" para o usuario logado
-2. Busca sera mais eficiente (filtra no banco ao inves de memoria)
-3. Busca incluira mais campos (patrimonio, data, tipo)
-4. Webhook do diagnostico continua funcionando como esta
+1. Cada cálculo feito na calculadora dispara webhook para n8n
+2. n8n pode processar e enviar para Google Sheets, CRM, etc.
+3. Erro no webhook NÃO bloqueia o salvamento do cálculo
+4. Logs registram sucesso/falha do webhook
+
