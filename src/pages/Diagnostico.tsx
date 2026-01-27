@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Building2, Briefcase, Home, Users, FileText, ArrowRight, Plus, Trash2, MapPin, Loader2 } from 'lucide-react';
+import Header from '../components/Header';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import LuxuryInput from '@/components/ui/LuxuryInput';
@@ -179,19 +180,21 @@ export default function Diagnostico() {
   };
 
   return (
-    <div className="min-h-screen bg-animated py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-            Diagnóstico Patrimonial
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Preencha os dados abaixo para uma análise personalizada
-          </p>
-        </div>
+    <div className="min-h-screen bg-animated">
+      <Header />
+      <main className="pt-28 pb-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          {/* Page Title */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+              Diagnóstico Patrimonial
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              Preencha os dados abaixo para uma análise personalizada
+            </p>
+          </div>
 
-        <Card className="glass-card p-6 md:p-8 space-y-8">
+          <Card className="glass-card p-6 md:p-8 space-y-8">
           {/* Seção 1: Dados Pessoais */}
           <section className="space-y-6">
             <div className="flex items-center gap-3 mb-4">
@@ -503,7 +506,8 @@ export default function Diagnostico() {
             </Button>
           </div>
         </Card>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }

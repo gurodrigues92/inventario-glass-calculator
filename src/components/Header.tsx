@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useIsMobile } from '../hooks/use-mobile';
 import MobileHeader from './MobileHeader';
 import { Gem, User, LogOut } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
 import {
@@ -40,7 +40,7 @@ const Header = () => {
       }}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+        <Link to="/" className="flex items-center space-x-4">
           <div 
             className="logo-diamond"
             style={{
@@ -81,7 +81,7 @@ const Header = () => {
               DESCOMPLICADO
             </span>
           </div>
-        </div>
+        </Link>
         
         <nav className="hidden md:flex items-center space-x-8">
           <button 

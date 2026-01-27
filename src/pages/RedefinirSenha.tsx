@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, Navigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Eye, EyeOff, CheckCircle, Gem } from 'lucide-react';
+import { Loader2, Eye, EyeOff, CheckCircle, Gem, ArrowLeft } from 'lucide-react';
 
 export default function RedefinirSenha() {
   const { isAuthenticated } = useAuth();
@@ -144,6 +144,18 @@ export default function RedefinirSenha() {
   return (
     <div className="min-h-screen bg-animated flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        {/* Back Button */}
+        <Link
+          to="/login"
+          className="flex items-center space-x-2 mb-6 font-medium transition-colors"
+          style={{ color: '#476D9E' }}
+          onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.color = '#0C2C45'}
+          onMouseLeave={(e) => (e.currentTarget as HTMLElement).style.color = '#476D9E'}
+        >
+          <ArrowLeft size={20} />
+          <span>Voltar para Login</span>
+        </Link>
+
         <Card 
           className="shadow-xl border-0 backdrop-blur-sm"
           style={{

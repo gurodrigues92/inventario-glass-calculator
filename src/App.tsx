@@ -84,7 +84,8 @@ const App = () => (
                   
                   <Route path="*" element={<NotFound />} />
                 </Routes>
-                <ValidationPanel />
+                {/* ValidationPanel only shown in development for authenticated users */}
+                {process.env.NODE_ENV === 'development' && <ValidationPanel />}
               </BrowserRouter>
             </div>
           </DiagnosticoProvider>

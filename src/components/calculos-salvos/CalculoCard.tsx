@@ -1,7 +1,5 @@
-
 import React from 'react';
 import { Calendar, DollarSign, MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { formatCurrency } from '../../utils/formatters';
 
 interface CalculoSalvo {
@@ -21,10 +19,9 @@ interface CalculoSalvo {
 
 interface CalculoCardProps {
   calculo: CalculoSalvo;
-  onViewDetails: (calculoId: string) => void;
 }
 
-const CalculoCard = ({ calculo, onViewDetails }: CalculoCardProps) => {
+const CalculoCard = ({ calculo }: CalculoCardProps) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('pt-BR', {
@@ -80,23 +77,24 @@ const CalculoCard = ({ calculo, onViewDetails }: CalculoCardProps) => {
           )}
         </div>
 
-        {/* Data e Ações */}
+        {/* Data */}
         <div className="flex flex-col justify-between">
-          <div className="flex items-center space-x-2 mb-4">
+          <div className="flex items-center space-x-2">
             <Calendar className="w-4 h-4 text-[#476D9E]" />
             <span className="text-[#476D9E] text-sm">
               {formatDate(calculo.created_at)}
             </span>
           </div>
           
-          <Button
-            onClick={() => onViewDetails(calculo.id)}
-            variant="outline"
-            size="sm"
-            className="border-[#476D9E] text-[#476D9E] hover:bg-[#F5EFEB]"
+          <span 
+            className="inline-block mt-4 px-3 py-1 rounded-full text-xs font-medium"
+            style={{
+              background: 'rgba(71, 109, 158, 0.1)',
+              color: '#476D9E'
+            }}
           >
-            Ver Detalhes
-          </Button>
+            {calculo.tipo_processo === 'extrajudicial' ? 'Extrajudicial' : 'Judicial'}
+          </span>
         </div>
       </div>
     </div>

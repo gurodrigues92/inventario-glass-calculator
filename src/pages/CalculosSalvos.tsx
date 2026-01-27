@@ -74,9 +74,6 @@ const CalculosSalvos = () => {
     }
   };
 
-  const handleViewDetails = (calculoId: string) => {
-    console.log('Ver detalhes do cálculo:', calculoId);
-  };
 
   if (isLoading) {
     return (
@@ -117,7 +114,6 @@ const CalculosSalvos = () => {
                 <CalculoCard
                   key={calculo.id}
                   calculo={calculo}
-                  onViewDetails={handleViewDetails}
                 />
               ))}
             </div>

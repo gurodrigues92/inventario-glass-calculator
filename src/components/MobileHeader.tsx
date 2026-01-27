@@ -1,17 +1,23 @@
-
 import React, { useState } from 'react';
-import { Gem, Menu, X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Gem, Menu, X, User, LogOut, Calculator } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import SpecialistSelectionDialog from './SpecialistSelectionDialog';
 import HowItWorksDialog from './HowItWorksDialog';
 
 const MobileHeader = () => {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSpecialistDialogOpen, setIsSpecialistDialogOpen] = useState(false);
   const [isHowItWorksDialogOpen, setIsHowItWorksDialogOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  const handleLogout = () => {
+    logout();
+    toggleMenu();
+  };
 
   return (
     <>
@@ -26,7 +32,7 @@ const MobileHeader = () => {
         }}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3 md:space-x-4">
+          <Link to="/" className="flex items-center space-x-3 md:space-x-4">
             <div 
               className="logo-diamond"
               style={{
@@ -67,7 +73,7 @@ const MobileHeader = () => {
                 DESCOMPLICADO
               </span>
             </div>
-          </div>
+          </Link>
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
@@ -150,27 +156,41 @@ const MobileHeader = () => {
             top: '80px'
           }}
         >
-          <nav className="flex flex-col items-center justify-start pt-12 space-y-8">
+          <nav className="flex flex-col items-center justify-start pt-8 space-y-6 px-6">
+            {/* User Info */}
+            {user && (
+              <div className="w-full text-center pb-6 border-b border-white/20">
+                <div className="flex items-center justify-center space-x-2 mb-2">
+                  <User size={20} className="text-white/80" />
+                  <span className="text-white font-medium">{user.nome}</span>
+                </div>
+                <span className="text-white/60 text-sm">{user.email}</span>
+              </div>
+            )}
+
             <button 
               onClick={() => {
                 setIsHowItWorksDialogOpen(true);
                 toggleMenu();
               }}
-              className="text-2xl font-medium text-white hover:text-opacity-80 transition-colors"
+              className="text-xl font-medium text-white hover:text-opacity-80 transition-colors"
             >
               Como funciona
             </button>
+            
             <button 
               onClick={() => {
                 navigate('/calculos-salvos');
                 toggleMenu();
               }}
-              className="text-2xl font-medium text-white hover:text-opacity-80 transition-colors"
+              className="flex items-center space-x-2 text-xl font-medium text-white hover:text-opacity-80 transition-colors"
             >
-              Meus Cálculos
+              <Calculator size={20} />
+              <span>Meus Cálculos</span>
             </button>
+            
             <button 
-              className="text-xl font-semibold px-8 py-4 rounded-xl transition-all"
+              className="text-lg font-semibold px-8 py-4 rounded-xl transition-all"
               style={{
                 background: 'linear-gradient(135deg, #D1BFA3, #E5D4B1)',
                 color: '#0C2C45',
@@ -185,6 +205,17 @@ const MobileHeader = () => {
             >
               Falar com especialista
             </button>
+
+            {/* Logout Button */}
+            {user && (
+              <button
+                onClick={handleLogout}
+                className="flex items-center space-x-2 text-lg font-medium text-red-400 hover:text-red-300 transition-colors mt-4 pt-4 border-t border-white/20 w-full justify-center"
+              >
+                <LogOut size={20} />
+                <span>Sair</span>
+              </button>
+            )}
           </nav>
         </div>
       )}

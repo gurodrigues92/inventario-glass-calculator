@@ -6,6 +6,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Mail, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
+import Header from '@/components/Header';
 
 interface Usuario {
   id: string;
@@ -84,8 +85,10 @@ export default function ReenviarAtivacao() {
   };
 
   return (
-    <div className="min-h-screen bg-animated p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-animated">
+      <Header />
+      <main className="pt-28 pb-12 px-4 md:px-8">
+        <div className="max-w-6xl mx-auto">
         <Card 
           className="shadow-xl border-0 backdrop-blur-sm"
           style={{
@@ -201,7 +204,8 @@ export default function ReenviarAtivacao() {
             )}
           </CardContent>
         </Card>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
