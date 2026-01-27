@@ -1,230 +1,191 @@
 
+# Analise Geral do Sistema - Problemas Identificados e Solucoes
 
-## Plano: Salvar Calculo Automaticamente ao Carregar Resultados
+## Resumo dos Problemas Encontrados
 
-### Objetivo
-Remover o botao "Salvar Calculo" e o modal que pede nome. O calculo sera salvo automaticamente quando a pagina de resultados carrega, usando o nome do usuario logado.
-
-### Problema de RLS Identificado
-
-Nos network requests, ha um erro critico:
-```
-POST /rest/v1/profiles → 401
-"new row violates row-level security policy for table profiles"
-```
-
-A policy atual de INSERT na tabela `profiles` exige que `auth.uid() = id`, mas estamos usando autenticacao customizada (tabela `usuarios`), nao Supabase Auth. Por isso, `auth.uid()` retorna `null` e a insercao falha.
-
-### Solucao em 2 Partes
+Apos analise completa do codigo, identifiquei **15 problemas** divididos em 4 categorias principais:
 
 ---
 
-## Parte 1: Corrigir RLS da tabela `profiles`
+## Categoria 1: Cabecalhos Inconsistentes
 
-A politica atual:
-```sql
-Policy: "Usuários autenticados podem inserir seu próprio perfil"
-WITH CHECK: (SELECT auth.uid() AS uid) = id
-```
+### Problema 1.1: Paginas SEM Header (cabecalho)
+| Pagina | Rota | Status |
+|--------|------|--------|
+| Diagnostico | /diagnostico | SEM HEADER |
+| AuditoriaITCMD | /auditoria-itcmd | SEM HEADER |
+| ReenviarAtivacao | /admin/reenviar-ativacao | SEM HEADER |
 
-**Problema**: O sistema usa autenticacao propria (tabela `usuarios`), nao Supabase Auth. `auth.uid()` sempre sera `null`.
+**Impacto**: Usuario nao tem como navegar de volta ou acessar menu do usuario
 
-**Solucao**: Criar uma edge function `salvar-calculo` que use `service_role` para inserir dados, similar ao `salvar-diagnostico`.
+**Solucao**: Adicionar `<Header />` nestas 3 paginas
 
----
+### Problema 1.2: MobileHeader sem menu de usuario
+O `Header.tsx` tem menu dropdown com nome do usuario e opcao de logout, mas o `MobileHeader.tsx` NAO tem:
+- Falta exibir nome do usuario
+- Falta opcao de logout no mobile
+- Falta link para "Meus Calculos" no menu mobile
 
-## Parte 2: Implementar Auto-Save
-
-### Arquivos a Modificar
-
-| Arquivo | Mudanca |
-|---------|---------|
-| `src/hooks/useResultsSave.ts` | Adicionar funcao `autoSaveCalculo` que salva via edge function |
-| `src/hooks/useResultsData.ts` | Chamar auto-save apos carregar resultados |
-| `src/pages/Results.tsx` | Remover modal e botao "Salvar Calculo" |
-| `src/components/ResultsActions.tsx` | Remover botao "Salvar Calculo" |
-| `supabase/functions/salvar-calculo/index.ts` | Nova edge function (CRIAR) |
+**Solucao**: Adicionar menu do usuario no MobileHeader igual ao desktop
 
 ---
 
-### Nova Edge Function: `salvar-calculo`
+## Categoria 2: Navegacao Quebrada / Paginas Orfas
 
+### Problema 2.1: Pagina Index.tsx nao utilizada
+O arquivo `src/pages/Index.tsx` existe mas NAO esta nas rotas. E uma pagina placeholder sem funcao.
+
+**Solucao**: Deletar arquivo (nao usado)
+
+### Problema 2.2: Pagina NotFound com visual inconsistente
+A pagina 404 usa:
+- `bg-gray-100` (diferente do padrao `bg-animated`)
+- Texto em ingles ("Oops! Page not found")
+- Link azul basico (`text-blue-500`)
+
+**Solucao**: Atualizar visual para seguir design system
+
+### Problema 2.3: Diagnostico sem botao voltar ao login
+Se usuario quiser sair do diagnostico, nao tem como - so pode continuar preenchendo.
+
+**Solucao**: Adicionar Header com opcao de logout
+
+### Problema 2.4: AcessoNegado sem botao voltar
+Pagina nao tem forma de voltar para tela anterior.
+
+**Solucao**: Adicionar link "Voltar" ou incluir Header minimo
+
+---
+
+## Categoria 3: Inconsistencias de UX
+
+### Problema 3.1: Botao "Ver Detalhes" em Calculos Salvos nao faz nada
 ```typescript
-// supabase/functions/salvar-calculo/index.ts
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
-Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
-  }
-
-  try {
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    )
-
-    const data = await req.json()
-    const { usuarioId, nome, email, dadosCalculo, tipoCalculadora } = data
-
-    // 1. Buscar ou criar profile
-    let profileId: string
-
-    if (usuarioId) {
-      const { data: existingProfile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('usuario_id', usuarioId)
-        .maybeSingle()
-
-      if (existingProfile) {
-        profileId = existingProfile.id
-      } else {
-        const { data: newProfile, error } = await supabase
-          .from('profiles')
-          .insert({ nome, email, usuario_id: usuarioId })
-          .select('id')
-          .single()
-        
-        if (error) throw error
-        profileId = newProfile.id
-      }
-    } else {
-      // Usuario anonimo
-      const { data: newProfile, error } = await supabase
-        .from('profiles')
-        .insert({ nome: nome || 'Anonimo' })
-        .select('id')
-        .single()
-      
-      if (error) throw error
-      profileId = newProfile.id
-    }
-
-    // 2. Salvar calculo
-    const { data: calculo, error: calculoError } = await supabase
-      .from('calculos_inventario')
-      .insert({
-        profile_id: profileId,
-        ...dadosCalculo
-      })
-      .select('id')
-      .single()
-
-    if (calculoError) throw calculoError
-
-    // 3. Registrar historico
-    await supabase.from('historico_consultas').insert({
-      profile_id: profileId,
-      tipo_calculadora: tipoCalculadora,
-      user_agent: req.headers.get('user-agent')
-    })
-
-    return new Response(
-      JSON.stringify({ success: true, calculoId: calculo.id }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
-  } catch (error) {
-    return new Response(
-      JSON.stringify({ success: false, error: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
-  }
-})
-```
-
----
-
-### Mudancas em `useResultsSave.ts`
-
-Remover `salvarCalculo` via client e usar edge function:
-
-```typescript
-const autoSaveCalculo = async () => {
-  if (!resultado || !formData || calculoSalvoId) return;
-
-  const { data, error } = await supabase.functions.invoke('salvar-calculo', {
-    body: {
-      usuarioId: user?.id || null,
-      nome: user?.nome || 'Visitante',
-      email: user?.email || null,
-      dadosCalculo: { ... },
-      tipoCalculadora: calculationType === 'advanced' ? 'avancada' : 'basica'
-    }
-  });
-
-  if (data?.success) {
-    setCalculoSalvoId(data.calculoId);
-  }
+const handleViewDetails = (calculoId: string) => {
+  console.log('Ver detalhes do cálculo:', calculoId);
 };
 ```
+Apenas faz console.log, nao abre os detalhes.
+
+**Solucao**: Implementar navegacao para /resultados com dados do calculo OU remover botao
+
+### Problema 3.2: Logo do Header nao e clicavel
+No Header desktop e mobile, clicar no logo/nome nao navega para home.
+
+**Solucao**: Envolver logo em `<Link to="/">`
+
+### Problema 3.3: Paginas de autenticacao sem voltar consistente
+| Pagina | Tem Voltar? |
+|--------|-------------|
+| Login | NAO |
+| DefinirSenha | SIM (link para login) |
+| RecuperarSenha | SIM (ArrowLeft + link) |
+| RedefinirSenha | NAO |
+| SolicitarAtivacao | SIM (link para login) |
+
+**Solucao**: Padronizar todas com ArrowLeft + "Voltar" no topo
 
 ---
 
-### Mudancas em `useResultsData.ts`
+## Categoria 4: Problemas Tecnicos
 
-Chamar auto-save quando loading terminar:
-
+### Problema 4.1: ValidationPanel aparece em todas as paginas (DEV)
 ```typescript
-useEffect(() => {
-  if (!isLoading && hasValidData && resultado) {
-    autoSaveCalculo();
-  }
-}, [isLoading, hasValidData]);
+<ValidationPanel />
 ```
+Esta dentro do BrowserRouter, aparece em todas as rotas incluindo login.
 
----
+**Solucao**: Mover para dentro de ProtectedRoute ou remover em producao
 
-### Mudancas em `Results.tsx`
-
-1. Remover `useState(showSalvarModal)`
-2. Remover import `SalvarCalculoModal`
-3. Remover componente `<SalvarCalculoModal />`
-4. Remover prop `onSalvar` do `ResultsActions`
-
----
-
-### Mudancas em `ResultsActions.tsx`
-
-1. Remover prop `onSalvar`
-2. Remover botao "Salvar Calculo"
-3. Manter apenas "Baixar PDF" e "Nova Consulta"
-
----
-
-### Fluxo Resultante
-
-```text
-Usuario preenche formulario
-        ↓
-Clica "Calcular"
-        ↓
-Navega para /resultados
-        ↓
-useResultsData carrega dados
-        ↓
-Loading termina → Auto-save dispara
-        ↓
-Edge function salvar-calculo executa
-        ↓
-Calculo disponivel em "Meus Calculos"
+### Problema 4.2: Link para auditoria so aparece em development
+```typescript
+{process.env.NODE_ENV === 'development' && (...)}
 ```
+Porem a rota /auditoria-itcmd existe e e acessivel por URL direta.
+
+**Solucao**: Proteger rota com verificacao de admin ou remover completamente
+
+### Problema 4.3: Admin/ReenviarAtivacao acessivel por qualquer usuario
+Nao ha verificacao se usuario e admin - qualquer usuario logado pode acessar.
+
+**Solucao**: Adicionar verificacao de permissao (is_admin ou similar)
 
 ---
 
-### Arquivos Criados/Modificados
+## Plano de Implementacao
+
+### Fase 1: Correcoes Criticas de Navegacao
+
+**Arquivo: `src/pages/Diagnostico.tsx`**
+- Adicionar `import Header from '../components/Header';`
+- Envolver conteudo com Header
+
+**Arquivo: `src/pages/AuditoriaITCMD.tsx`**
+- Adicionar Header
+
+**Arquivo: `src/pages/Admin/ReenviarAtivacao.tsx`**
+- Adicionar Header
+- Adicionar verificacao de admin
+
+### Fase 2: Padronizar Navegacao
+
+**Arquivo: `src/components/MobileHeader.tsx`**
+- Adicionar menu do usuario com nome e logout
+- Adicionar imports: `User, LogOut` de lucide-react
+- Adicionar `useAuth` hook
+
+**Arquivo: `src/components/Header.tsx` e `MobileHeader.tsx`**
+- Tornar logo clicavel com Link para "/"
+
+**Arquivo: `src/pages/NotFound.tsx`**
+- Atualizar visual para design system
+- Traduzir para portugues
+- Adicionar animacao consistente
+
+### Fase 3: Correcoes de Funcionalidade
+
+**Arquivo: `src/pages/CalculosSalvos.tsx`**
+- Implementar `handleViewDetails` ou remover botao
+
+**Arquivos de autenticacao (Login, RedefinirSenha)**
+- Adicionar botao voltar consistente
+
+### Fase 4: Limpeza
+
+**Arquivo: `src/pages/Index.tsx`**
+- Deletar (nao utilizado)
+
+**Arquivo: `src/App.tsx`**
+- Mover ValidationPanel para local apropriado
+
+---
+
+## Arquivos a Modificar
 
 | Arquivo | Acao |
 |---------|------|
-| `supabase/functions/salvar-calculo/index.ts` | CRIAR |
-| `src/hooks/useResultsSave.ts` | MODIFICAR (usar edge function) |
-| `src/hooks/useResultsData.ts` | MODIFICAR (chamar auto-save) |
-| `src/pages/Results.tsx` | MODIFICAR (remover modal) |
-| `src/components/ResultsActions.tsx` | MODIFICAR (remover botao salvar) |
-| `src/components/SalvarCalculoModal.tsx` | REMOVER (nao mais necessario) |
+| `src/pages/Diagnostico.tsx` | Adicionar Header |
+| `src/pages/AuditoriaITCMD.tsx` | Adicionar Header |
+| `src/pages/Admin/ReenviarAtivacao.tsx` | Adicionar Header + verificacao admin |
+| `src/components/MobileHeader.tsx` | Adicionar menu usuario + logout |
+| `src/components/Header.tsx` | Logo clicavel |
+| `src/pages/NotFound.tsx` | Redesenhar com design system |
+| `src/pages/Login.tsx` | Adicionar botao voltar |
+| `src/pages/RedefinirSenha.tsx` | Adicionar botao voltar |
+| `src/pages/AcessoNegado.tsx` | Adicionar botao voltar |
+| `src/pages/CalculosSalvos.tsx` | Implementar/remover handleViewDetails |
+| `src/pages/Index.tsx` | DELETAR |
+| `src/App.tsx` | Mover ValidationPanel |
 
+---
+
+## Resultado Esperado
+
+Apos implementacao:
+- Todas as paginas terao cabecalho consistente
+- Usuario podera navegar de volta de qualquer pagina
+- Logo funcionara como link para home
+- Mobile tera paridade de funcionalidades com desktop
+- Pagina 404 tera visual profissional
+- Botoes farao o que prometem
+- Sistema limpo sem arquivos orfaos
