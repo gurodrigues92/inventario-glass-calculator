@@ -38,7 +38,11 @@ const LuxuryRadioGroup = ({
                 : 'bg-card/50 border-2 border-border/30 hover:border-primary/50 hover:bg-card/70'
               }
             `}
-            style={{ minWidth: orientation === 'horizontal' ? '140px' : 'auto' }}
+            style={{ 
+              minWidth: orientation === 'horizontal' ? '140px' : 'auto',
+              position: 'relative',
+              zIndex: 1
+            }}
           >
             <div className={`
               w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-300
