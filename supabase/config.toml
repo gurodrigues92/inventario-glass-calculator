@@ -55,3 +55,9 @@ verify_jwt = false
 
 [functions.get-user-calculos]
 verify_jwt = false
+
+[functions.salvar-diagnostico]
+verify_jwt = false
+
+[functions.exportar-diagnosticos]
+verify_jwt = false
