@@ -24,6 +24,6 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, 
     }
   },
   auth: {
-    flowType: 'implicit'  // Evita PKCE — funciona em qualquer browser/dispositivo
+    flowType: 'pkce'  // PKCE evita tokens no fragmento e reduz risco de XSS
   }
 });

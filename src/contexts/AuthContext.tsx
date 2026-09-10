@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { parseEdgeError } from '@/lib/utils';
 
 interface Usuario {
   id: string;
@@ -56,69 +57,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
 
-      // Primeiro tenta autenticar com Supabase Auth nativo
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password: password
+      // Autenticação via edge function customizada (PBKDF2 + inventario_glass.usuarios)
+      const { data: rawData, error: fnError } = await supabase.functions.invoke('auth-login', {
+        body: { email: email.trim().toLowerCase(), password }
       });
 
-      if (authError) {
-        console.error('Erro de autenticação:', authError);
+      // auth-login responde 401 com JSON de negócio (SENHA_NAO_DEFINIDA etc.) — extrair antes de tratar como falha de rede
+      const data = rawData ?? (fnError ? await parseEdgeError(fnError) : null);
 
-        // Mensagens de erro amigáveis
-        if (authError.message.includes('Invalid login credentials')) {
-          return { success: false, error: 'E-mail ou senha incorretos' };
-        } else if (authError.message.includes('Email not confirmed')) {
-          return { success: false, error: 'E-mail não confirmado' };
-        } else {
-          return { success: false, error: 'Erro ao fazer login. Tente novamente.' };
-        }
+      if (!data) {
+        console.error('Erro ao chamar auth-login:', fnError);
+        return { success: false, error: 'Erro de conexão. Tente novamente.' };
       }
 
-      // Se autenticou com sucesso, busca dados adicionais do usuário na tabela 'usuarios'
-      if (authData?.user) {
-        const { data: userData, error: userError } = await supabase
-          .from('usuarios')
-          .select('*')
-          .eq('email', email.trim().toLowerCase())
-          .single();
+      if (!data?.success) {
+        const errorCode = data?.error;
+        console.error('Erro no login:', errorCode);
 
-        if (userError || !userData) {
-          // Se não encontrou na tabela usuarios, usa dados do auth
-          const basicUser: Usuario = {
-            id: authData.user.id,
-            nome: authData.user.email || '',
-            email: authData.user.email || '',
-            ativo: true,
-            created_at: authData.user.created_at,
-            updated_at: new Date().toISOString()
-          };
-
-          setUser(basicUser);
-          localStorage.setItem('inventario_user', JSON.stringify(basicUser));
-          localStorage.setItem('lastLoginCheck', Date.now().toString());
-
-          return { success: true };
+        if (errorCode === 'SENHA_NAO_DEFINIDA') {
+          return { success: false, error: 'SENHA_NAO_DEFINIDA', needsPasswordDefinition: true, token: data?.token };
         }
-
-        // Verifica se usuário está ativo
-        if (!userData.ativo) {
-          await supabase.auth.signOut();
-          return {
-            success: false,
-            error: 'Conta inativa. Entre em contato com o suporte.'
-          };
+        if (errorCode === 'CONTA_INATIVA') {
+          return { success: false, error: 'CONTA_INATIVA', token: data?.token };
         }
-
-        // Salvar usuário no estado e localStorage
-        setUser(userData);
-        localStorage.setItem('inventario_user', JSON.stringify(userData));
-        localStorage.setItem('lastLoginCheck', Date.now().toString());
-
-        return { success: true };
+        return { success: false, error: data?.error || 'E-mail ou senha incorretos' };
       }
 
-      return { success: false, error: 'Erro inesperado' };
+      // Login bem-sucedido — salvar usuário no estado e localStorage
+      const userData: Usuario = data.user;
+      setUser(userData);
+      localStorage.setItem('inventario_user', JSON.stringify(userData));
+      localStorage.setItem('lastLoginCheck', Date.now().toString());
+
+      return { success: true };
     } catch (error) {
       console.error('Erro no login:', error);
       return { success: false, error: 'Erro inesperado' };

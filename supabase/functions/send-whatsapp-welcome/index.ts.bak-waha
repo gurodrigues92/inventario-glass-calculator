@@ -21,12 +21,12 @@ serve(async (req) => {
   }
 
   try {
-    const wahaUrl = Deno.env.get('WAHA_API_URL')
-    const wahaKey = Deno.env.get('WAHA_API_KEY')
-    const wahaSession = Deno.env.get('WAHA_SESSION')
+    const evolutionUrl = Deno.env.get('EVOLUTION_API_URL')
+    const evolutionKey = Deno.env.get('EVOLUTION_API_KEY')
+    const instanceName = Deno.env.get('EVOLUTION_INSTANCE_NAME')
 
-    if (!wahaUrl || !wahaKey || !wahaSession) {
-      throw new Error('Configuração da WAHA API incompleta')
+    if (!evolutionUrl || !evolutionKey || !instanceName) {
+      throw new Error('Configuração da Evolution API incompleta')
     }
 
     const { nome, telefone, token, produto, siteUrl }: WhatsAppRequest = await req.json()
@@ -82,36 +82,32 @@ _Patrimônio Sem Inventário_`
 
     console.log('Enviando WhatsApp para:', phoneWithCountry.substring(0, 5) + '***')
 
-    // chatId: mantém se já tiver "@", senão dígitos + "@c.us"
-    const chatId = phoneWithCountry.includes('@') ? phoneWithCountry : `${phoneWithCountry}@c.us`
-
-    // Enviar via WAHA
+    // Enviar via Evolution API
     const response = await fetch(
-      `${wahaUrl}/api/sendText`,
+      `${evolutionUrl}/message/sendText/${instanceName}`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Api-Key': wahaKey
+          'apikey': evolutionKey
         },
         body: JSON.stringify({
-          session: wahaSession,
-          chatId,
+          number: phoneWithCountry,
           text: message
         })
       }
     )
 
     const result = await response.json()
-
-    console.log('Resposta WAHA:', {
+    
+    console.log('Resposta Evolution API:', { 
       status: response.status, 
       ok: response.ok,
       result: JSON.stringify(result).substring(0, 200)
     })
 
     if (!response.ok) {
-      throw new Error(`WAHA error: ${JSON.stringify(result)}`)
+      throw new Error(`Evolution API error: ${JSON.stringify(result)}`)
     }
 
     console.log('✅ WhatsApp enviado com sucesso!')

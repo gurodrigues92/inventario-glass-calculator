@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { parseEdgeError } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,11 +21,14 @@ export default function SolicitarAtivacao() {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('reenviar-email-manual', {
+      const { data: rawData, error } = await supabase.functions.invoke('reenviar-email-manual', {
         body: { email }
       });
 
-      if (error) {
+      // Edge function pode responder 4xx com JSON de negócio — extrair antes de tratar como falha de rede
+      const data = rawData ?? (error ? await parseEdgeError(error) : null);
+
+      if (!data) {
         console.error('Erro ao solicitar reenvio:', error);
         setError('Erro de conexão. Tente novamente.');
         setIsLoading(false);

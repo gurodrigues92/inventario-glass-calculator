@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { parseEdgeError } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -49,11 +50,14 @@ export default function DefinirSenha() {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('definir-senha', {
+      const { data: rawData, error } = await supabase.functions.invoke('definir-senha', {
         body: { token, password }
       });
 
-      if (error) {
+      // Edge function pode responder 4xx com JSON de negócio (token expirado/inválido) — extrair antes de tratar como falha de rede
+      const data = rawData ?? (error ? await parseEdgeError(error) : null);
+
+      if (!data) {
         console.error('Erro na função definir-senha:', error);
         setError('Erro de conexão. Tente novamente.');
         return;
