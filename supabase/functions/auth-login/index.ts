@@ -158,7 +158,15 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      db: { schema: 'inventario_glass' },
+      global: {
+        headers: {
+          'Accept-Profile': 'inventario_glass',
+          'Content-Profile': 'inventario_glass'
+        }
+      }
+    })
 
     const { email, password }: LoginRequest = await req.json()
 
@@ -172,12 +180,25 @@ serve(async (req) => {
       })
     }
 
-    // Buscar usuário pelo email
-    const { data: usuario, error: userError } = await supabase
+    // Buscar usuário pelo email ignorando caixa: o front normaliza pra minuscula,
+    // mas o cadastro veio da Hotmart com a caixa original (09/09/2026, cliente travado).
+    // `_` e `%` sao curinga no LIKE e aparecem em email de verdade: escapar.
+    const emailNormalizado = email.trim().toLowerCase()
+    const emailPattern = emailNormalizado.replace(/[\\%_]/g, (c) => `\\${c}`)
+
+    // Duplicata por caixa existe na base (mesmo e-mail em dois produtos): pegar a
+    // linha exata quando houver, e so cair no match sem caixa se nao for ambiguo.
+    const escolher = (linhas: any[] | null) =>
+      linhas?.find((u) => u.email === emailNormalizado) ??
+      (linhas?.length === 1 ? linhas[0] : null)
+
+    const { data: candidatos, error: userError } = await supabase
       .from('usuarios')
       .select('*')
-      .eq('email', email)
-      .single()
+      .ilike('email', emailPattern)
+      .limit(5)
+
+    const usuario = escolher(candidatos)
 
     if (userError || !usuario) {
       console.log('Usuário não encontrado:', email)
@@ -192,13 +213,13 @@ serve(async (req) => {
 
     // Verificar se a senha foi definida
     if (!usuario.senha_hash) {
-      console.log('Usuário sem senha definida:', email, 'Token:', usuario.token_definicao_senha);
-      return new Response(JSON.stringify({ 
-        success: false, 
+      // O token de definicao NAO sai daqui: esta e a resposta a uma chamada sem senha
+      // valida, e devolver o token entregaria a conta pra quem souber o email.
+      console.log('Usuário sem senha definida:', email);
+      return new Response(JSON.stringify({
+        success: false,
         error: 'SENHA_NAO_DEFINIDA',
-        message: 'Você precisa definir sua senha primeiro.',
-        token: usuario.token_definicao_senha,
-        hasToken: !!usuario.token_definicao_senha
+        message: 'Você ainda não definiu sua senha. Solicite o link por e-mail.'
       }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -208,12 +229,10 @@ serve(async (req) => {
     // Verificar se o usuário está ativo
     if (!usuario.ativo) {
       console.log('Usuário inativo:', email);
-      return new Response(JSON.stringify({ 
-        success: false, 
+      return new Response(JSON.stringify({
+        success: false,
         error: 'CONTA_INATIVA',
-        message: 'Sua conta não está ativa. Defina sua senha primeiro.',
-        token: usuario.token_definicao_senha,
-        hasToken: !!usuario.token_definicao_senha
+        message: 'Sua conta não está ativa. Defina sua senha primeiro.'
       }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -245,12 +264,44 @@ serve(async (req) => {
 
     // Login bem-sucedido
     console.log('Login bem-sucedido para:', email)
-    
+
+    // Detectar primeiro login + alertar Discord
+    if (!usuario.primeiro_login_em) {
+      const agora = new Date().toISOString()
+      await supabase
+        .from('usuarios')
+        .update({ primeiro_login_em: agora })
+        .eq('id', usuario.id)
+
+      const discordWebhook = Deno.env.get('DISCORD_WEBHOOK_INVENTARIO')
+      if (discordWebhook) {
+        const payload = {
+          username: 'Calculadora Inventário',
+          embeds: [{
+            title: '🔐 Primeiro login realizado',
+            color: 3447003,
+            fields: [
+              { name: 'Nome', value: usuario.nome || '—', inline: true },
+              { name: 'Email', value: usuario.email, inline: true },
+              { name: 'WhatsApp', value: usuario.telefone || '—', inline: true },
+              { name: 'Produto', value: usuario.produto || '—', inline: false }
+            ],
+            timestamp: agora
+          }]
+        }
+        fetch(discordWebhook, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(err => console.error('Erro Discord (primeiro login):', err))
+      }
+    }
+
     // Remover dados sensíveis antes de retornar
     const { senha_hash, token_definicao_senha, ...usuarioSeguro } = usuario
 
-    return new Response(JSON.stringify({ 
-      success: true, 
+    return new Response(JSON.stringify({
+      success: true,
       user: usuarioSeguro,
       message: 'Login realizado com sucesso'
     }), {

@@ -20,7 +20,6 @@ interface AuthContextType {
     success: boolean; 
     error?: string; 
     message?: string;
-    token?: string;
     needsPasswordDefinition?: boolean;
   }>;
   logout: () => void;
@@ -51,7 +50,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     success: boolean;
     error?: string;
     message?: string;
-    token?: string;
     needsPasswordDefinition?: boolean;
   }> => {
     try {
@@ -75,10 +73,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error('Erro no login:', errorCode);
 
         if (errorCode === 'SENHA_NAO_DEFINIDA') {
-          return { success: false, error: 'SENHA_NAO_DEFINIDA', needsPasswordDefinition: true, token: data?.token };
+          return { success: false, error: 'SENHA_NAO_DEFINIDA', needsPasswordDefinition: true, message: data?.message as string };
         }
         if (errorCode === 'CONTA_INATIVA') {
-          return { success: false, error: 'CONTA_INATIVA', token: data?.token };
+          return { success: false, error: 'CONTA_INATIVA', message: data?.message as string };
         }
         return { success: false, error: data?.error || 'E-mail ou senha incorretos' };
       }
@@ -87,7 +85,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userData: Usuario = data.user;
       setUser(userData);
       localStorage.setItem('inventario_user', JSON.stringify(userData));
-      localStorage.setItem('lastLoginCheck', Date.now().toString());
 
       return { success: true };
     } catch (error) {

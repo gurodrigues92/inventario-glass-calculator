@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.50.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,7 +19,10 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      db: { schema: 'inventario_glass' },
+      global: { headers: { 'Accept-Profile': 'inventario_glass', 'Content-Profile': 'inventario_glass' } }
+    });
 
     const { email }: ReenviarEmailRequest = await req.json();
 
@@ -30,11 +33,23 @@ serve(async (req) => {
     console.log(`[REENVIO MANUAL] Iniciando processo para: ${email}`);
 
     // 1. Buscar usuário
-    const { data: usuario, error: errorUsuario } = await supabase
+    // `_` e `%` sao curinga no LIKE e aparecem em email de verdade: escapar.
+    const emailNormalizado = email.trim().toLowerCase();
+    const emailPattern = emailNormalizado.replace(/[\\%_]/g, (c) => `\\${c}`);
+
+    // Duplicata por caixa existe na base (mesmo e-mail em dois produtos): pegar a
+    // linha exata quando houver, e so cair no match sem caixa se nao for ambiguo.
+    const escolher = (linhas: any[] | null) =>
+      linhas?.find((u) => u.email === emailNormalizado) ??
+      (linhas?.length === 1 ? linhas[0] : null)
+
+    const { data: candidatos, error: errorUsuario } = await supabase
       .from('usuarios')
       .select('*')
-      .eq('email', email)
-      .single();
+      .ilike('email', emailPattern)
+      .limit(5);
+
+    const usuario = escolher(candidatos);
 
     if (errorUsuario || !usuario) {
       throw new Error(`Usuário não encontrado: ${email}`);
@@ -60,7 +75,7 @@ serve(async (req) => {
         token_definicao_senha: token,
         token_gerado_em: new Date().toISOString()
       })
-      .eq('email', email);
+      .eq('id', usuario.id);
 
     if (updateError) {
       throw new Error(`Erro ao atualizar usuário: ${updateError.message}`);
@@ -74,8 +89,7 @@ serve(async (req) => {
         nome: usuario.nome,
         email: usuario.email,
         token: token,
-        produto: usuario.produto || 'Calculadora de Inventário',
-        siteUrl: 'https://app.inventariodescomplicado.com.br'
+        produto: usuario.produto || 'Calculadora de Inventário'
       }
     });
 
@@ -125,12 +139,12 @@ serve(async (req) => {
       }
     );
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('[REENVIO MANUAL] Erro:', error);
     return new Response(
       JSON.stringify({
         success: false,
-        error: (error instanceof Error ? error.message : String(error))
+        error: error.message
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { parseEdgeError } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
@@ -26,26 +27,23 @@ export default function RecuperarSenha() {
     setIsLoading(true);
 
     try {
-      // Usa auth nativo do Supabase ao invés de Edge Function
-      const { error } = await supabase.auth.resetPasswordForEmail(
-        email.trim().toLowerCase(),
-        {
-          redirectTo: `${window.location.origin}/redefinir-senha`
-        }
-      );
+      // A senha vive em inventario_glass.usuarios (PBKDF2), nao no Auth nativo:
+      // o reset tem que passar pela edge function, senao nao muda nada.
+      const { data: rawData, error } = await supabase.functions.invoke('recuperar-senha', {
+        body: { email: email.trim().toLowerCase() }
+      });
 
-      if (error) {
+      const data = rawData ?? (error ? await parseEdgeError(error) : null);
+
+      if (!data) {
         console.error('Erro ao recuperar senha:', error);
+        setError('Erro de conexão. Tente novamente.');
+        setIsLoading(false);
+        return;
+      }
 
-        // Mensagens de erro mais amigáveis
-        if (error.message.includes('Email rate limit exceeded')) {
-          setError('Muitas tentativas. Aguarde alguns minutos e tente novamente.');
-        } else if (error.message.includes('Invalid email')) {
-          setError('E-mail inválido.');
-        } else {
-          setError('Erro ao enviar e-mail. Tente novamente.');
-        }
-
+      if (!data.success) {
+        setError((data.error as string) || 'Erro ao enviar e-mail. Tente novamente.');
         setIsLoading(false);
         return;
       }

@@ -31,21 +31,13 @@ export default function Login() {
     if (result.success) {
       navigate('/');
     } else {
-      // Verificar se precisa definir senha
-      if (result.needsPasswordDefinition && result.token) {
-        console.log('Redirecionando para definir senha com token:', result.token);
-        navigate(`/definir-senha?token=${result.token}`);
-        return;
-      }
-      
-      // Mostrar mensagem específica ou genérica
-      if (result.error === 'SENHA_NAO_DEFINIDA') {
-        setError('Você precisa definir sua senha primeiro. Redirecionando...');
+      // Conta sem senha definida: mandar pro reenvio do link por e-mail.
+      // O token de ativacao nao vem mais na resposta do login, de proposito.
+      if (result.error === 'SENHA_NAO_DEFINIDA' || result.error === 'CONTA_INATIVA') {
+        setError('Você ainda não definiu sua senha. Vamos reenviar o link para o seu e-mail.');
         setTimeout(() => {
-          navigate('/definir-senha');
+          navigate('/solicitar-ativacao');
         }, 2000);
-              } else if (result.error === 'CONTA_INATIVA') {
-        setError('Sua conta não está ativa. Você precisa definir sua senha primeiro.');
       } else if (result.error === 'Credenciais inválidas' || result.error === 'Email ou senha incorretos') {
         setError('Email ou senha incorretos. Se você ainda não definiu sua senha, clique em "Não recebeu o email?" abaixo.');
       } else {

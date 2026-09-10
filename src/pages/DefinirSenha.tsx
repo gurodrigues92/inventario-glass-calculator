@@ -24,7 +24,7 @@ export default function DefinirSenha() {
 
   useEffect(() => {
     if (!token) {
-      setError('Token de ativação não encontrado na URL');
+      setError('Link sem token. Solicite um novo link por e-mail.');
     }
   }, [token]);
 
@@ -33,7 +33,7 @@ export default function DefinirSenha() {
     setError('');
     
     if (!token) {
-      setError('Token de ativação inválido');
+      setError('Link inválido. Solicite um novo link por e-mail.');
       return;
     }
 
@@ -66,7 +66,7 @@ export default function DefinirSenha() {
       if (!data.success) {
         // Mensagens de erro mais claras
         if (data.error.includes('expirado') || data.error.includes('Token expirado')) {
-          setError('Seu link de ativação expirou. Solicite um novo clicando no botão abaixo.');
+          setError('Seu link expirou. Solicite um novo clicando no botão abaixo.');
         } else if (data.error.includes('inválido') || data.error.includes('Token inválido')) {
           setError('Link inválido ou já utilizado. Solicite um novo clicando no botão abaixo.');
         } else {

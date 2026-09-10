@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
-import { Resend } from "npm:resend@4.0.0";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { Resend } from "npm:resend@2.0.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -31,7 +31,15 @@ serve(async (req) => {
       throw new Error('Serviço de e-mail não configurado');
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
+    const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
+      db: { schema: 'inventario_glass' },
+      global: {
+        headers: {
+          'Accept-Profile': 'inventario_glass',
+          'Content-Profile': 'inventario_glass'
+        }
+      }
+    });
     const resend = new Resend(resendApiKey);
 
     const { email }: RecuperarSenhaRequest = await req.json();
@@ -52,11 +60,24 @@ serve(async (req) => {
     console.log('Buscando usuário com e-mail:', email);
 
     // Buscar usuário pelo e-mail
-    const { data: usuario, error: usuarioError } = await supabase
+    // Busca ignorando caixa.
+    // `_` e `%` sao curinga no LIKE e aparecem em email de verdade: escapar.
+    const emailNormalizado = email.trim().toLowerCase();
+    const emailPattern = emailNormalizado.replace(/[\\%_]/g, (c) => `\\${c}`);
+
+    // Duplicata por caixa existe na base (mesmo e-mail em dois produtos): pegar a
+    // linha exata quando houver, e so cair no match sem caixa se nao for ambiguo.
+    const escolher = (linhas: any[] | null) =>
+      linhas?.find((u) => u.email === emailNormalizado) ??
+      (linhas?.length === 1 ? linhas[0] : null)
+
+    const { data: candidatos, error: usuarioError } = await supabase
       .from('usuarios')
       .select('id, nome, email, ativo')
-      .eq('email', email.trim().toLowerCase())
-      .maybeSingle();
+      .ilike('email', emailPattern)
+      .limit(5);
+
+    const usuario = escolher(candidatos);
 
     if (usuarioError) {
       console.error('Erro ao buscar usuário:', usuarioError);
@@ -124,15 +145,14 @@ serve(async (req) => {
     console.log('Token de recuperação salvo no banco de dados');
 
     // Construir URL de recuperação
-    const urlBase = supabaseUrl.replace('.supabase.co', '.lovableproject.com');
-    const linkRecuperacao = `${urlBase}/redefinir-senha?token=${token}`;
+    const linkRecuperacao = `https://calculadora.patrimonioseminventario.com.br/definir-senha?token=${token}`;
 
     console.log('Enviando e-mail de recuperação para:', email);
 
     // Enviar e-mail
     const { error: emailError } = await resend.emails.send({
-      from: 'Inventário Descomplicado <onboarding@resend.dev>',
-      to: [email],
+      from: 'Inventário Descomplicado <noreply@updates.patrimonioseminventario.com.br>',
+      to: [usuario.email],
       subject: 'Recuperação de Senha - Inventário Descomplicado',
       html: `
         <!DOCTYPE html>
