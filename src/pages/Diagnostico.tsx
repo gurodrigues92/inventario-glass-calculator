@@ -10,7 +10,7 @@ import LuxuryRadioGroup from '@/components/ui/LuxuryRadioGroup';
 import LuxuryTextarea from '@/components/ui/LuxuryTextarea';
 import { useDiagnostico, Empresa, Herdeiro } from '@/contexts/DiagnosticoContext';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { invocarEdge } from '@/lib/edge';
 import { useAuth } from '@/contexts/AuthContext';
 
 const estadosBrasileiros = [
@@ -144,8 +144,7 @@ export default function Diagnostico() {
     
     try {
       // Salvar no Supabase via edge function
-      const { data, error } = await supabase.functions.invoke('salvar-diagnostico', {
-        body: {
+      const { data, error } = await invocarEdge<{ success?: boolean; error?: string; diagnostico?: { id: string } }>('salvar-diagnostico', {
           nome: dados.nome,
           cidade: dados.cidade,
           estado: dados.estado,
@@ -157,14 +156,16 @@ export default function Diagnostico() {
           imoveisAlugados: dados.imoveisAlugados,
           receitaAluguel: dados.receitaAluguel,
           herdeiros: dados.herdeiros,
-          observacoes: dados.observacoes,
-          usuarioId: user?.id || null
-        }
+          observacoes: dados.observacoes
       });
 
-      if (error) {
-        console.error('Erro ao salvar diagnóstico:', error);
-        toast.error('Erro ao salvar diagnóstico. Tente novamente.');
+      if (!data?.success) {
+        console.error('Erro ao salvar diagnóstico:', data?.error ?? error);
+        toast.error(
+          data?.error === 'SESSAO_INVALIDA'
+            ? 'Sua sessão expirou. Entre novamente.'
+            : 'Erro ao salvar diagnóstico. Tente novamente.'
+        );
         return;
       }
 

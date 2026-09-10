@@ -111,6 +111,27 @@ serve(async (req) => {
 
     console.log('Usuário encontrado:', usuario.id);
 
+    // Trava de repeticao: a funcao e publica, entao sem isso da pra encher a caixa
+    // de qualquer comprador chamando em loop (10/09/2026).
+    const cincoMinAtras = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const { data: recente } = await supabase
+      .from('password_reset_tokens')
+      .select('id')
+      .eq('user_id', usuario.id)
+      .gt('created_at', cincoMinAtras)
+      .limit(1);
+
+    if (recente && recente.length > 0) {
+      console.log('Pedido repetido em menos de 5 minutos, ignorando:', usuario.id);
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: 'Se o e-mail existir em nossa base, você receberá instruções para redefinir sua senha.'
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Gerar token seguro usando a função do banco
     const { data: tokenData, error: tokenError } = await supabase
       .rpc('gerar_token_seguro');

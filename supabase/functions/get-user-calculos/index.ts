@@ -1,9 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { usuarioDaSessao, respostaSemSessao } from '../_shared/sessao.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-sessao',
 };
 
 serve(async (req) => {
@@ -13,23 +14,23 @@ serve(async (req) => {
   }
 
   try {
-    const { usuarioId } = await req.json();
-
-    if (!usuarioId) {
-      console.error('[get-user-calculos] usuarioId não fornecido');
-      return new Response(
-        JSON.stringify({ error: 'usuarioId é obrigatório' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    console.log('[get-user-calculos] Buscando cálculos para usuário:', usuarioId);
-
     // Usar service role para bypass de RLS
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        db: { schema: 'inventario_glass' },
+        global: { headers: { 'Accept-Profile': 'inventario_glass', 'Content-Profile': 'inventario_glass' } }
+      }
     );
+
+    // Quem e o usuario vem da sessao assinada, nunca do corpo: com service role
+    // aqui, aceitar um id do cliente entregaria o calculo de qualquer pessoa.
+    const usuario = await usuarioDaSessao(req, supabaseAdmin);
+    if (!usuario) return respostaSemSessao(corsHeaders);
+
+    const usuarioId = usuario.id;
+    console.log('[get-user-calculos] Buscando cálculos para usuário:', usuarioId);
 
     // OTIMIZADO: Primeiro buscar o profile_id do usuário
     const { data: profile, error: profileError } = await supabaseAdmin

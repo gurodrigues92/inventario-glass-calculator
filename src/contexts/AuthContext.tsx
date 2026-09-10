@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { parseEdgeError } from '@/lib/utils';
+import { invocarEdge, guardarSessao, limparSessao } from '@/lib/edge';
 
 interface Usuario {
   id: string;
@@ -33,7 +32,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Verificar se há usuário no localStorage
+    // O localStorage e chute otimista pra tela nao piscar. Quem decide se a
+    // sessao vale e o servidor: conta desativada ou token vencido cai aqui.
     const storedUser = localStorage.getItem('inventario_user');
     if (storedUser) {
       try {
@@ -43,7 +43,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem('inventario_user');
       }
     }
-    setIsLoading(false);
+
+    let cancelado = false;
+
+    invocarEdge<{ success?: boolean; user?: Usuario }>('auth-sessao')
+      .then(({ data }) => {
+        if (cancelado) return;
+
+        if (data?.success && data.user) {
+          setUser(data.user);
+          localStorage.setItem('inventario_user', JSON.stringify(data.user));
+        } else {
+          setUser(null);
+          localStorage.removeItem('inventario_user');
+          limparSessao();
+        }
+      })
+      .finally(() => {
+        if (!cancelado) setIsLoading(false);
+      });
+
+    return () => { cancelado = true; };
   }, []);
 
   const login = async (email: string, password: string): Promise<{
@@ -56,12 +76,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
 
       // Autenticação via edge function customizada (PBKDF2 + inventario_glass.usuarios)
-      const { data: rawData, error: fnError } = await supabase.functions.invoke('auth-login', {
-        body: { email: email.trim().toLowerCase(), password }
-      });
-
-      // auth-login responde 401 com JSON de negócio (SENHA_NAO_DEFINIDA etc.) — extrair antes de tratar como falha de rede
-      const data = rawData ?? (fnError ? await parseEdgeError(fnError) : null);
+      const { data, error: fnError } = await invocarEdge<{
+        success?: boolean;
+        error?: string;
+        message?: string;
+        user?: Usuario;
+        session?: { token: string; expiraEm: string };
+      }>('auth-login', { email: email.trim().toLowerCase(), password });
 
       if (!data) {
         console.error('Erro ao chamar auth-login:', fnError);
@@ -81,8 +102,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: data?.error || 'E-mail ou senha incorretos' };
       }
 
-      // Login bem-sucedido — salvar usuário no estado e localStorage
+      if (!data.session?.token || !data.user) {
+        console.error('auth-login respondeu sem sessão');
+        return { success: false, error: 'Resposta inválida do servidor. Tente novamente.' };
+      }
+
+      // Login bem-sucedido — guardar a sessão assinada e o usuário
       const userData: Usuario = data.user;
+      guardarSessao(data.session.token);
       setUser(userData);
       localStorage.setItem('inventario_user', JSON.stringify(userData));
 
@@ -98,6 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('inventario_user');
+    limparSessao();
   };
 
   const value: AuthContextType = {

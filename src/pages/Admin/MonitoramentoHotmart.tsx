@@ -26,7 +26,8 @@ interface Compra {
   erro_mensagem?: string;
   erro_stack?: string;
   etapa_falha?: string;
-  webhook_payload?: Record<string, unknown>;
+  // O tipo gerado do Supabase devolve Json (pode ser string, numero, objeto).
+  webhook_payload?: unknown;
   produto?: string;
 }
 

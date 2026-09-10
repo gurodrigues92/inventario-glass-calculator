@@ -1,7 +1,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import Header from '../components/Header';
-import { supabase } from '@/integrations/supabase/client';
+import { invocarEdge, sessaoExpirou } from '@/lib/edge';
 import { useAuth } from '@/contexts/AuthContext';
 import CalculosHeader from '../components/calculos-salvos/CalculosHeader';
 import SearchBar from '../components/calculos-salvos/SearchBar';
@@ -31,13 +31,7 @@ const CalculosSalvos = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [tipoFiltro, setTipoFiltro] = useState('todos');
   const [isLoading, setIsLoading] = useState(true);
-  const { user } = useAuth();
-
-  useEffect(() => {
-    if (user?.id) {
-      carregarCalculos();
-    }
-  }, [carregarCalculos, user?.id]);
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     let filtered = calculos;
@@ -87,14 +81,15 @@ const CalculosSalvos = () => {
     }
 
     try {
-      // Usar edge function para buscar cálculos do usuário
-      const { data, error } = await supabase.functions.invoke('get-user-calculos', {
-        body: { usuarioId: user.id }
-      });
+      // Quem e o usuario vai na sessao assinada; a funcao ignora id vindo do corpo.
+      const { data } = await invocarEdge<{ calculos?: CalculoSalvo[]; error?: string }>('get-user-calculos');
 
-      if (error) throw error;
+      if (sessaoExpirou(data)) {
+        logout();
+        return;
+      }
 
-      const calculosFormatados = data.calculos || [];
+      const calculosFormatados = data?.calculos || [];
       setCalculos(calculosFormatados);
       setFilteredCalculos(calculosFormatados);
     } catch (error) {
@@ -102,7 +97,13 @@ const CalculosSalvos = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [user?.id]);
+  }, [user?.id, logout]);
+
+  useEffect(() => {
+    if (user?.id) {
+      carregarCalculos();
+    }
+  }, [carregarCalculos, user?.id]);
 
 
   if (isLoading) {

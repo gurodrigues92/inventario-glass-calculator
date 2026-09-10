@@ -1,8 +1,9 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { usuarioDaSessao, respostaSemSessao } from '../_shared/sessao.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-sessao',
 }
 
 Deno.serve(async (req) => {
@@ -13,18 +14,32 @@ Deno.serve(async (req) => {
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+      {
+        db: { schema: 'inventario_glass' },
+        global: { headers: { 'Accept-Profile': 'inventario_glass', 'Content-Profile': 'inventario_glass' } }
+      }
     )
 
+    // A calculadora so roda logada: o dono do calculo vem da sessao assinada,
+    // nunca de um id no corpo.
+    const usuarioSessao = await usuarioDaSessao(req, supabase)
+    if (!usuarioSessao) return respostaSemSessao(corsHeaders)
+
+    const usuarioId = usuarioSessao.id
+
     const data = await req.json()
-    const { usuarioId, nome, email, dadosCalculo, tipoCalculadora, dadosDiagnostico } = data
+    const { nome, email, dadosCalculo, tipoCalculadora, dadosDiagnostico } = data
 
     console.log('Recebendo dados para salvar calculo:', { usuarioId, nome, tipoCalculadora, temDiagnostico: !!dadosDiagnostico })
 
     // 1. Buscar ou criar profile
     let profileId: string
+    let telefoneUsuario: string | null = null
 
-    if (usuarioId) {
+    {
+      telefoneUsuario = usuarioSessao.telefone || null
+
       const { data: existingProfile } = await supabase
         .from('profiles')
         .select('id')
@@ -48,20 +63,6 @@ Deno.serve(async (req) => {
         profileId = newProfile.id
         console.log('Novo profile criado:', profileId)
       }
-    } else {
-      // Usuario anonimo - criar profile temporario
-      const { data: newProfile, error } = await supabase
-        .from('profiles')
-        .insert({ nome: nome || 'Visitante' })
-        .select('id')
-        .single()
-      
-      if (error) {
-        console.error('Erro ao criar profile anonimo:', error)
-        throw error
-      }
-      profileId = newProfile.id
-      console.log('Profile anonimo criado:', profileId)
     }
 
     // 2. Salvar calculo
@@ -95,9 +96,10 @@ Deno.serve(async (req) => {
       const webhookPayload = {
         id: calculo.id,
         usuario: {
-          id: usuarioId || null,
-          nome: nome || 'Visitante',
-          email: email || null
+          id: usuarioId,
+          nome: nome || usuarioSessao.nome,
+          email: email || usuarioSessao.email,
+          telefone: telefoneUsuario || null
         },
         diagnostico: dadosDiagnostico ? {
           nome: dadosDiagnostico.nome,

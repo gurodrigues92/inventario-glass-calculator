@@ -1,8 +1,9 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { usuarioDaSessao, respostaSemSessao } from '../_shared/sessao.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-sessao',
 };
 
 interface DiagnosticoData {
@@ -31,7 +32,13 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      db: { schema: 'inventario_glass' }
+    });
+
+    // O diagnostico so e preenchido logado: o dono vem da sessao assinada.
+    const usuarioSessao = await usuarioDaSessao(req, supabase);
+    if (!usuarioSessao) return respostaSemSessao(corsHeaders);
 
     const data: DiagnosticoData = await req.json();
     
@@ -57,7 +64,7 @@ Deno.serve(async (req) => {
     const { data: diagnostico, error } = await supabase
       .from('diagnosticos')
       .insert({
-        usuario_id: data.usuarioId || null,
+        usuario_id: usuarioSessao.id,
         nome: data.nome,
         cidade: data.cidade,
         estado: data.estado,

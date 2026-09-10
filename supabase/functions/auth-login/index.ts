@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { assinarSessao } from '../_shared/sessao.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -300,8 +301,13 @@ serve(async (req) => {
     // Remover dados sensíveis antes de retornar
     const { senha_hash, token_definicao_senha, ...usuarioSeguro } = usuario
 
+    // Sessao assinada: e isso que autoriza as chamadas seguintes. O front nao
+    // manda mais usuarioId no corpo pra dizer quem e.
+    const sessao = await assinarSessao(usuario.id)
+
     return new Response(JSON.stringify({
       success: true,
+      session: sessao,
       user: usuarioSeguro,
       message: 'Login realizado com sucesso'
     }), {

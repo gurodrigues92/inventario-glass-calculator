@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { invocarEdge } from '@/lib/edge';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDiagnostico } from '@/contexts/DiagnosticoContext';
 import { parseCurrencyValue } from '../utils/formatters';
@@ -60,20 +60,15 @@ export const useResultsSave = (resultado: ResultadoCalculo | null, formData: Res
 
         console.log('Auto-salvando calculo...', { usuarioId: user?.id, tipoCalculadora });
 
-        const { data, error } = await supabase.functions.invoke('salvar-calculo', {
-          body: {
-            usuarioId: user?.id || null,
-            nome: user?.nome || 'Visitante',
-            email: user?.email || null,
-            dadosCalculo,
-            tipoCalculadora,
-            dadosDiagnostico: diagnostico
-          }
+        const { data } = await invocarEdge<{ success?: boolean; calculoId?: string; error?: string }>('salvar-calculo', {
+          nome: user?.nome,
+          email: user?.email,
+          dadosCalculo,
+          tipoCalculadora,
+          dadosDiagnostico: diagnostico
         });
 
-        if (error) {
-          console.error('Erro ao auto-salvar calculo:', error);
-        } else if (data?.success) {
+        if (data?.success) {
           console.log('Calculo auto-salvo com sucesso:', data.calculoId);
           setCalculoSalvoId(data.calculoId);
         } else {
