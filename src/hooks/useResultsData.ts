@@ -9,6 +9,23 @@ interface LoadingStep {
   progress: number;
 }
 
+export interface ResultsFormData {
+  estado: string;
+  valorImoveis: string;
+  valorVeiculos: string;
+  valorInvestimentos: string;
+  patrimonioHistoricoIR?: string;
+  patrimonio?: string;
+  patrimonioAtualMercado?: string;
+  tipoProcesso: 'judicial' | 'extrajudicial';
+  herdeiros?: string;
+  temTestamento?: boolean;
+  temMenoresIncapazes?: boolean;
+  temLitigio?: boolean;
+  valorOutrosBens?: string;
+  dividasEspolio?: string;
+}
+
 const LOADING_STEPS: LoadingStep[] = [
   { message: 'Analisando patrimônio...', progress: 25 },
   { message: 'Calculando ITCMD...', progress: 50 },
@@ -24,7 +41,10 @@ export const useResultsData = () => {
   const [loadingStep, setLoadingStep] = useState(0);
   const [loadingProgress, setLoadingProgress] = useState(0);
   
-  const { formData, calculationType } = location.state || {};
+  const { formData, calculationType } = (location.state || {}) as {
+    formData?: ResultsFormData;
+    calculationType?: string;
+  };
 
   useEffect(() => {
     console.log('Results page data:', { formData, calculationType });
@@ -59,7 +79,7 @@ export const useResultsData = () => {
     const loadingInterval = simulateLoading();
     
     return () => clearInterval(loadingInterval);
-  }, [formData, navigate]);
+  }, [formData, calculationType, navigate]);
 
   const dadosCalculo: DadosCalculoInventario = formData ? {
     patrimonio: parseCurrencyValue(formData.patrimonio),

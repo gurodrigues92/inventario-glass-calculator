@@ -1,6 +1,7 @@
 import React from 'react';
-import { DadosCalculoInventario } from '../utils/itcmdCalculator';
+import { DadosCalculoInventario, ResultadoCalculo } from '../utils/itcmdCalculator';
 import { useIsMobile } from '../hooks/use-mobile';
+import type { ResultsFormData } from '../hooks/useResultsData';
 import { calcularHoldingLTDA } from '../utils/calculators/holdingLTDACalculator';
 import CostSummaryCard from './results/CostSummaryCard';
 import CostBreakdownCard from './results/CostBreakdownCard';
@@ -12,9 +13,9 @@ import CTACard from './results/CTACard';
 import ComparisonSection from './results/ComparisonSection';
 
 interface ResultsSimplifiedProps {
-  resultado: any;
+  resultado: ResultadoCalculo;
   dadosCalculo: DadosCalculoInventario;
-  formData: any;
+  formData: ResultsFormData;
 }
 
 const ResultsSimplified = ({ resultado, dadosCalculo, formData }: ResultsSimplifiedProps) => {

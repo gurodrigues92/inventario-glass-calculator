@@ -9,14 +9,16 @@ import {
   gerarRelatorioAuditoria, 
   testarEstadosSuspeitos,
   type ResumoAuditoria,
-  type ResultadoAuditoria 
+  type ResultadoAuditoria,
+  type EstadoSuspeito,
+  type FaixaDetalhada
 } from '../../utils/auditoria/itcmdAuditoria';
 import { formatCurrency } from '../../utils/formatters';
 
 const AuditoriaITCMD = () => {
   const [resumoAuditoria, setResumoAuditoria] = useState<ResumoAuditoria | null>(null);
   const [carregando, setCarregando] = useState(false);
-  const [estadosSuspeitos, setEstadosSuspeitos] = useState<any>(null);
+  const [estadosSuspeitos, setEstadosSuspeitos] = useState<Record<string, EstadoSuspeito> | null>(null);
 
   const executarAuditoria = async () => {
     setCarregando(true);
@@ -228,7 +230,7 @@ const AuditoriaITCMD = () => {
                   </AlertDescription>
                 </Alert>
                 
-                {Object.entries(estadosSuspeitos).map(([uf, dados]: [string, any]) => (
+                {Object.entries(estadosSuspeitos).map(([uf, dados]: [string, EstadoSuspeito]) => (
                   <Card key={uf}>
                     <CardHeader>
                       <CardTitle>{uf} - {dados.nome}</CardTitle>
@@ -249,7 +251,7 @@ const AuditoriaITCMD = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            {dados.calculoDetalhado.map((faixa: any, index: number) => (
+                            {dados.calculoDetalhado.map((faixa: FaixaDetalhada, index: number) => (
                               <tr key={index} className="border-b">
                                 <td className="p-2">{faixa.faixa}</td>
                                 <td className="p-2">{faixa.aliquota}</td>

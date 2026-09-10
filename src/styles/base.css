@@ -1,12 +1,11 @@
 
-@layer base {
+
   * {
     @apply border-border;
     box-sizing: border-box;
   }
   
   html {
-    @apply light;
     background: var(--bg-principal, #FFFFFF) !important;
     color: var(--text-primary, #2C2C2C) !important;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -28,7 +27,7 @@
     color: var(--text-primary, #2C2C2C) !important;
     min-height: 100vh;
   }
-}
+
 
 /* Classe para background animado clean */
 .bg-animated {

@@ -59,7 +59,7 @@ export const formatCurrencyAsTyping = (inputValue: string, allowDecimals: boolea
   if (!inputValue) return '';
   
   // Remove tudo exceto números, vírgulas e pontos
-  let cleanValue = inputValue.replace(/[^\d,\.]/g, '');
+  const cleanValue = inputValue.replace(/[^\d,.]/g, '');
   
   if (!cleanValue) return '';
   
@@ -102,7 +102,7 @@ export const formatSmartCurrencyInput = (inputValue: string, allowDecimals: bool
   if (allowDecimals) {
     // Para valores com decimais - aceita diferentes formatos de entrada
     // Remove tudo exceto números, vírgulas e pontos
-    cleanValue = cleanValue.replace(/[^\d,\.]/g, '');
+    cleanValue = cleanValue.replace(/[^\d,.]/g, '');
     
     // Se não tem vírgula nem ponto, trata como número inteiro
     if (!cleanValue.includes(',') && !cleanValue.includes('.')) {

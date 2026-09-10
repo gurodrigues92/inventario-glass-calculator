@@ -21,6 +21,20 @@ export interface ResumoAuditoria {
   discrepanciasEncontradas: ResultadoAuditoria[];
 }
 
+export interface FaixaDetalhada {
+  faixa: string;
+  aliquota: string;
+  valorIncidencia: number;
+  impostoFaixa: number;
+}
+
+export interface EstadoSuspeito {
+  nome: string;
+  calculoDetalhado: FaixaDetalhada[];
+  impostoTotal: number;
+  aliquotaEfetiva: string;
+}
+
 // Função para calcular manualmente ITCMD progressivo para validação
 const calcularManualProgressivo = (patrimonio: number, estado: string): number => {
   const estadoData = ESTADOS_DATA[estado];
@@ -193,9 +207,9 @@ export const gerarRelatorioAuditoria = (resumo: ResumoAuditoria): string => {
 };
 
 // Função específica para testar estados suspeitos
-export const testarEstadosSuspeitos = (): { [uf: string]: any } => {
+export const testarEstadosSuspeitos = (): Record<string, EstadoSuspeito> => {
   const estadosSuspeitos = ['RS', 'MT', 'SC', 'SP', 'PE'];
-  const resultados: { [uf: string]: any } = {};
+  const resultados: Record<string, EstadoSuspeito> = {};
   
   estadosSuspeitos.forEach(uf => {
     const estado = ESTADOS_DATA[uf];
@@ -203,7 +217,7 @@ export const testarEstadosSuspeitos = (): { [uf: string]: any } => {
     
     if (estado.itcmd.tipo === 'progressiva') {
       const faixas = estado.itcmd.faixas!;
-      let calculoDetalhado = [];
+      const calculoDetalhado: FaixaDetalhada[] = [];
       let imposto = 0;
       let valorRestante = patrimonio;
       let limiteAnterior = 0;

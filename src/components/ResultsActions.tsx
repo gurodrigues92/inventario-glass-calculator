@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, ArrowLeft } from 'lucide-react';
+import { Download, ArrowLeft, CheckCircle, Loader2 } from 'lucide-react';
 import { usePDF } from '../hooks/usePDF';
 import { useToast } from '../hooks/use-toast';
 import { useIsMobile } from '../hooks/use-mobile';
@@ -26,7 +26,7 @@ const ResultsActions = ({ shareData, isSaving, calculoSalvoId }: ResultsActionsP
     try {
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      console.log('Iniciando geração de PDF com dados:', shareData);
+      // Removido log desnecessário
       
       await generatePDF(
         'results-content',
@@ -98,6 +98,27 @@ const ResultsActions = ({ shareData, isSaving, calculoSalvoId }: ResultsActionsP
 
   return (
     <div className={`results-actions ${isMobile ? 'mobile-results-actions' : ''}`}>
+      {/* Indicador de Salvamento */}
+      {(isSaving || calculoSalvoId) && (
+        <div className="flex justify-center mb-4">
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${
+            isSaving ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700'
+          }`}>
+            {isSaving ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Salvando cálculo...</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle className="w-4 h-4" />
+                <span>Cálculo salvo automaticamente</span>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       <div 
         className={`flex ${isMobile ? 'flex-col' : 'flex-row'} ${isMobile ? 'gap-4' : 'gap-3'} justify-center items-center`}
         style={{

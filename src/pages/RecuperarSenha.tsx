@@ -26,23 +26,31 @@ export default function RecuperarSenha() {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('recuperar-senha', {
-        body: { email: email.trim().toLowerCase() }
-      });
+      // Usa auth nativo do Supabase ao invés de Edge Function
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        email.trim().toLowerCase(),
+        {
+          redirectTo: `${window.location.origin}/redefinir-senha`
+        }
+      );
 
       if (error) {
-        console.error('Erro na função recuperar-senha:', error);
-        setError('Erro de conexão. Tente novamente.');
+        console.error('Erro ao recuperar senha:', error);
+
+        // Mensagens de erro mais amigáveis
+        if (error.message.includes('Email rate limit exceeded')) {
+          setError('Muitas tentativas. Aguarde alguns minutos e tente novamente.');
+        } else if (error.message.includes('Invalid email')) {
+          setError('E-mail inválido.');
+        } else {
+          setError('Erro ao enviar e-mail. Tente novamente.');
+        }
+
         setIsLoading(false);
         return;
       }
 
-      if (!data.success) {
-        setError(data.error || 'Erro ao processar solicitação');
-        setIsLoading(false);
-        return;
-      }
-
+      // Sempre mostra sucesso (por segurança, não revela se email existe)
       setSuccess(true);
     } catch (error) {
       console.error('Erro ao recuperar senha:', error);

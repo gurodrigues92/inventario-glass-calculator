@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Header from '../components/Header';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -37,7 +37,7 @@ const CalculosSalvos = () => {
     if (user?.id) {
       carregarCalculos();
     }
-  }, [user?.id]);
+  }, [carregarCalculos, user?.id]);
 
   useEffect(() => {
     let filtered = calculos;
@@ -80,7 +80,7 @@ const CalculosSalvos = () => {
     setFilteredCalculos(filtered);
   }, [searchTerm, tipoFiltro, calculos]);
 
-  const carregarCalculos = async () => {
+  const carregarCalculos = useCallback(async () => {
     if (!user?.id) {
       setIsLoading(false);
       return;
@@ -102,7 +102,7 @@ const CalculosSalvos = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?.id]);
 
 
   if (isLoading) {

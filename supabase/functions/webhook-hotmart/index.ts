@@ -272,18 +272,16 @@ serve(async (req) => {
     })
 
     let isNewUser = false
-    let tokenDefinicaoSenha: string
 
-    // Gerar token seguro usando a função do banco
     const { data: tokenData, error: tokenError } = await supabase
       .rpc('gerar_token_seguro')
-    
+
     if (tokenError || !tokenData) {
       console.error('Erro ao gerar token:', tokenError)
       throw new Error('Falha ao gerar token de segurança')
     }
-    
-    tokenDefinicaoSenha = tokenData
+
+    const tokenDefinicaoSenha: string = tokenData
 
     let usuarioId: string | null = null
 

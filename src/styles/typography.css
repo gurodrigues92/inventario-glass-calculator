@@ -1,6 +1,6 @@
 
 /* Elementos de Destaque Clean */
-@layer components {
+
   .golden-accent {
     background: linear-gradient(135deg, #D1BFA3, #E5D4B1);
     -webkit-background-clip: text;
@@ -94,7 +94,7 @@
     font-size: 14px;
     line-height: 1.6;
   }
-}
+
 
 /* Mobile Typography Adjustments */
 @media (max-width: 768px) {
@@ -120,7 +120,7 @@
 }
 
 /* Responsive Typography Classes - Using utilities layer for higher specificity */
-@layer utilities {
+
   .title-responsive {
     font-size: clamp(1.25rem, 4vw, 2.5rem);
     line-height: 1.2;
@@ -135,4 +135,4 @@
     font-size: clamp(1.5rem, 5vw, 3rem);
     line-height: 1.1;
   }
-}
+

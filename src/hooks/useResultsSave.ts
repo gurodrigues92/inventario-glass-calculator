@@ -3,10 +3,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDiagnostico } from '@/contexts/DiagnosticoContext';
 import { parseCurrencyValue } from '../utils/formatters';
+import type { ResultadoCalculo } from '../utils/itcmdCalculator';
+import type { ResultsFormData } from './useResultsData';
+import type { DadosDiagnostico } from '@/contexts/DiagnosticoContext';
 
-export const useResultsSave = (resultado: any, formData: any, calculationType: string) => {
+export const useResultsSave = (resultado: ResultadoCalculo | null, formData: ResultsFormData | null, calculationType: string) => {
   const { user } = useAuth();
   const { dados: dadosDiagnostico } = useDiagnostico();
+  const diagnostico = dadosDiagnostico as DadosDiagnostico;
   const [calculoSalvoId, setCalculoSalvoId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const saveAttempted = useRef(false);
@@ -63,7 +67,7 @@ export const useResultsSave = (resultado: any, formData: any, calculationType: s
             email: user?.email || null,
             dadosCalculo,
             tipoCalculadora,
-            dadosDiagnostico
+            dadosDiagnostico: diagnostico
           }
         });
 
@@ -83,7 +87,7 @@ export const useResultsSave = (resultado: any, formData: any, calculationType: s
     };
 
     autoSaveCalculo();
-  }, [resultado, formData, calculationType, user, calculoSalvoId, isSaving]);
+  }, [resultado, formData, calculationType, user, calculoSalvoId, isSaving, diagnostico]);
 
   return {
     calculoSalvoId,

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import type { ResultadoCalculo, ResultadoRefinado } from '../utils/types/calculator';
 
 interface DadosUsuario {
   nome: string;
@@ -27,10 +28,10 @@ interface DadosCalculo {
   custoCustas: number;
   tempoEstimado?: string;
   percentualSobrePatrimonio?: number;
-  insights?: any;
-  alertas?: any;
-  detalhamento?: any;
-  comparacao?: any;
+  insights?: ResultadoCalculo['insights'];
+  alertas?: ResultadoCalculo['alertas'];
+  detalhamento?: ResultadoCalculo['detalhamento'];
+  comparacao?: ResultadoCalculo['comparacao'];
 }
 
 export const useCalculoStorage = () => {
@@ -141,7 +142,7 @@ export const useCalculoStorage = () => {
     }
   };
 
-  const salvarRefinamento = async (calculoOriginalId: string, dadosRefinados: any) => {
+  const salvarRefinamento = async (calculoOriginalId: string, dadosRefinados: ResultadoRefinado) => {
     setIsLoading(true);
     
     try {
@@ -154,7 +155,7 @@ export const useCalculoStorage = () => {
           ajustes: dadosRefinados.ajustes,
           isencoes: dadosRefinados.isencoes,
           comparativo: dadosRefinados.comparativo,
-          tem_litigio_refinado: dadosRefinados.temLitigioRefinado
+          tem_litigio_refinado: dadosRefinados.temLitigio
         })
         .select('id')
         .single();

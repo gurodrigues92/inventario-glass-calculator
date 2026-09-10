@@ -45,7 +45,7 @@ const handler = async (req: Request): Promise<Response> => {
       .gte('created_at', hoje.toISOString());
 
     if (error) {
-      throw new Error(`Error fetching logs: ${error.message}`);
+      throw new Error(`Error fetching logs: ${(error instanceof Error ? error.message : String(error))}`);
     }
 
     const stats: EstatisticasDia = {
@@ -177,10 +177,10 @@ const handler = async (req: Request): Promise<Response> => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error in enviar-resumo-diario:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: (error instanceof Error ? error.message : String(error)) }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

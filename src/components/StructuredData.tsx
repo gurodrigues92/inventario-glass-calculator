@@ -1,8 +1,12 @@
 import { Helmet } from 'react-helmet-async';
 
+type StructuredDataPayload = {
+  breadcrumbs?: Array<Record<string, unknown>>;
+};
+
 interface StructuredDataProps {
   type: 'WebApplication' | 'Calculator' | 'Organization' | 'FAQ' | 'HowTo' | 'BreadcrumbList';
-  data?: any;
+  data?: StructuredDataPayload;
 }
 
 const StructuredData = ({ type, data }: StructuredDataProps) => {

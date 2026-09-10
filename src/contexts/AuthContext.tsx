@@ -46,46 +46,79 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<{ 
-    success: boolean; 
-    error?: string; 
+  const login = async (email: string, password: string): Promise<{
+    success: boolean;
+    error?: string;
     message?: string;
     token?: string;
     needsPasswordDefinition?: boolean;
   }> => {
     try {
       setIsLoading(true);
-      
-      const { data, error } = await supabase.functions.invoke('auth-login', {
-        body: { email, password }
+
+      // Primeiro tenta autenticar com Supabase Auth nativo
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password: password
       });
 
-      if (error) {
-        console.error('Erro na função de login:', error);
-        return { success: false, error: 'Erro de conexão' };
+      if (authError) {
+        console.error('Erro de autenticação:', authError);
+
+        // Mensagens de erro amigáveis
+        if (authError.message.includes('Invalid login credentials')) {
+          return { success: false, error: 'E-mail ou senha incorretos' };
+        } else if (authError.message.includes('Email not confirmed')) {
+          return { success: false, error: 'E-mail não confirmado' };
+        } else {
+          return { success: false, error: 'Erro ao fazer login. Tente novamente.' };
+        }
       }
 
-      if (!data.success) {
-        // Verificar se é erro específico que precisa de redirecionamento
-        if (data.error === 'SENHA_NAO_DEFINIDA' || data.error === 'CONTA_INATIVA') {
-          console.log('Usuário precisa definir senha:', data);
-          return { 
-            success: false, 
-            error: data.error,
-            message: data.message,
-            token: data.token,
-            needsPasswordDefinition: true
+      // Se autenticou com sucesso, busca dados adicionais do usuário na tabela 'usuarios'
+      if (authData?.user) {
+        const { data: userData, error: userError } = await supabase
+          .from('usuarios')
+          .select('*')
+          .eq('email', email.trim().toLowerCase())
+          .single();
+
+        if (userError || !userData) {
+          // Se não encontrou na tabela usuarios, usa dados do auth
+          const basicUser: Usuario = {
+            id: authData.user.id,
+            nome: authData.user.email || '',
+            email: authData.user.email || '',
+            ativo: true,
+            created_at: authData.user.created_at,
+            updated_at: new Date().toISOString()
+          };
+
+          setUser(basicUser);
+          localStorage.setItem('inventario_user', JSON.stringify(basicUser));
+          localStorage.setItem('lastLoginCheck', Date.now().toString());
+
+          return { success: true };
+        }
+
+        // Verifica se usuário está ativo
+        if (!userData.ativo) {
+          await supabase.auth.signOut();
+          return {
+            success: false,
+            error: 'Conta inativa. Entre em contato com o suporte.'
           };
         }
-        return { success: false, error: data.message || data.error };
+
+        // Salvar usuário no estado e localStorage
+        setUser(userData);
+        localStorage.setItem('inventario_user', JSON.stringify(userData));
+        localStorage.setItem('lastLoginCheck', Date.now().toString());
+
+        return { success: true };
       }
-      
-      // Salvar usuário no estado e localStorage
-      setUser(data.user);
-      localStorage.setItem('inventario_user', JSON.stringify(data.user));
-      localStorage.setItem('lastLoginCheck', Date.now().toString());
-      
-      return { success: true };
+
+      return { success: false, error: 'Erro inesperado' };
     } catch (error) {
       console.error('Erro no login:', error);
       return { success: false, error: 'Erro inesperado' };
@@ -114,6 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {

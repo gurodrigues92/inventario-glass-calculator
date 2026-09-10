@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { formatCurrencyWithDecimals } from '../../utils/formatters';
 import GlassCard from '../GlassCard';
 import { useIsMobile } from '../../hooks/use-mobile';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, LabelList } from 'recharts';
-import { Trophy, TrendingDown } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 
 interface ComparisonSectionProps {
   custoTotalPF: number;
@@ -12,6 +11,46 @@ interface ComparisonSectionProps {
   custoTotalSA: number;
   patrimonio: number;
 }
+
+interface CustomLabelProps {
+  x?: number;
+  y?: number;
+  width?: number;
+  value?: number;
+  index?: number;
+  data: Array<{
+    name: string;
+    valor: number;
+    color: string;
+    percentual: string;
+  }>;
+  isMobile: boolean;
+}
+
+const CustomLabel = (props: CustomLabelProps) => {
+  const { x, y, width, value, index, data, isMobile } = props;
+  
+  if (index === undefined || !data[index]) return null;
+  
+  const item = data[index];
+  
+  // Default values to avoid NaN
+  const xPos = x !== undefined ? x : 0;
+  const widthVal = width !== undefined ? width : 0;
+  const yPos = y !== undefined ? y : 0;
+
+  return (
+    <text 
+      x={xPos + widthVal + 10} 
+      y={yPos + 15} 
+      fill={item.color} 
+      fontSize={isMobile ? 11 : 13}
+      fontWeight="600"
+    >
+      {value !== undefined ? formatCurrencyWithDecimals(value) : ''} ({item.percentual}%)
+    </text>
+  );
+};
 
 const ComparisonSection = ({ custoTotalPF, custoTotalLTDA, custoTotalSA, patrimonio }: ComparisonSectionProps) => {
   const isMobile = useIsMobile();
@@ -41,22 +80,6 @@ const ComparisonSection = ({ custoTotalPF, custoTotalLTDA, custoTotalSA, patrimo
   ];
 
   const maxValue = Math.max(...data.map(d => d.valor));
-
-  const CustomLabel = (props: any) => {
-    const { x, y, width, value, index } = props;
-    const item = data[index];
-    return (
-      <text 
-        x={x + width + 10} 
-        y={y + 15} 
-        fill={item.color} 
-        fontSize={isMobile ? 11 : 13}
-        fontWeight="600"
-      >
-        {formatCurrencyWithDecimals(value)} ({item.percentual}%)
-      </text>
-    );
-  };
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -117,7 +140,7 @@ const ComparisonSection = ({ custoTotalPF, custoTotalLTDA, custoTotalSA, patrimo
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
-                <LabelList content={<CustomLabel />} />
+                <LabelList content={(props: any) => <CustomLabel {...props} data={data} isMobile={isMobile} />} />
               </Bar>
             </BarChart>
           </ResponsiveContainer>
@@ -210,8 +233,8 @@ const ComparisonSection = ({ custoTotalPF, custoTotalLTDA, custoTotalSA, patrimo
               <tr style={{ borderBottom: '1px solid #F0EBE6' }}>
                 <td className={`${isMobile ? 'py-2 text-xs' : 'py-3 text-sm'}`} style={{ color: '#476D9E' }}>ITBI</td>
                 <td className={`text-center ${isMobile ? 'py-2 text-xs' : 'py-3 text-sm'}`} style={{ color: '#E74C3C' }}>N/A</td>
-                <td className={`text-center ${isMobile ? 'py-2 text-xs' : 'py-3 text-sm'}`} style={{ color: '#F39C12' }}>3%</td>
-                <td className={`text-center ${isMobile ? 'py-2 text-xs' : 'py-3 text-sm'}`} style={{ color: '#27AE60' }}>N/A</td>
+                <td className={`text-center ${isMobile ? 'py-2 text-xs' : 'py-3 text-sm'}`} style={{ color: '#F39C12' }}>3%*</td>
+                <td className={`text-center ${isMobile ? 'py-2 text-xs' : 'py-3 text-sm'} font-bold`} style={{ color: '#27AE60' }}>Isento**</td>
               </tr>
               <tr style={{ background: 'rgba(209, 191, 163, 0.1)' }}>
                 <td className={`${isMobile ? 'py-3 text-sm' : 'py-4 text-base'} font-bold`} style={{ color: '#0C2C45' }}>TOTAL</td>
@@ -229,8 +252,14 @@ const ComparisonSection = ({ custoTotalPF, custoTotalLTDA, custoTotalSA, patrimo
           </table>
         </div>
 
+        {/* Notas de rodapé ITBI */}
+        <div className={`mt-4 space-y-1 ${isMobile ? 'text-xs' : 'text-xs'}`} style={{ color: '#9FB7D4' }}>
+          <div>* ITBI de 3% incide sobre a diferença entre o valor de mercado e o valor histórico declarado no IR dos imóveis transferidos para a Holding LTDA.</div>
+          <div>** A isenção de ITBI na Holding S/A é condicional: a receita de aluguéis não pode ultrapassar 50% da receita total da empresa. Caso contrário, o ITBI será cobrado normalmente.</div>
+        </div>
+
         {/* Legenda */}
-        <div className={`mt-6 flex flex-wrap gap-4 justify-center ${isMobile ? 'text-xs' : 'text-sm'}`}>
+        <div className={`mt-4 flex flex-wrap gap-4 justify-center ${isMobile ? 'text-xs' : 'text-sm'}`}>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full" style={{ background: '#E74C3C' }} />
             <span style={{ color: '#476D9E' }}>Maior custo</span>
@@ -241,7 +270,7 @@ const ComparisonSection = ({ custoTotalPF, custoTotalLTDA, custoTotalSA, patrimo
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full" style={{ background: '#27AE60' }} />
-            <span style={{ color: '#476D9E' }}>Mais econômico</span>
+            <span style={{ color: '#476D9E' }}>Maior segurança na sucessão e menor custo</span>
           </div>
         </div>
       </GlassCard>

@@ -11,7 +11,7 @@ interface PatrimonioInputProps {
 
 const PatrimonioInput = ({ value, onChange, error }: PatrimonioInputProps) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let inputValue = e.target.value.replace(/\D/g, '');
+    const inputValue = e.target.value.replace(/\D/g, '');
     
     if (inputValue) {
       const numericValue = parseInt(inputValue);

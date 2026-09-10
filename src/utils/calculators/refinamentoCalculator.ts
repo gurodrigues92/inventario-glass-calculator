@@ -10,7 +10,7 @@ const parseCurrencyToNumber = (value: string | undefined): number => {
 };
 
 export const aplicarRefinamentos = (calculoBase: ResultadoCalculo, dadosRefinados: DadosRefinamento): ResultadoRefinado => {
-  let calculoRefinado = { ...calculoBase };
+  const calculoRefinado = { ...calculoBase };
   const ajustes: Array<{ nome: string; impacto: string; descricao: string }> = [];
   const isencoes: Array<{ tipo: string; valor: number }> = [];
 

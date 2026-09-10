@@ -25,15 +25,10 @@ export default function ReenviarAtivacao() {
   const [processando, setProcessando] = useState<string | null>(null);
   const [mensagem, setMensagem] = useState<{ tipo: 'success' | 'error', texto: string } | null>(null);
 
-  // Verificar se é admin (você pode adicionar uma coluna 'is_admin' na tabela usuarios)
-  // Por enquanto, vamos apenas verificar se está autenticado
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
   useEffect(() => {
+    if (!user) return;
     carregarUsuariosPendentes();
-  }, []);
+  }, [user]);
 
   const carregarUsuariosPendentes = async () => {
     setIsLoading(true);
@@ -83,6 +78,10 @@ export default function ReenviarAtivacao() {
       setProcessando(null);
     }
   };
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-animated">

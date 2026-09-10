@@ -1,6 +1,6 @@
 
 /* Badge Styles Premium */
-@layer components {
+
   .badge-fast {
     background: linear-gradient(135deg, var(--accent-green), #059669) !important;
     color: white !important;
@@ -104,7 +104,7 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
-}
+
 
 /* Badge Animation Effects */
 @keyframes badge-pulse {

@@ -1,5 +1,5 @@
 // Teste rápido da auditoria ITCMD para identificar problemas
-import { executarAuditoriaITCMD, testarEstadosSuspeitos } from './auditoria/itcmdAuditoria';
+import { executarAuditoriaITCMD, testarEstadosSuspeitos, type EstadoSuspeito, type FaixaDetalhada } from './auditoria/itcmdAuditoria';
 
 // Função para executar teste rápido e mostrar resultados no console
 export const executarTesteRapido = () => {
@@ -37,12 +37,12 @@ export const executarTesteRapido = () => {
   console.log('🔍 ANÁLISE DOS ESTADOS SUSPEITOS:\n');
   const suspeitos = testarEstadosSuspeitos();
   
-  Object.entries(suspeitos).forEach(([uf, dados]: [string, any]) => {
+  Object.entries(suspeitos).forEach(([uf, dados]: [string, EstadoSuspeito]) => {
     console.log(`${uf} - ${dados.nome}:`);
     console.log(`  Imposto Total: R$ ${dados.impostoTotal.toLocaleString()}`);
     console.log(`  Alíquota Efetiva: ${dados.aliquotaEfetiva}`);
     console.log(`  Cálculo detalhado:`);
-    dados.calculoDetalhado.forEach((faixa: any) => {
+    dados.calculoDetalhado.forEach((faixa: FaixaDetalhada) => {
       console.log(`    ${faixa.faixa}: ${faixa.aliquota} sobre R$ ${faixa.valorIncidencia.toLocaleString()} = R$ ${faixa.impostoFaixa.toLocaleString()}`);
     });
     console.log('');

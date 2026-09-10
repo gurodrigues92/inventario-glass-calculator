@@ -67,7 +67,7 @@ export const calcularCustosInventario = (dados: DadosCalculoInventario): Resulta
     detalhamento: {
       itcmd: {
         valor: itcmdResult.valor,
-        percentual: baseCalculo > 0 ? (itcmdResult.valor / baseCalculo * 100) : 0,
+        percentual: patrimonio > 0 ? (itcmdResult.valor / patrimonio * 100) : 0,
         descricao: itcmdResult.descricao
       },
       honorarios: {

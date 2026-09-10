@@ -1,11 +1,18 @@
 
 import { useState } from 'react';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+// import jsPDF from 'jspdf'; // Dynamically imported
+// import html2canvas from 'html2canvas'; // Dynamically imported
 import { formatCurrencyWithDecimals } from '../utils/formatters';
 
+type PdfData = {
+  total: number;
+  patrimonio: number;
+  estado: string;
+  tipoProcesso: string;
+};
+
 // Função para validar e criar dados padrão
-const validateAndCreateDefaultData = (data: any) => {
+const validateAndCreateDefaultData = (data?: Partial<PdfData>): PdfData => {
   return {
     total: data?.total || 0,
     patrimonio: data?.patrimonio || 0,
@@ -76,12 +83,7 @@ export const usePDF = () => {
   const generatePDF = async (
     elementId: string, 
     fileName: string = 'relatorio-inventario.pdf',
-    data?: {
-      total: number;
-      patrimonio: number;
-      estado: string;
-      tipoProcesso: string;
-    }
+    data?: Partial<PdfData>
   ) => {
     setIsGenerating(true);
     
@@ -90,6 +92,9 @@ export const usePDF = () => {
     console.log('Dados validados para PDF:', validatedData);
     
     try {
+      // Dynamic imports to reduce initial bundle size
+      const jsPDF = (await import('jspdf')).default;
+      const html2canvas = (await import('html2canvas')).default;
 
       // Aguardar renderização inicial
       await new Promise(resolve => setTimeout(resolve, 800));
@@ -196,174 +201,103 @@ export const usePDF = () => {
       let yPos = 40;
       pdf.text(`Estado: ${validatedData.estado}`, margin, yPos);
       yPos += 6;
-      pdf.text(`Tipo de Processo: ${validatedData.tipoProcesso}`, margin, yPos);
+      pdf.text(`Tipo de Processo: ${validatedData.tipoProcesso === 'extrajudicial' ? 'Extrajudicial (Cartório)' : 'Judicial'}`, margin, yPos);
       yPos += 6;
-      pdf.text(`Patrimônio: ${formatCurrencyWithDecimals(validatedData.patrimonio)}`, margin, yPos);
+      pdf.text(`Patrimônio Declarado: ${formatCurrencyWithDecimals(validatedData.patrimonio)}`, margin, yPos);
       yPos += 6;
-      pdf.text(`Custo Total: ${formatCurrencyWithDecimals(validatedData.total)}`, margin, yPos);
-      yPos += 6;
+      pdf.text(`Custo Total Estimado: ${formatCurrencyWithDecimals(validatedData.total)}`, margin, yPos);
+      yPos += 10;
       
-      pdf.setFontSize(8);
-      pdf.setTextColor(150, 150, 150);
-      pdf.text('────────────────────────────────────────────────────────────────────────', margin, yPos + 3);
+      pdf.setLineWidth(0.5);
+      pdf.setDrawColor(200, 200, 200);
+      pdf.line(margin, yPos, pageWidth - margin, yPos);
+      yPos += 10;
 
       // Adicionar imagem da página 1
       const imgWidth1 = contentWidth;
       const imgHeight1 = (canvas1.height * imgWidth1) / canvas1.width;
-      const startY1 = 55; // Sempre usar posição com dados
       
-      pdf.addImage(imgData1, 'PNG', margin, startY1, imgWidth1, imgHeight1, undefined, 'FAST');
-
-      // PÁGINA 2 - HOLDING S/A E CTA com retry robusto
-      const page2Element = await waitForElement('results-page-2');
-
-      console.log('Capturando página 2 (holding e CTA)');
-      const canvas2 = await html2canvas(page2Element, {
-        scale: 3, // Maior qualidade
-        useCORS: true,
-        allowTaint: false,
-        backgroundColor: '#ffffff',
-        removeContainer: false,
-        imageTimeout: 45000,
-        scrollX: 0,
-        scrollY: 0,
-        width: page2Element.scrollWidth,
-        height: page2Element.scrollHeight,
-        windowWidth: window.innerWidth,
-        windowHeight: window.innerHeight,
-        logging: true,
-        foreignObjectRendering: false, // Melhor compatibilidade
-        ignoreElements: (element) => {
-          const htmlElement = element as HTMLElement;
-          return element.classList?.contains('loading') || 
-                 element.classList?.contains('skeleton') ||
-                 htmlElement.style?.display === 'none' ||
-                 htmlElement.style?.visibility === 'hidden';
-        },
-        onclone: (clonedDoc, element) => {
-          const clonedElement = clonedDoc.getElementById('results-page-2');
-          if (clonedElement) {
-            // Aplicar estilos para impressão
-            clonedElement.style.backgroundColor = '#ffffff';
-            clonedElement.style.padding = '20px';
-            clonedElement.style.minHeight = 'auto';
-            clonedElement.style.pageBreakBefore = 'auto';
-            clonedElement.style.transform = 'none';
-            clonedElement.style.filter = 'none';
-            
-            // Forçar aplicação de estilos em todos os elementos
-            const allElements = clonedElement.querySelectorAll('*') as NodeListOf<HTMLElement>;
-            allElements.forEach((el) => {
-              // Garantir texto visível
-              const computedStyle = window.getComputedStyle(el);
-              if (el.style.color === 'transparent' || el.style.color === '' || computedStyle.color === 'rgba(0, 0, 0, 0)') {
-                el.style.color = '#000000 !important';
-              }
-              
-              // Aplicar backgrounds de gradiente como cores sólidas
-              if (el.classList.contains('bg-gradient-to-br') || el.classList.contains('bg-gradient-to-r')) {
-                el.style.background = '#f8fafc !important';
-                el.style.backgroundImage = 'none !important';
-              }
-              
-              // Glass cards - aplicar background sólido
-              if (el.classList.contains('glass-card') || el.classList.contains('backdrop-blur')) {
-                el.style.backgroundColor = 'rgba(255, 255, 255, 0.95) !important';
-                el.style.backdropFilter = 'none !important';
-                el.style.border = '1px solid rgba(0, 0, 0, 0.1) !important';
-                el.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1) !important';
-              }
-              
-              // Botões e elementos interativos
-              if (el.tagName === 'BUTTON' || el.classList.contains('btn')) {
-                el.style.backgroundColor = '#3b82f6 !important';
-                el.style.color = '#ffffff !important';
-                el.style.border = '1px solid #3b82f6 !important';
-              }
-              
-              // Textos coloridos - garantir contraste
-              if (el.style.color?.includes('hsl') || computedStyle.color?.includes('hsl')) {
-                el.style.color = '#1e293b !important';
-              }
-            });
-          }
-        }
-      });
-
-      const imgData2 = canvas2.toDataURL('image/png', 1.0);
-
-      // Adicionar nova página
-      pdf.addPage();
-
-      // Header da página 2
-      pdf.setFontSize(16);
-      pdf.setTextColor(12, 44, 69);
-      pdf.text('Planejamento Sucessório - Estratégia Avançada', margin, 20);
+      // Se a imagem for maior que o espaço restante, adicionar em nova página?
+      // Neste caso, vamos apenas adicionar
+      pdf.addImage(imgData1, 'PNG', margin, yPos, imgWidth1, imgHeight1);
       
+      // Rodapé página 1
       pdf.setFontSize(8);
       pdf.setTextColor(150, 150, 150);
-      pdf.text('────────────────────────────────────────────────────────────────────────', margin, 25);
+      pdf.text('Inventário Simplificado - Página 1 de 2', pageWidth / 2, pageHeight - 10, { align: 'center' });
 
-      // Adicionar imagem da página 2
-      const imgWidth2 = contentWidth;
-      const imgHeight2 = (canvas2.height * imgWidth2) / canvas2.width;
-      const startY2 = 35;
-      
-      pdf.addImage(imgData2, 'PNG', margin, startY2, imgWidth2, imgHeight2, undefined, 'FAST');
-
-      // Footer em todas as páginas
-      const pageCount = pdf.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        pdf.setPage(i);
-        pdf.setFontSize(7);
-        pdf.setTextColor(120, 120, 120);
+      // PÁGINA 2 - GRÁFICOS E COMPARAÇÃO
+      try {
+        console.log('Capturando página 2 (gráficos e comparação)');
+        const page2Element = await waitForElement('results-page-2', 5); // Menos retries pois já deve estar carregado
         
-        // Footer esquerdo
-        pdf.text('Inventário Descomplicado - Cálculo estimativo baseado na legislação atual', margin, pageHeight - 5);
+        pdf.addPage();
         
-        // Footer direito (número da página)
-        const pageText = `Página ${i} de ${pageCount}`;
-        const pageTextWidth = pdf.getStringUnitWidth(pageText) * 7 / pdf.internal.scaleFactor;
-        pdf.text(pageText, pageWidth - margin - pageTextWidth, pageHeight - 5);
+        // Header da página 2
+        pdf.setFontSize(14);
+        pdf.setTextColor(12, 44, 69);
+        pdf.text('Análise Comparativa e Gráficos', margin, 20);
+        
+        const canvas2 = await html2canvas(page2Element, {
+          scale: 3,
+          useCORS: true,
+          allowTaint: false,
+          backgroundColor: '#ffffff',
+          removeContainer: false,
+          imageTimeout: 45000,
+          scrollX: 0,
+          scrollY: 0,
+          width: page2Element.scrollWidth,
+          height: page2Element.scrollHeight,
+          windowWidth: window.innerWidth,
+          windowHeight: window.innerHeight,
+          logging: true,
+          foreignObjectRendering: false,
+          ignoreElements: (element) => {
+            const htmlElement = element as HTMLElement;
+            return element.classList?.contains('loading') || 
+                   htmlElement.style?.display === 'none' ||
+                   htmlElement.style?.visibility === 'hidden';
+          },
+          onclone: (clonedDoc, element) => {
+            const clonedElement = clonedDoc.getElementById('results-page-2');
+            if (clonedElement) {
+              clonedElement.style.backgroundColor = '#ffffff';
+              clonedElement.style.padding = '20px';
+              clonedElement.style.minHeight = 'auto';
+              clonedElement.style.transform = 'none';
+              
+              // Ajustes específicos para gráficos
+              const charts = clonedElement.querySelectorAll('.recharts-wrapper');
+              charts.forEach((chart: any) => {
+                chart.style.backgroundColor = '#ffffff';
+              });
+            }
+          }
+        });
+        
+        const imgData2 = canvas2.toDataURL('image/png', 1.0);
+        const imgWidth2 = contentWidth;
+        const imgHeight2 = (canvas2.height * imgWidth2) / canvas2.width;
+        
+        pdf.addImage(imgData2, 'PNG', margin, 30, imgWidth2, imgHeight2);
+        
+        // Rodapé página 2
+        pdf.setFontSize(8);
+        pdf.setTextColor(150, 150, 150);
+        pdf.text('Inventário Simplificado - Página 2 de 2', pageWidth / 2, pageHeight - 10, { align: 'center' });
+        
+      } catch (page2Error) {
+        console.warn('Não foi possível gerar a página 2 (opcional):', page2Error);
+        // Não falhar o processo se a página 2 falhar (pode não ter conteúdo suficiente)
       }
-
-      console.log('PDF gerado com sucesso:', { 
-        fileName, 
-        pages: pageCount,
-        page1Size: `${(imgData1.length * 0.75 / 1024).toFixed(0)}KB`,
-        page2Size: `${(imgData2.length * 0.75 / 1024).toFixed(0)}KB`
-      });
-
+      
+      console.log('Salvando PDF final');
       pdf.save(fileName);
-      return true;
-    } catch (error) {
-      console.error('Erro detalhado ao gerar PDF:', {
-        error,
-        message: error instanceof Error ? error.message : 'Erro desconhecido',
-        stack: error instanceof Error ? error.stack : undefined,
-        validatedData
-      });
       
-      if (error instanceof Error) {
-        // Erros específicos de elementos DOM
-        if (error.message.includes('não foi encontrado') || error.message.includes('não carregou')) {
-          throw new Error(`Conteúdo da página não foi carregado. Aguarde alguns segundos e tente novamente. Se o problema persistir, recarregue a página.`);
-        } 
-        // Erros do html2canvas
-        else if (error.message.includes('timeout') || error.message.includes('canvas')) {
-          throw new Error('Falha na captura da página. Verifique sua conexão de internet e tente novamente.');
-        } 
-        // Erros do jsPDF
-        else if (error.message.includes('jsPDF') || error.message.includes('PDF')) {
-          throw new Error('Erro interno na geração do PDF. Tente novamente em alguns segundos.');
-        }
-        // Erro genérico
-        else {
-          throw new Error(`Erro na geração do PDF: ${error.message}. Dados usados: Estado: ${validatedData.estado}, Processo: ${validatedData.tipoProcesso}`);
-        }
-      } else {
-        throw new Error('Erro desconhecido ao gerar PDF. Verifique se a página está totalmente carregada e tente novamente.');
-      }
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      throw error;
     } finally {
       setIsGenerating(false);
     }

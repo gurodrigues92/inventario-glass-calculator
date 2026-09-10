@@ -86,6 +86,7 @@ export function DiagnosticoProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useDiagnostico() {
   const context = useContext(DiagnosticoContext);
   if (!context) {

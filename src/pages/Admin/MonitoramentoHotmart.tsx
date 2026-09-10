@@ -26,7 +26,7 @@ interface Compra {
   erro_mensagem?: string;
   erro_stack?: string;
   etapa_falha?: string;
-  webhook_payload?: any;
+  webhook_payload?: Record<string, unknown>;
   produto?: string;
 }
 
@@ -89,7 +89,7 @@ export default function MonitoramentoHotmart() {
           toast.error(`⚠️ Taxa de erro elevada: ${((erro / data.length) * 100).toFixed(1)}%`);
         }
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Erro ao carregar compras:', error);
       toast.error('Erro ao carregar dados');
     } finally {

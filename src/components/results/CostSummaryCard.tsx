@@ -1,11 +1,11 @@
 import React from 'react';
 import { formatCurrencyWithDecimals, numeroParaExtenso } from '../../utils/formatters';
 import GlassCard from '../GlassCard';
-import { DadosCalculoInventario } from '../../utils/itcmdCalculator';
+import { DadosCalculoInventario, ResultadoCalculo } from '../../utils/itcmdCalculator';
 import { useIsMobile } from '../../hooks/use-mobile';
 
 interface CostSummaryCardProps {
-  resultado: any;
+  resultado: ResultadoCalculo;
   dadosCalculo: DadosCalculoInventario;
 }
 

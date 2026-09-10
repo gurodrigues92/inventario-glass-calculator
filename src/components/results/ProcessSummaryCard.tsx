@@ -1,9 +1,10 @@
 import React from 'react';
 import GlassCard from '../GlassCard';
 import { useIsMobile } from '../../hooks/use-mobile';
+import type { ResultsFormData } from '../../hooks/useResultsData';
 
 interface ProcessSummaryCardProps {
-  formData: any;
+  formData: ResultsFormData;
 }
 
 const ProcessSummaryCard = ({ formData }: ProcessSummaryCardProps) => {

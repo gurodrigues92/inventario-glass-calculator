@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams, Navigate, Link } from 'react-router-dom';
+import { useNavigate, Navigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
@@ -10,10 +10,9 @@ import { Loader2, Eye, EyeOff, CheckCircle, Gem, ArrowLeft } from 'lucide-react'
 
 export default function RedefinirSenha() {
   const { isAuthenticated } = useAuth();
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const token = searchParams.get('token');
 
+  const [isReady, setIsReady] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -22,25 +21,35 @@ export default function RedefinirSenha() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  // Redirecionar se já estiver logado
-  if (isAuthenticated) {
+  useEffect(() => {
+    // Com implicit flow, o GoTrue redireciona com #access_token=...&type=recovery no hash
+    // O Supabase client processa o hash e dispara PASSWORD_RECOVERY via onAuthStateChange
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY' && session) {
+        setIsReady(true);
+        setError('');
+      }
+    });
+
+    // Fallback direto: checa se o hash da URL já indica recovery (pode ter sido processado antes do useEffect)
+    const hash = window.location.hash;
+    if (hash.includes('type=recovery') || hash.includes('access_token')) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) setIsReady(true);
+      });
+    }
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Redirecionar se já estiver logado (mas não durante o fluxo de recovery)
+  if (isAuthenticated && !isReady) {
     return <Navigate to="/" replace />;
   }
-
-  useEffect(() => {
-    if (!token) {
-      setError('Token de recuperação não encontrado na URL');
-    }
-  }, [token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
-    if (!token) {
-      setError('Token de recuperação inválido');
-      return;
-    }
 
     if (password.length < 6) {
       setError('A senha deve ter pelo menos 6 caracteres');
@@ -55,29 +64,22 @@ export default function RedefinirSenha() {
     setIsLoading(true);
 
     try {
-      // Reutilizar a edge function definir-senha
-      const { data, error } = await supabase.functions.invoke('definir-senha', {
-        body: { token, password }
-      });
+      const { error } = await supabase.auth.updateUser({ password });
 
       if (error) {
-        console.error('Erro na função definir-senha:', error);
-        setError('Erro de conexão. Tente novamente.');
-        return;
-      }
-
-      if (!data.success) {
-        setError(data.error);
+        console.error('Erro ao redefinir senha:', error);
+        setError('Erro ao redefinir senha. Tente novamente.');
         return;
       }
 
       setSuccess(true);
+      await supabase.auth.signOut();
       setTimeout(() => {
         navigate('/login');
       }, 3000);
 
-    } catch (error) {
-      console.error('Erro ao redefinir senha:', error);
+    } catch (err) {
+      console.error('Erro ao redefinir senha:', err);
       setError('Erro inesperado. Tente novamente.');
     } finally {
       setIsLoading(false);
@@ -134,6 +136,35 @@ export default function RedefinirSenha() {
               >
                 Ir para Login
               </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Aguardando o evento PASSWORD_RECOVERY do Supabase
+  if (!isReady) {
+    return (
+      <div className="min-h-screen bg-animated flex items-center justify-center p-4">
+        <Card
+          className="w-full max-w-md shadow-xl border-0"
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            border: '1px solid #E8E2DD',
+            boxShadow: '0 8px 24px rgba(12, 44, 69, 0.16)'
+          }}
+        >
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <Loader2 className="mx-auto h-12 w-12 animate-spin mb-4" style={{ color: '#476D9E' }} />
+              <p style={{ color: '#476D9E' }}>Verificando link de recuperação...</p>
+              <p className="text-sm mt-3" style={{ color: '#9FB7D4' }}>
+                Se esta tela não carregar, o link pode ter expirado.{' '}
+                <Link to="/recuperar-senha" style={{ color: '#476D9E', fontWeight: 600 }}>
+                  Solicitar novo link
+                </Link>
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -304,23 +335,23 @@ export default function RedefinirSenha() {
 
               <button
                 type="submit"
-                disabled={isLoading || !token}
+                disabled={isLoading}
                 className="w-full font-semibold py-3 px-4 rounded-lg transition-all duration-300"
                 style={{
                   background: 'linear-gradient(135deg, #0C2C45, #476D9E)',
                   color: '#FFFFFF',
                   border: 'none',
                   boxShadow: '0 4px 16px rgba(12, 44, 69, 0.2)',
-                  cursor: (isLoading || !token) ? 'not-allowed' : 'pointer'
+                  cursor: isLoading ? 'not-allowed' : 'pointer'
                 }}
                 onMouseEnter={(e) => {
-                  if (!isLoading && token) {
+                  if (!isLoading) {
                     (e.target as HTMLElement).style.transform = 'translateY(-2px)';
                     (e.target as HTMLElement).style.boxShadow = '0 8px 24px rgba(12, 44, 69, 0.3)';
                   }
                 }}
                 onMouseLeave={(e) => {
-                  if (!isLoading && token) {
+                  if (!isLoading) {
                     (e.target as HTMLElement).style.transform = 'translateY(0)';
                     (e.target as HTMLElement).style.boxShadow = '0 4px 16px rgba(12, 44, 69, 0.2)';
                   }

@@ -1,11 +1,13 @@
 import React from 'react';
 import { formatCurrencyWithDecimals, numeroParaExtenso } from '../../utils/formatters';
 import GlassCard from '../GlassCard';
+import type { ResultadoCalculo } from '../../utils/itcmdCalculator';
 import { useIsMobile } from '../../hooks/use-mobile';
+import type { ResultsFormData } from '../../hooks/useResultsData';
 
 interface CostBreakdownCardProps {
-  resultado: any;
-  formData: any;
+  resultado: ResultadoCalculo;
+  formData: ResultsFormData;
 }
 
 const CostBreakdownCard = ({ resultado, formData }: CostBreakdownCardProps) => {

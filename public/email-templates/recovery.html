@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redefinição de Senha - Inventário Descomplicado</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #F5EFEB;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+    <div style="background: white; border-radius: 16px; padding: 40px; box-shadow: 0 8px 24px rgba(12, 44, 69, 0.16);">
+
+      <!-- Logo -->
+      <div style="text-align: center; margin-bottom: 30px;">
+        <div style="width: 56px; height: 56px; background: #0C2C45; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; transform: rotate(45deg); box-shadow: 0 4px 16px rgba(12, 44, 69, 0.2);">
+          <span style="transform: rotate(-45deg); font-size: 28px; color: white;">💎</span>
+        </div>
+        <h1 style="color: #0C2C45; margin: 20px 0 4px 0; font-size: 22px; font-weight: 700;">Inventário Descomplicado</h1>
+      </div>
+
+      <!-- Conteúdo -->
+      <h2 style="color: #0C2C45; font-size: 20px; margin-bottom: 16px;">Redefinição de Senha</h2>
+
+      <p style="color: #476D9E; line-height: 1.6; margin-bottom: 20px;">
+        Olá! Recebemos uma solicitação para redefinir a senha da sua conta.
+        Se foi você, clique no botão abaixo para criar uma nova senha:
+      </p>
+
+      <!-- Botão -->
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="{{ .ConfirmationURL }}"
+           style="display: inline-block; background: linear-gradient(135deg, #0C2C45, #476D9E); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 16px rgba(12, 44, 69, 0.2);">
+          Redefinir Senha
+        </a>
+      </div>
+
+      <!-- Link alternativo -->
+      <p style="color: #476D9E; font-size: 14px; line-height: 1.6; margin-top: 24px;">
+        Ou copie e cole este link no seu navegador:
+      </p>
+      <p style="color: #476D9E; font-size: 12px; word-break: break-all; background: #F5EFEB; padding: 12px; border-radius: 6px;">
+        {{ .ConfirmationURL }}
+      </p>
+
+      <!-- Aviso -->
+      <div style="border-top: 1px solid #E8E2DD; margin-top: 30px; padding-top: 20px;">
+        <p style="color: #476D9E; font-size: 14px; line-height: 1.6;">
+          <strong>⚠️ Este link expira em 24 horas.</strong>
+        </p>
+        <p style="color: #476D9E; font-size: 14px; line-height: 1.6;">
+          Se você não solicitou a redefinição de senha, ignore este e-mail.
+          Sua conta permanecerá segura.
+        </p>
+      </div>
+    </div>
+
+    <p style="text-align: center; color: #9FB7D4; font-size: 12px; margin-top: 20px;">
+      © 2026 Inventário Descomplicado. Todos os direitos reservados.
+    </p>
+  </div>
+</body>
+</html>
